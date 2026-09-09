@@ -19,7 +19,8 @@ public class Institution {
     @Column(nullable = false)
     private String name;
 
-    private String type;
+    private InstitutionType institutionType;
+
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", nullable = false)

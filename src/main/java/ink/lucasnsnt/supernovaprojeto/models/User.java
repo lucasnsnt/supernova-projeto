@@ -32,6 +32,7 @@ public class User {
 
     private String phone;
 
+    @Column(nullable = false)
     private LocalDate dateOfBirth;
 
     @Column(nullable = false)
@@ -51,4 +52,12 @@ public class User {
             registrationDate = LocalDateTime.now();
         }
     }
+
+    private byte age(){
+        if(dateOfBirth == null){
+            return 0;
+        }
+        return (byte) ((LocalDate.now().getYear() + LocalDate.now().getMonthValue()) - dateOfBirth.getYear());
+    };
+
 }
