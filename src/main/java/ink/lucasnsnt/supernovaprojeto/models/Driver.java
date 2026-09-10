@@ -1,5 +1,6 @@
 package ink.lucasnsnt.supernovaprojeto.models;
 
+import ink.lucasnsnt.supernovaprojeto.models.enums.DriverStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

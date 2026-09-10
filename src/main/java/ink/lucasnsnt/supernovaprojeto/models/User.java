@@ -1,5 +1,6 @@
 package ink.lucasnsnt.supernovaprojeto.models;
 
+import ink.lucasnsnt.supernovaprojeto.models.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -18,6 +19,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(nullable = false)

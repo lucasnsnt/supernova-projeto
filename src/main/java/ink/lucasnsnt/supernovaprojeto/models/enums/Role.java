@@ -1,4 +1,4 @@
-package ink.lucasnsnt.supernovaprojeto.models;
+package ink.lucasnsnt.supernovaprojeto.models.enums;
 
 public enum Role {
     STUDENT,
