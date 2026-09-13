@@ -4,6 +4,10 @@ import ink.lucasnsnt.supernovaprojeto.models.*;
 import ink.lucasnsnt.supernovaprojeto.models.enums.Direction;
 import ink.lucasnsnt.supernovaprojeto.models.enums.InstitutionType;
 import ink.lucasnsnt.supernovaprojeto.models.enums.Role;
+import ink.lucasnsnt.supernovaprojeto.repositories.DriverStudentLinkRepository;
+import ink.lucasnsnt.supernovaprojeto.repositories.StudentScheduleRepository;
+import ink.lucasnsnt.supernovaprojeto.repositories.UserRepository;
+import ink.lucasnsnt.supernovaprojeto.repositories.VehicleRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,18 @@ class JpaRelationshipTests {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private VehicleRepository vehicleRepository;
+
+    @Autowired
+    private StudentScheduleRepository studentScheduleRepository;
+
+    @Autowired
+    private DriverStudentLinkRepository driverStudentLinkRepository;
 
     @Test
     void shouldPersistAndNavigateMainRelationships() {
@@ -85,6 +101,13 @@ class JpaRelationshipTests {
         assertThat(persistedStudent.getSchedules()).hasSize(1);
         assertThat(persistedStudent.getDriverLinks().getFirst().getDriver().getId())
                 .isEqualTo(persistedDriver.getId());
+
+        assertThat(userRepository.findByEmailIgnoreCase("MOTORISTA@SUPERNOVA.TEST")).isPresent();
+        assertThat(vehicleRepository.findAllByDriverId(persistedDriver.getId())).hasSize(1);
+        assertThat(studentScheduleRepository.findAllByStudentId(persistedStudent.getId())).hasSize(1);
+        assertThat(driverStudentLinkRepository
+                .findByDriverIdAndStudentId(persistedDriver.getId(), persistedStudent.getId()))
+                .isPresent();
     }
 
     private User user(String name, String email, Role role) {
