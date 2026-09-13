@@ -2,6 +2,7 @@ package ink.lucasnsnt.supernovaprojeto;
 
 import ink.lucasnsnt.supernovaprojeto.models.*;
 import ink.lucasnsnt.supernovaprojeto.models.enums.Direction;
+import ink.lucasnsnt.supernovaprojeto.models.enums.DriverStudentLinkStatus;
 import ink.lucasnsnt.supernovaprojeto.models.enums.InstitutionType;
 import ink.lucasnsnt.supernovaprojeto.models.enums.Role;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverStudentLinkRepository;
@@ -80,6 +81,7 @@ class JpaRelationshipTests {
 
         DriverStudentLink link = DriverStudentLink.builder()
                 .startDate(LocalDate.now())
+                .status(DriverStudentLinkStatus.ACTIVE)
                 .build();
         driver.addStudentLink(link);
         student.addDriverLink(link);
@@ -106,7 +108,8 @@ class JpaRelationshipTests {
         assertThat(vehicleRepository.findAllByDriverId(persistedDriver.getId())).hasSize(1);
         assertThat(studentScheduleRepository.findAllByStudentId(persistedStudent.getId())).hasSize(1);
         assertThat(driverStudentLinkRepository
-                .findByDriverIdAndStudentId(persistedDriver.getId(), persistedStudent.getId()))
+                .findFirstByDriverIdAndStudentIdAndStatus(
+                        persistedDriver.getId(), persistedStudent.getId(), DriverStudentLinkStatus.ACTIVE))
                 .isPresent();
     }
 

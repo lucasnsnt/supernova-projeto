@@ -36,10 +36,14 @@ public class DriverInvite {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private InviteStatus status = InviteStatus.PENDING;
+    private InviteStatus status = InviteStatus.ACTIVE;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    private LocalDateTime revokedAt;
+
+    private LocalDateTime expiredAt;
 
     @PrePersist
     private void prePersist() {

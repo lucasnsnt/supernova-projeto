@@ -16,4 +16,6 @@ public interface DriverInviteRepository extends JpaRepository<DriverInvite, Long
     List<DriverInvite> findAllByDriverId(Long driverId);
 
     List<DriverInvite> findAllByDriverIdAndStatus(Long driverId, InviteStatus status);
+
+    Optional<DriverInvite> findFirstByDriverIdAndStatus(Long driverId, InviteStatus status);
 }
