@@ -45,8 +45,14 @@ public class User {
     private Role role;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "address_id", unique = true)
     private Address address;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Driver driver;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Student student;
 
     @PrePersist
     private void prePersist() {

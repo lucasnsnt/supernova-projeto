@@ -4,6 +4,9 @@ import ink.lucasnsnt.supernovaprojeto.models.enums.DriverStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "drivers")
 @Getter
@@ -28,4 +31,31 @@ public class Driver {
     @Column(nullable = false)
     @Builder.Default
     private DriverStatus status = DriverStatus.PENDING;
+
+    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Vehicle> vehicles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<DriverInvite> invites = new ArrayList<>();
+
+    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<DriverStudentLink> studentLinks = new ArrayList<>();
+
+    public void addVehicle(Vehicle vehicle) {
+        vehicles.add(vehicle);
+        vehicle.setDriver(this);
+    }
+
+    public void addInvite(DriverInvite invite) {
+        invites.add(invite);
+        invite.setDriver(this);
+    }
+
+    public void addStudentLink(DriverStudentLink link) {
+        studentLinks.add(link);
+        link.setDriver(this);
+    }
 }

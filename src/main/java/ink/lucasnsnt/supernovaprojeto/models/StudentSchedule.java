@@ -1,8 +1,7 @@
 package ink.lucasnsnt.supernovaprojeto.models;
 
 import ink.lucasnsnt.supernovaprojeto.models.enums.Direction;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.DayOfWeek;
@@ -10,7 +9,13 @@ import java.time.LocalTime;
 
 
 @Entity
-@Table(name = "students_schedule")
+@Table(
+        name = "student_schedules",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_student_schedule",
+                columnNames = {"student_id", "day_of_week", "time", "direction"}
+        )
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,12 +23,22 @@ import java.time.LocalTime;
 @Builder
 public class StudentSchedule {
 
-    Student student;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    DayOfWeek dayOfWeek;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
 
-    LocalTime time;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DayOfWeek dayOfWeek;
 
-    Direction direction;
+    @Column(nullable = false)
+    private LocalTime time;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Direction direction;
 }

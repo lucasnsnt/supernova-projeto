@@ -22,6 +22,7 @@ public class Vehicle {
     @Column(nullable = false)
     private String model;
 
+    @Column(name = "manufacturing_year")
     private Integer year;
 
     @Column(nullable = false, unique = true)

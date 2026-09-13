@@ -1,6 +1,6 @@
 package ink.lucasnsnt.supernovaprojeto.models.enums;
 
-public enum DriverStudentLInkStatus {
+public enum DriverStudentLinkStatus {
     PENDING,
     ACTIVE,
     REJECTED,

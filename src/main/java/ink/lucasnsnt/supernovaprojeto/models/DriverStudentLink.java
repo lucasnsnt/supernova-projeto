@@ -1,14 +1,19 @@
 package ink.lucasnsnt.supernovaprojeto.models;
 
-import ink.lucasnsnt.supernovaprojeto.models.enums.DriverStudentLInkStatus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import ink.lucasnsnt.supernovaprojeto.models.enums.DriverStudentLinkStatus;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "driver_student_link")
+@Table(
+        name = "driver_student_links",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_driver_student_link",
+                columnNames = {"driver_id", "student_id"}
+        )
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,9 +21,25 @@ import java.time.LocalDate;
 @Builder
 public class DriverStudentLink {
 
-    Driver driver;
-    Student student;
-    LocalDate startDate;
-    LocalDate endDate;
-    DriverStudentLInkStatus status;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "driver_id", nullable = false)
+    private Driver driver;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
+
+    @Column(nullable = false)
+    private LocalDate startDate;
+
+    private LocalDate endDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private DriverStudentLinkStatus status = DriverStudentLinkStatus.PENDING;
 }
