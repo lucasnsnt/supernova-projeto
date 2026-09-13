@@ -1,8 +1,10 @@
 package ink.lucasnsnt.supernovaprojeto.models;
 
+import ink.lucasnsnt.supernovaprojeto.models.enums.Direction;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class Student {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "institution_id")
     private Institution institution;
 
@@ -43,5 +45,27 @@ public class Student {
     public void addDriverLink(DriverStudentLink link) {
         driverLinks.add(link);
         link.setStudent(this);
+    }
+
+    @Transient
+    public boolean isProfileComplete() {
+        if (institution == null || user == null || user.getAddress() == null) {
+            return false;
+        }
+
+        return !schedules.isEmpty() && schedules.stream()
+                .map(StudentSchedule::getDayOfWeek)
+                .distinct()
+                .allMatch(this::hasRoundTripOn);
+    }
+
+    private boolean hasRoundTripOn(DayOfWeek dayOfWeek) {
+        boolean hasOutbound = schedules.stream().anyMatch(schedule ->
+                schedule.getDayOfWeek() == dayOfWeek
+                        && schedule.getDirection() == Direction.IDA);
+        boolean hasReturn = schedules.stream().anyMatch(schedule ->
+                schedule.getDayOfWeek() == dayOfWeek
+                        && schedule.getDirection() == Direction.VOLTA);
+        return hasOutbound && hasReturn;
     }
 }
