@@ -7,13 +7,7 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(
-        name = "driver_student_links",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_driver_student_link",
-                columnNames = {"driver_id", "student_id"}
-        )
-)
+@Table(name = "driver_student_links")
 @Getter
 @Setter
 @NoArgsConstructor
