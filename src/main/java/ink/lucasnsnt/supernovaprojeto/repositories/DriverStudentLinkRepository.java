@@ -11,7 +11,11 @@ import java.util.Optional;
 @Repository
 public interface DriverStudentLinkRepository extends JpaRepository<DriverStudentLink, Long> {
 
-    Optional<DriverStudentLink> findByDriverIdAndStudentId(Long driverId, Long studentId);
+    Optional<DriverStudentLink> findFirstByDriverIdAndStudentIdAndStatus(
+            Long driverId, Long studentId, DriverStudentLinkStatus status);
+
+    Optional<DriverStudentLink> findFirstByStudentIdAndStatus(
+            Long studentId, DriverStudentLinkStatus status);
 
     List<DriverStudentLink> findAllByDriverId(Long driverId);
 
