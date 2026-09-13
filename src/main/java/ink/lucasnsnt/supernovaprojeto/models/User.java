@@ -1,0 +1,71 @@
+package ink.lucasnsnt.supernovaprojeto.models;
+
+import ink.lucasnsnt.supernovaprojeto.models.enums.Role;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Email
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    private String phone;
+
+    @Column(nullable = false)
+    private LocalDate dateOfBirth;
+
+    @Column(nullable = false)
+    private LocalDateTime registrationDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", unique = true)
+    private Address address;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Driver driver;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Student student;
+
+    @PrePersist
+    private void prePersist() {
+        if (registrationDate == null) {
+            registrationDate = LocalDateTime.now();
+        }
+    }
+
+    private byte age(){
+        if(dateOfBirth == null){
+            return 0;
+        }
+        return (byte) ((LocalDate.now().getYear() + LocalDate.now().getMonthValue()) - dateOfBirth.getYear());
+    };
+
+}
