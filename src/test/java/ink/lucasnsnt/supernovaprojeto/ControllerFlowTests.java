@@ -6,12 +6,14 @@ import ink.lucasnsnt.supernovaprojeto.models.Address;
 import ink.lucasnsnt.supernovaprojeto.models.Driver;
 import ink.lucasnsnt.supernovaprojeto.models.User;
 import ink.lucasnsnt.supernovaprojeto.models.enums.InstitutionType;
+import ink.lucasnsnt.supernovaprojeto.models.enums.NotificationType;
 import ink.lucasnsnt.supernovaprojeto.models.enums.Role;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverInviteRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.UserRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.VehicleRepository;
 import ink.lucasnsnt.supernovaprojeto.services.DriverService;
 import ink.lucasnsnt.supernovaprojeto.services.InstitutionService;
+import ink.lucasnsnt.supernovaprojeto.services.InAppNotificationService;
 import ink.lucasnsnt.supernovaprojeto.services.StudentScheduleService;
 import ink.lucasnsnt.supernovaprojeto.services.StudentService;
 import org.junit.jupiter.api.Test;
@@ -44,6 +46,7 @@ class ControllerFlowTests {
     @Autowired private StudentScheduleService scheduleService;
     @Autowired private DriverService driverService;
     @Autowired private InstitutionService institutionService;
+    @Autowired private InAppNotificationService notificationService;
 
     @Test
     void studentShouldConfigureOneWayScheduleUsingOnlyOwnJwtIdentity() throws Exception {
@@ -76,6 +79,19 @@ class ControllerFlowTests {
                         .with(jwt().jwt(token -> token.subject(studentUser.getId().toString()))
                                 .authorities(new SimpleGrantedAuthority("ROLE_DRIVER"))))
                 .andExpect(status().isForbidden());
+
+        var notification = notificationService.create(studentUser.getId(),
+                NotificationType.DEPARTURE_REMINDER, "Horário da viagem",
+                "Confira o horário previsto de saída", null, null);
+
+        mockMvc.perform(get("/api/me/notifications/unread-count").with(jwtFor(studentUser)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").value(1));
+
+        mockMvc.perform(patch("/api/me/notifications/{id}/read", notification.id())
+                        .with(jwtFor(studentUser)).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.readAt").isNotEmpty());
     }
 
     @Test

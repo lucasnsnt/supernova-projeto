@@ -16,5 +16,7 @@ public interface InAppNotificationRepository extends JpaRepository<InAppNotifica
 
     Optional<InAppNotification> findByIdAndRecipientId(Long id, Long recipientId);
 
+    List<InAppNotification> findAllByRecipientIdAndReadAtIsNull(Long recipientId);
+
     long countByRecipientIdAndReadAtIsNull(Long recipientId);
 }
