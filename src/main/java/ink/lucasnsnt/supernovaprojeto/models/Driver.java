@@ -37,6 +37,10 @@ public class Driver {
 
     private LocalDateTime reviewedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "operational_address_id")
+    private Address operationalAddress;
+
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Vehicle> vehicles = new ArrayList<>();
