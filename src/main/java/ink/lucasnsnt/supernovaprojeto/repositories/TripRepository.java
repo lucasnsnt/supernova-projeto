@@ -38,4 +38,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
 
     List<Trip> findAllByStatusAndPlannedDepartureAtBetween(
             TripStatus status, LocalDateTime start, LocalDateTime end);
+
+    List<Trip> findAllByStatusAndDepartureReminderSentAtIsNullAndServiceDate(
+            TripStatus status, LocalDate serviceDate);
 }

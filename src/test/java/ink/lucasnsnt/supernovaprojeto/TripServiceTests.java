@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.*;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,6 +86,27 @@ class TripServiceTests {
         assertThatThrownBy(() -> service.changeVehicle(10L, 40L, 51L))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("capacidade");
+    }
+
+    @Test
+    void shouldSendOneReminderInsideDepartureWindow() {
+        Trip due = trip();
+        Trip future = trip();
+        future.setId(41L);
+        future.setPlannedDepartureAt(LocalDateTime.of(2026, 9, 15, 7, 0));
+        when(tripRepository.findAllByStatusAndDepartureReminderSentAtIsNullAndServiceDate(
+                TripStatus.PLANNED, LocalDate.of(2026, 9, 15)))
+                .thenReturn(List.of(due, future));
+        service = serviceAt(LocalDateTime.of(2026, 9, 15, 5, 30));
+
+        assertThat(service.sendDueDepartureReminders()).isOne();
+
+        assertThat(due.getDepartureReminderSentAt())
+                .isEqualTo(LocalDateTime.of(2026, 9, 15, 5, 30));
+        assertThat(future.getDepartureReminderSentAt()).isNull();
+        verify(notificationService).create(
+                eq(10L), eq(NotificationType.DEPARTURE_REMINDER),
+                eq("Hora da viagem"), contains("06:00"), same(due), isNull());
     }
 
     private TripService serviceAt(LocalDateTime localDateTime) {

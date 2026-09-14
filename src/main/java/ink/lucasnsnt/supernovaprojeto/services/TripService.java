@@ -141,6 +141,32 @@ public class TripService {
         return TripResponse.from(trip);
     }
 
+    @Transactional
+    public int sendDueDepartureReminders() {
+        LocalDateTime now = LocalDateTime.now(clock);
+        List<Trip> trips = tripRepository
+                .findAllByStatusAndDepartureReminderSentAtIsNullAndServiceDate(
+                        TripStatus.PLANNED, now.toLocalDate());
+        int sent = 0;
+        for (Trip trip : trips) {
+            LocalDateTime departureAt = effectiveDepartureAt(trip);
+            if (departureAt == null
+                    || now.isBefore(departureAt.minus(properties.getDepartureChangeLock()))) {
+                continue;
+            }
+            notificationService.create(
+                    trip.getDriver().getId(),
+                    NotificationType.DEPARTURE_REMINDER,
+                    "Hora da viagem",
+                    "A saída está prevista para " + departureAt.toLocalTime(),
+                    trip,
+                    null);
+            trip.setDepartureReminderSentAt(now);
+            sent++;
+        }
+        return sent;
+    }
+
     private Trip findOwnedTrip(Long driverId, Long tripId) {
         driverService.requireApproved(driverId);
         return tripRepository.findByIdAndDriverId(tripId, driverId)
@@ -152,6 +178,11 @@ public class TripService {
                 && trip.getStatus() != TripStatus.NEEDS_ATTENTION) {
             throw new BusinessRuleException("Esta operação só pode ser realizada antes do início da viagem");
         }
+    }
+
+    private LocalDateTime effectiveDepartureAt(Trip trip) {
+        return trip.getDriverDepartureAt() == null
+                ? trip.getPlannedDepartureAt() : trip.getDriverDepartureAt();
     }
 
     private void notifyParticipants(

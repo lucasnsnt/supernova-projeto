@@ -53,6 +53,8 @@ public class Trip {
 
     private LocalDateTime departureConfirmedAt;
 
+    private LocalDateTime departureReminderSentAt;
+
     private LocalDateTime startedAt;
 
     private LocalDateTime completedAt;

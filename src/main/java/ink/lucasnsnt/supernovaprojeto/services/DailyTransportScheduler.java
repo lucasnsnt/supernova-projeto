@@ -13,6 +13,7 @@ public class DailyTransportScheduler {
 
     private final DailyConfirmationService confirmationService;
     private final TripPlanningService tripPlanningService;
+    private final TripService tripService;
     private final Clock clock;
 
     @Scheduled(cron = "${app.transport.scheduler-cron:0 * * * * *}",
@@ -23,5 +24,6 @@ public class DailyTransportScheduler {
         confirmationService.releaseAvailableForDate(today.plusDays(1));
         confirmationService.expirePending();
         tripPlanningService.planReadyConfirmations();
+        tripService.sendDueDepartureReminders();
     }
 }
