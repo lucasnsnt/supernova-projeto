@@ -9,6 +9,7 @@ import ink.lucasnsnt.supernovaprojeto.dtos.link.LinkedStudentResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.vehicle.VehicleRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.vehicle.VehicleResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.common.AddressRequest;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.DailyConfirmationResponse;
 import ink.lucasnsnt.supernovaprojeto.models.DriverInvite;
 import ink.lucasnsnt.supernovaprojeto.models.Vehicle;
 import ink.lucasnsnt.supernovaprojeto.services.AccountService;
@@ -16,6 +17,7 @@ import ink.lucasnsnt.supernovaprojeto.services.DriverInviteService;
 import ink.lucasnsnt.supernovaprojeto.services.DriverService;
 import ink.lucasnsnt.supernovaprojeto.services.DriverStudentLinkService;
 import ink.lucasnsnt.supernovaprojeto.services.VehicleService;
+import ink.lucasnsnt.supernovaprojeto.services.DailyConfirmationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/drivers/me")
@@ -38,6 +41,7 @@ public class DriverController {
     private final DriverInviteService inviteService;
     private final DriverStudentLinkService linkService;
     private final VehicleService vehicleService;
+    private final DailyConfirmationService confirmationService;
 
     @GetMapping
     public DriverResponse getProfile(@AuthenticationPrincipal Jwt jwt) {
@@ -103,6 +107,14 @@ public class DriverController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long linkId) {
         return linkService.endByDriverResponse(userId(jwt), linkId);
+    }
+
+    @GetMapping("/daily-confirmations")
+    public List<DailyConfirmationResponse> findDailyConfirmations(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam LocalDate date) {
+        driverService.requireOperationalView(userId(jwt));
+        return confirmationService.findByDriver(userId(jwt), date);
     }
 
     @GetMapping("/vehicles")

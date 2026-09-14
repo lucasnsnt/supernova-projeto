@@ -29,4 +29,10 @@ public interface DriverStudentLinkRepository extends JpaRepository<DriverStudent
     List<DriverStudentLink> findAllByDriverIdAndStatus(Long driverId, DriverStudentLinkStatus status);
 
     List<DriverStudentLink> findAllByStudentIdAndStatus(Long studentId, DriverStudentLinkStatus status);
+
+    @EntityGraph(attributePaths = {
+            "driver", "driver.user", "student", "student.user", "student.user.address",
+            "student.institution", "student.institution.address", "student.schedules"
+    })
+    List<DriverStudentLink> findAllByStatus(DriverStudentLinkStatus status);
 }
