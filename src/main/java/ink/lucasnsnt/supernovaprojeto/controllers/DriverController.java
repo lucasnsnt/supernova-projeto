@@ -23,6 +23,7 @@ import ink.lucasnsnt.supernovaprojeto.services.DriverStudentLinkService;
 import ink.lucasnsnt.supernovaprojeto.services.VehicleService;
 import ink.lucasnsnt.supernovaprojeto.services.DailyConfirmationService;
 import ink.lucasnsnt.supernovaprojeto.services.TripService;
+import ink.lucasnsnt.supernovaprojeto.services.TripPlanningService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -48,6 +49,7 @@ public class DriverController {
     private final VehicleService vehicleService;
     private final DailyConfirmationService confirmationService;
     private final TripService tripService;
+    private final TripPlanningService tripPlanningService;
 
     @GetMapping
     public DriverResponse getProfile(@AuthenticationPrincipal Jwt jwt) {
@@ -144,6 +146,13 @@ public class DriverController {
             @PathVariable Long tripId,
             @Valid @RequestBody TripVehicleUpdateRequest request) {
         return tripService.changeVehicle(userId(jwt), tripId, request.vehicleId());
+    }
+
+    @PostMapping("/trips/{tripId}/replanning")
+    public TripResponse replanTrip(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long tripId) {
+        return tripPlanningService.replan(userId(jwt), tripId);
     }
 
     @PostMapping("/trips/{tripId}/start")

@@ -99,6 +99,42 @@ class TripPlanningServiceTests {
                 anyString(), contains("coordenadas"), same(tripCaptor.getValue()), isNull());
     }
 
+    @Test
+    void shouldReplanTripAfterOperationalIssueIsFixed() {
+        DailyConfirmation confirmation = confirmation(101L, 20L, LocalTime.of(7, 0), true);
+        Vehicle vehicle = vehicle(confirmation.getDriver(), 15);
+        Trip trip = Trip.builder()
+                .id(40L)
+                .driver(confirmation.getDriver())
+                .serviceDate(confirmation.getServiceDate())
+                .direction(Direction.IDA)
+                .status(TripStatus.NEEDS_ATTENTION)
+                .plannedDepartureAt(confirmation.getPreliminaryDepartureAt())
+                .planningIssue("Coordenadas ausentes")
+                .createdAt(LocalDateTime.of(2026, 9, 15, 6, 0))
+                .build();
+        trip.addParticipant(TripParticipant.builder()
+                .student(confirmation.getStudent())
+                .confirmation(confirmation)
+                .pickupOrder(1)
+                .dropoffOrder(1)
+                .build());
+        when(tripRepository.findByIdAndDriverId(40L, 10L)).thenReturn(Optional.of(trip));
+        when(vehicleRepository.findFirstByDriverIdAndDefaultVehicleTrue(10L))
+                .thenReturn(Optional.of(vehicle));
+        when(routeGateway.optimize(any())).thenAnswer(invocation -> successful(invocation.getArgument(0)));
+
+        var response = service.replan(10L, 40L);
+
+        assertThat(response.status()).isEqualTo(TripStatus.PLANNED);
+        assertThat(response.planningIssue()).isNull();
+        assertThat(response.vehicle().id()).isEqualTo(50L);
+        assertThat(trip.getRouteCalculatedAt()).isNotNull();
+        verify(routeGateway).optimize(any(RoutePlanningRequest.class));
+        verify(notificationService).create(eq(20L), eq(NotificationType.TRIP_PLANNED),
+                anyString(), anyString(), same(trip), same(confirmation));
+    }
+
     private RoutePlanningResult successful(RoutePlanningRequest request) {
         int[] order = {1};
         List<RouteStopPlan> stops = request.passengers().stream()

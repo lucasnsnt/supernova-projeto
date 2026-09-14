@@ -1,6 +1,9 @@
 package ink.lucasnsnt.supernovaprojeto.services;
 
 import ink.lucasnsnt.supernovaprojeto.config.DailyTransportProperties;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripResponse;
+import ink.lucasnsnt.supernovaprojeto.exceptions.BusinessRuleException;
+import ink.lucasnsnt.supernovaprojeto.exceptions.ResourceNotFoundException;
 import ink.lucasnsnt.supernovaprojeto.models.*;
 import ink.lucasnsnt.supernovaprojeto.models.enums.*;
 import ink.lucasnsnt.supernovaprojeto.repositories.DailyConfirmationRepository;
@@ -57,6 +60,30 @@ public class TripPlanningService {
             }
         }
         return tripsCreated;
+    }
+
+    @Transactional
+    public TripResponse replan(Long driverId, Long tripId) {
+        Trip trip = tripRepository.findByIdAndDriverId(tripId, driverId)
+                .orElseThrow(() -> new ResourceNotFoundException("Viagem", tripId));
+        if (trip.getStatus() != TripStatus.NEEDS_ATTENTION) {
+            throw new BusinessRuleException(
+                    "Somente uma viagem que precisa de atenção pode ser recalculada");
+        }
+        Vehicle vehicle = trip.getVehicle() == null
+                ? vehicleRepository.findFirstByDriverIdAndDefaultVehicleTrue(driverId).orElse(null)
+                : trip.getVehicle();
+        List<DailyConfirmation> confirmations = trip.getParticipants().stream()
+                .map(TripParticipant::getConfirmation)
+                .toList();
+        RoutePlanningResult route = vehicle == null
+                ? RoutePlanningResult.unavailable("O motorista não possui um veículo padrão")
+                : optimize(confirmations, vehicle);
+        applyReplanning(trip, vehicle, route, LocalDateTime.now(clock));
+        if (route.feasible()) {
+            notifyTripPlanned(trip);
+        }
+        return TripResponse.from(trip);
     }
 
     private List<List<DailyConfirmation>> partition(
@@ -167,6 +194,33 @@ public class TripPlanningService {
         return new RoutePassenger(confirmation.getId(), confirmation.getStudent().getId(),
                 point(institution), point(home), scheduled,
                 scheduled.plus(properties.getMaximumReturnWait()), null);
+    }
+
+    private void applyReplanning(
+            Trip trip, Vehicle vehicle, RoutePlanningResult route, LocalDateTime calculatedAt) {
+        trip.setVehicle(vehicle);
+        trip.setStatus(route.feasible() ? TripStatus.PLANNED : TripStatus.NEEDS_ATTENTION);
+        trip.setPlanningIssue(route.issue());
+        trip.setRouteProvider(route.provider());
+        trip.setRouteReference(route.reference());
+        trip.setEncodedPolyline(route.encodedPolyline());
+        trip.setRouteCalculatedAt(route.feasible() ? calculatedAt : null);
+        if (!route.feasible()) {
+            return;
+        }
+        trip.setPlannedDepartureAt(route.departureAt());
+        Map<Long, RouteStopPlan> stops = route.stops().stream()
+                .collect(Collectors.toMap(RouteStopPlan::confirmationId, stop -> stop));
+        for (TripParticipant participant : trip.getParticipants()) {
+            RouteStopPlan stop = stops.get(participant.getConfirmation().getId());
+            if (stop == null) {
+                throw new BusinessRuleException("A rota recalculada não contém todos os alunos");
+            }
+            participant.setPickupOrder(stop.pickupOrder());
+            participant.setDropoffOrder(stop.dropoffOrder());
+            participant.setEstimatedPickupAt(stop.estimatedPickupAt());
+            participant.setEstimatedDropoffAt(stop.estimatedDropoffAt());
+        }
     }
 
     private RoutePoint point(Address address) {
