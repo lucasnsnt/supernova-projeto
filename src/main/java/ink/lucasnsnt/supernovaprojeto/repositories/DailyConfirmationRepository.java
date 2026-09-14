@@ -27,6 +27,14 @@ public interface DailyConfirmationRepository extends JpaRepository<DailyConfirma
     List<DailyConfirmation> findAllByStatusAndResponseDeadlineLessThanEqual(
             DailyConfirmationStatus status, LocalDateTime deadline);
 
+    @EntityGraph(attributePaths = {
+            "driver", "driver.user", "driver.user.address", "driver.operationalAddress",
+            "student", "student.user", "student.user.address",
+            "student.institution", "student.institution.address"
+    })
+    List<DailyConfirmation> findAllByStatusAndResponseDeadlineLessThanEqualOrderByResponseDeadline(
+            DailyConfirmationStatus status, LocalDateTime deadline);
+
     boolean existsByStudentIdAndServiceDateAndDirection(
             Long studentId, LocalDate serviceDate,
             ink.lucasnsnt.supernovaprojeto.models.enums.Direction direction);

@@ -1,0 +1,151 @@
+package ink.lucasnsnt.supernovaprojeto;
+
+import ink.lucasnsnt.supernovaprojeto.config.DailyTransportProperties;
+import ink.lucasnsnt.supernovaprojeto.models.*;
+import ink.lucasnsnt.supernovaprojeto.models.enums.*;
+import ink.lucasnsnt.supernovaprojeto.repositories.*;
+import ink.lucasnsnt.supernovaprojeto.services.InAppNotificationService;
+import ink.lucasnsnt.supernovaprojeto.services.TripPlanningService;
+import ink.lucasnsnt.supernovaprojeto.services.routing.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.time.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+class TripPlanningServiceTests {
+
+    private DailyConfirmationRepository confirmationRepository;
+    private TripParticipantRepository participantRepository;
+    private TripRepository tripRepository;
+    private VehicleRepository vehicleRepository;
+    private RoutePlanningGateway routeGateway;
+    private InAppNotificationService notificationService;
+    private TripPlanningService service;
+
+    @BeforeEach
+    void setUp() {
+        confirmationRepository = mock(DailyConfirmationRepository.class);
+        participantRepository = mock(TripParticipantRepository.class);
+        tripRepository = mock(TripRepository.class);
+        vehicleRepository = mock(VehicleRepository.class);
+        routeGateway = mock(RoutePlanningGateway.class);
+        notificationService = mock(InAppNotificationService.class);
+        ZoneId zone = ZoneId.of("America/Bahia");
+        Clock clock = Clock.fixed(
+                LocalDateTime.of(2026, 9, 15, 11, 30).atZone(zone).toInstant(), zone);
+        service = new TripPlanningService(
+                confirmationRepository, participantRepository, tripRepository, vehicleRepository,
+                routeGateway, notificationService, new DailyTransportProperties(), clock);
+    }
+
+    @Test
+    void shouldSplitReturnsThatExceedMaximumWait() {
+        DailyConfirmation first = confirmation(101L, 20L, LocalTime.of(12, 0), true);
+        DailyConfirmation second = confirmation(102L, 21L, LocalTime.of(12, 20), true);
+        DailyConfirmation third = confirmation(103L, 22L, LocalTime.of(13, 0), true);
+        when(confirmationRepository
+                .findAllByStatusAndResponseDeadlineLessThanEqualOrderByResponseDeadline(
+                        eq(DailyConfirmationStatus.YES), any()))
+                .thenReturn(List.of(first, second, third));
+        when(vehicleRepository.findFirstByDriverIdAndDefaultVehicleTrue(10L))
+                .thenReturn(Optional.of(vehicle(first.getDriver(), 15)));
+        when(routeGateway.optimize(any())).thenAnswer(invocation -> successful(invocation.getArgument(0)));
+        AtomicLong tripIds = new AtomicLong(40);
+        when(tripRepository.save(any())).thenAnswer(invocation -> {
+            Trip trip = invocation.getArgument(0);
+            trip.setId(tripIds.getAndIncrement());
+            return trip;
+        });
+
+        int created = service.planReadyConfirmations();
+
+        assertThat(created).isEqualTo(2);
+        var requestCaptor = org.mockito.ArgumentCaptor.forClass(RoutePlanningRequest.class);
+        verify(routeGateway, times(2)).optimize(requestCaptor.capture());
+        assertThat(requestCaptor.getAllValues())
+                .extracting(request -> request.passengers().size())
+                .containsExactly(2, 1);
+        verify(tripRepository, times(2)).save(any(Trip.class));
+        verify(notificationService, times(3)).create(anyLong(), eq(NotificationType.TRIP_PLANNED),
+                anyString(), anyString(), any(Trip.class), any(DailyConfirmation.class));
+    }
+
+    @Test
+    void shouldKeepConfirmedStudentWhenCoordinatesAreMissing() {
+        DailyConfirmation confirmation = confirmation(101L, 20L, LocalTime.of(12, 0), false);
+        when(confirmationRepository
+                .findAllByStatusAndResponseDeadlineLessThanEqualOrderByResponseDeadline(
+                        eq(DailyConfirmationStatus.YES), any()))
+                .thenReturn(List.of(confirmation));
+        when(vehicleRepository.findFirstByDriverIdAndDefaultVehicleTrue(10L))
+                .thenReturn(Optional.of(vehicle(confirmation.getDriver(), 15)));
+        var tripCaptor = org.mockito.ArgumentCaptor.forClass(Trip.class);
+
+        assertThat(service.planReadyConfirmations()).isOne();
+
+        verify(routeGateway, never()).optimize(any());
+        verify(tripRepository).save(tripCaptor.capture());
+        assertThat(tripCaptor.getValue().getStatus()).isEqualTo(TripStatus.NEEDS_ATTENTION);
+        assertThat(tripCaptor.getValue().getParticipants()).hasSize(1);
+        verify(notificationService).create(eq(10L), eq(NotificationType.PLANNING_NEEDS_ATTENTION),
+                anyString(), contains("coordenadas"), same(tripCaptor.getValue()), isNull());
+    }
+
+    private RoutePlanningResult successful(RoutePlanningRequest request) {
+        int[] order = {1};
+        List<RouteStopPlan> stops = request.passengers().stream()
+                .map(passenger -> {
+                    int current = order[0]++;
+                    return new RouteStopPlan(passenger.confirmationId(), current, current,
+                            LocalDateTime.of(2026, 9, 15, 12, current),
+                            LocalDateTime.of(2026, 9, 15, 12, current + 10));
+                })
+                .toList();
+        return new RoutePlanningResult(true, "TEST", "route-test",
+                LocalDateTime.of(2026, 9, 15, 11, 45), "polyline", null, stops);
+    }
+
+    private DailyConfirmation confirmation(
+            Long confirmationId, Long studentId, LocalTime time, boolean coordinates) {
+        Address base = address(coordinates);
+        User driverUser = User.builder().id(10L).name("Motorista").address(base).build();
+        Driver driver = Driver.builder().user(driverUser).status(DriverStatus.APPROVED).build();
+        driver.setId(10L);
+        User studentUser = User.builder().id(studentId).name("Aluno " + studentId)
+                .address(address(coordinates)).build();
+        Institution institution = Institution.builder().id(60L).name("Universidade")
+                .address(address(coordinates)).build();
+        Student student = Student.builder().user(studentUser).institution(institution).build();
+        student.setId(studentId);
+        return DailyConfirmation.builder()
+                .id(confirmationId).driver(driver).student(student)
+                .serviceDate(LocalDate.of(2026, 9, 15)).direction(Direction.VOLTA)
+                .scheduledTime(time).preliminaryDepartureAt(LocalDate.of(2026, 9, 15).atTime(time))
+                .availableAt(LocalDateTime.of(2026, 9, 15, 6, 0))
+                .responseDeadline(LocalDateTime.of(2026, 9, 15, 11, 0))
+                .status(DailyConfirmationStatus.YES).createdAt(LocalDateTime.of(2026, 9, 15, 6, 0))
+                .build();
+    }
+
+    private Vehicle vehicle(Driver driver, int capacity) {
+        return Vehicle.builder().id(50L).driver(driver).brand("Fiat").model("Ducato")
+                .licensePlate("ABC1D23").passengerCapacity(capacity).defaultVehicle(true).build();
+    }
+
+    private Address address(boolean coordinates) {
+        return Address.builder()
+                .street("Rua").number("1").neighborhood("Centro")
+                .city("Salvador").state("BA").zipCode("40000-000")
+                .latitude(coordinates ? new BigDecimal("-12.9714") : null)
+                .longitude(coordinates ? new BigDecimal("-38.5014") : null)
+                .build();
+    }
+}
