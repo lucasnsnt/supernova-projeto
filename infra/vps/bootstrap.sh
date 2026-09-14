@@ -26,6 +26,11 @@ done
 
 install -d -m 0750 -o "$deploy_user" -g "$deploy_user" "$app_dir"
 
+if [[ ! -f "$app_dir/google-service-account.json" ]]; then
+  install -m 0644 -o root -g "$deploy_user" /dev/null \
+    "$app_dir/google-service-account.json"
+fi
+
 if [[ ! -f "$app_dir/supernova.env" ]]; then
   database_password="$(openssl rand -hex 24)"
   jwt_secret="$(openssl rand -base64 48 | tr -d '\n')"
@@ -55,6 +60,8 @@ SQL
     "SECURE_COOKIES=true" \
     "MAIL_DELIVERY=log" \
     "MAIL_HEALTH_ENABLED=false" \
+    "GOOGLE_ROUTE_OPTIMIZATION_ENABLED=false" \
+    "GOOGLE_CLOUD_PROJECT=" \
     >"$app_dir/supernova.env"
 fi
 

@@ -10,6 +10,7 @@ services:
       - ${SUPERNOVA_ENV_FILE:-/opt/supernova/supernova.env}
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/google-service-account.json
       JAVA_TOOL_OPTIONS: >-
         -XX:MaxRAMPercentage=55.0
         -XX:InitialRAMPercentage=20.0
@@ -27,8 +28,14 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
+    secrets:
+      - google_credentials
     logging:
       driver: json-file
       options:
         max-size: 10m
         max-file: "3"
+
+secrets:
+  google_credentials:
+    file: ${GOOGLE_CREDENTIALS_FILE:-/opt/supernova/google-service-account.json}

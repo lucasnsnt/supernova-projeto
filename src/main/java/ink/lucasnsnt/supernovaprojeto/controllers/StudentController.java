@@ -10,10 +10,15 @@ import ink.lucasnsnt.supernovaprojeto.dtos.student.ScheduleUpdateRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.student.StudentProfileStatus;
 import ink.lucasnsnt.supernovaprojeto.dtos.student.StudentProfileUpdateRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.student.StudentDetailsResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.DailyConfirmationAnswerRequest;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.DailyConfirmationResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripResponse;
 import ink.lucasnsnt.supernovaprojeto.services.AccountService;
 import ink.lucasnsnt.supernovaprojeto.services.DriverStudentLinkService;
 import ink.lucasnsnt.supernovaprojeto.services.StudentScheduleService;
 import ink.lucasnsnt.supernovaprojeto.services.StudentService;
+import ink.lucasnsnt.supernovaprojeto.services.DailyConfirmationService;
+import ink.lucasnsnt.supernovaprojeto.services.TripService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,6 +29,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -36,6 +42,8 @@ public class StudentController {
     private final StudentService studentService;
     private final StudentScheduleService scheduleService;
     private final DriverStudentLinkService linkService;
+    private final DailyConfirmationService confirmationService;
+    private final TripService tripService;
 
     @GetMapping
     public StudentDetailsResponse getDetails(@AuthenticationPrincipal Jwt jwt) {
@@ -107,6 +115,28 @@ public class StudentController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long linkId) {
         return linkService.endByStudentResponse(userId(jwt), linkId);
+    }
+
+    @GetMapping("/daily-confirmations")
+    public List<DailyConfirmationResponse> findDailyConfirmations(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam LocalDate date) {
+        return confirmationService.findByStudent(userId(jwt), date);
+    }
+
+    @PutMapping("/daily-confirmations/{confirmationId}/answer")
+    public DailyConfirmationResponse answerDailyConfirmation(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long confirmationId,
+            @Valid @RequestBody DailyConfirmationAnswerRequest request) {
+        return confirmationService.answer(userId(jwt), confirmationId, request.answer());
+    }
+
+    @GetMapping("/trips")
+    public List<TripResponse> findTrips(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam LocalDate date) {
+        return tripService.findByStudent(userId(jwt), date);
     }
 
     private Long userId(Jwt jwt) {

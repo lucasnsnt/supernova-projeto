@@ -36,6 +36,24 @@ para `smtp` somente depois de preencher as configurações de e-mail. Ao habilit
 o SMTP, defina também `MAIL_HEALTH_ENABLED=true` para que o Actuator monitore a
 conexão com o provedor.
 
+## Otimização de rotas da Google
+
+Habilite a Route Optimization API no projeto Google Cloud e conceda à conta de
+serviço usada pela aplicação permissão para consumir a API. Copie somente o JSON
+da conta de serviço para `/opt/supernova/google-service-account.json`; o arquivo
+é montado no container como segredo e nunca deve ser adicionado ao repositório.
+
+No `/opt/supernova/supernova.env`, configure:
+
+```dotenv
+GOOGLE_ROUTE_OPTIMIZATION_ENABLED=true
+GOOGLE_CLOUD_PROJECT=id-do-projeto
+```
+
+Enquanto `GOOGLE_ROUTE_OPTIMIZATION_ENABLED=false`, o backend permanece
+funcional, mas novos planejamentos ficam em `NEEDS_ATTENTION` até a integração
+ser habilitada e o motorista solicitar o recálculo.
+
 ## Segredos do ambiente `production` no GitHub
 
 - `VPS_HOST`

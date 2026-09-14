@@ -33,7 +33,11 @@ public class Vehicle {
 
     private String color;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "driver_id")
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean defaultVehicle = false;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "driver_id", nullable = false)
     private Driver driver;
 }

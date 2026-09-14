@@ -6,13 +6,17 @@ import ink.lucasnsnt.supernovaprojeto.exceptions.ResourceNotFoundException;
 import ink.lucasnsnt.supernovaprojeto.models.Driver;
 import ink.lucasnsnt.supernovaprojeto.models.DriverInvite;
 import ink.lucasnsnt.supernovaprojeto.models.User;
+import ink.lucasnsnt.supernovaprojeto.models.Address;
 import ink.lucasnsnt.supernovaprojeto.models.enums.DriverStatus;
 import ink.lucasnsnt.supernovaprojeto.models.enums.InviteStatus;
 import ink.lucasnsnt.supernovaprojeto.models.enums.Role;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverInviteRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.UserRepository;
+import ink.lucasnsnt.supernovaprojeto.repositories.AddressRepository;
+import ink.lucasnsnt.supernovaprojeto.dtos.common.AddressRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.driver.DriverResponse;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +36,7 @@ public class DriverService {
     private final DriverRepository driverRepository;
     private final UserRepository userRepository;
     private final DriverInviteRepository inviteRepository;
+    private final AddressRepository addressRepository;
     private final Clock clock;
 
     @Transactional
@@ -177,10 +182,53 @@ public class DriverService {
         return DriverResponse.from(findById(driverId));
     }
 
+    @Transactional
+    public DriverResponse setOperationalAddress(
+            @NotNull Long driverId, @Valid AddressRequest request) {
+        Driver driver = requireApproved(driverId);
+        Address address = driver.getOperationalAddress();
+        if (address == null || address == driver.getUser().getAddress()) {
+            address = addressRepository.save(newAddress(request));
+            driver.setOperationalAddress(address);
+        } else {
+            copyAddress(address, request);
+        }
+        return DriverResponse.from(driver);
+    }
+
+    @Transactional
+    public DriverResponse useRegistrationAddressForOperation(@NotNull Long driverId) {
+        Driver driver = requireApproved(driverId);
+        Address previous = driver.getOperationalAddress();
+        driver.setOperationalAddress(null);
+        if (previous != null && previous != driver.getUser().getAddress()) {
+            addressRepository.delete(previous);
+        }
+        return DriverResponse.from(driver);
+    }
+
     private void requireStatus(Driver driver, DriverStatus expected) {
         if (driver.getStatus() != expected) {
             throw new BusinessRuleException(
                     "Transição inválida: o motorista precisa estar com status " + expected);
         }
+    }
+
+    private void copyAddress(Address target, AddressRequest source) {
+        target.setStreet(source.street().trim());
+        target.setNumber(source.number().trim());
+        target.setComplement(source.complement());
+        target.setNeighborhood(source.neighborhood().trim());
+        target.setCity(source.city().trim());
+        target.setState(source.state().trim().toUpperCase());
+        target.setZipCode(source.zipCode().trim());
+        target.setLatitude(source.latitude());
+        target.setLongitude(source.longitude());
+    }
+
+    private Address newAddress(AddressRequest source) {
+        Address address = new Address();
+        copyAddress(address, source);
+        return address;
     }
 }

@@ -14,6 +14,7 @@ public record DriverResponse(
         String phone,
         LocalDate dateOfBirth,
         AddressResponse address,
+        AddressResponse operationalAddress,
         String cnh,
         DriverStatus status,
         String statusReason,
@@ -22,7 +23,9 @@ public record DriverResponse(
     public static DriverResponse from(Driver driver) {
         var user = driver.getUser();
         return new DriverResponse(driver.getId(), user.getName(), user.getEmail(), user.getPhone(),
-                user.getDateOfBirth(), AddressResponse.from(user.getAddress()), driver.getCnh(),
+                user.getDateOfBirth(), AddressResponse.from(user.getAddress()),
+                AddressResponse.from(driver.getOperationalAddress() == null
+                        ? user.getAddress() : driver.getOperationalAddress()), driver.getCnh(),
                 driver.getStatus(), driver.getStatusReason(), driver.getReviewedAt());
     }
 }
