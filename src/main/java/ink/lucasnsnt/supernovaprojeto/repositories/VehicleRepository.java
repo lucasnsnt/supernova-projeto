@@ -15,4 +15,10 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     boolean existsByLicensePlateIgnoreCase(String licensePlate);
 
     List<Vehicle> findAllByDriverId(Long driverId);
+
+    Optional<Vehicle> findFirstByDriverIdAndDefaultVehicleTrue(Long driverId);
+
+    Optional<Vehicle> findFirstByDriverIdOrderByIdAsc(Long driverId);
+
+    boolean existsByDriverIdAndDefaultVehicleTrue(Long driverId);
 }

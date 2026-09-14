@@ -2,9 +2,11 @@ package ink.lucasnsnt.supernovaprojeto.services;
 
 import ink.lucasnsnt.supernovaprojeto.exceptions.ResourceConflictException;
 import ink.lucasnsnt.supernovaprojeto.exceptions.ResourceNotFoundException;
+import ink.lucasnsnt.supernovaprojeto.exceptions.BusinessRuleException;
 import ink.lucasnsnt.supernovaprojeto.models.Driver;
 import ink.lucasnsnt.supernovaprojeto.models.Vehicle;
 import ink.lucasnsnt.supernovaprojeto.repositories.VehicleRepository;
+import ink.lucasnsnt.supernovaprojeto.repositories.TripRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -21,6 +23,7 @@ import java.util.List;
 public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
+    private final TripRepository tripRepository;
     private final DriverService driverService;
 
     @Transactional
@@ -44,6 +47,7 @@ public class VehicleService {
                 .licensePlate(licensePlate.toUpperCase())
                 .passengerCapacity(passengerCapacity)
                 .color(color)
+                .defaultVehicle(!vehicleRepository.existsByDriverIdAndDefaultVehicleTrue(driverId))
                 .build();
         driver.addVehicle(vehicle);
         return vehicleRepository.save(vehicle);
@@ -85,7 +89,34 @@ public class VehicleService {
     public void delete(@NotNull Long driverId, @NotNull Long vehicleId) {
         driverService.requireApproved(driverId);
         Vehicle vehicle = findOwnedVehicle(driverId, vehicleId);
+        if (tripRepository.existsByVehicleId(vehicleId)) {
+            throw new BusinessRuleException("Um veículo associado a viagens não pode ser removido");
+        }
+        boolean wasDefault = vehicle.isDefaultVehicle();
         vehicleRepository.delete(vehicle);
+        vehicleRepository.flush();
+        if (wasDefault) {
+            vehicleRepository.findFirstByDriverIdOrderByIdAsc(driverId)
+                    .ifPresent(replacement -> replacement.setDefaultVehicle(true));
+        }
+    }
+
+    @Transactional
+    public Vehicle setDefault(@NotNull Long driverId, @NotNull Long vehicleId) {
+        driverService.requireApproved(driverId);
+        Vehicle selected = findOwnedVehicle(driverId, vehicleId);
+        vehicleRepository.findFirstByDriverIdAndDefaultVehicleTrue(driverId)
+                .filter(current -> !current.getId().equals(vehicleId))
+                .ifPresent(current -> current.setDefaultVehicle(false));
+        selected.setDefaultVehicle(true);
+        return selected;
+    }
+
+    @Transactional(readOnly = true)
+    public Vehicle findDefault(@NotNull Long driverId) {
+        return vehicleRepository.findFirstByDriverIdAndDefaultVehicleTrue(driverId)
+                .orElseThrow(() -> new BusinessRuleException(
+                        "Defina um veículo padrão antes de planejar viagens"));
     }
 
     private Vehicle findOwnedVehicle(Long driverId, Long vehicleId) {

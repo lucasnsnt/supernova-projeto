@@ -14,6 +14,8 @@ import java.util.Optional;
 @Repository
 public interface TripRepository extends JpaRepository<Trip, Long> {
 
+    boolean existsByVehicleId(Long vehicleId);
+
     @EntityGraph(attributePaths = {
             "vehicle", "participants", "participants.student", "participants.student.user",
             "participants.student.institution", "participants.confirmation"

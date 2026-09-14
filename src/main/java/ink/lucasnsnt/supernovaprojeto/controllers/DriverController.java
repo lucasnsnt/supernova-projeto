@@ -8,6 +8,7 @@ import ink.lucasnsnt.supernovaprojeto.dtos.invite.InviteResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.link.LinkedStudentResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.vehicle.VehicleRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.vehicle.VehicleResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.common.AddressRequest;
 import ink.lucasnsnt.supernovaprojeto.models.DriverInvite;
 import ink.lucasnsnt.supernovaprojeto.models.Vehicle;
 import ink.lucasnsnt.supernovaprojeto.services.AccountService;
@@ -53,6 +54,19 @@ public class DriverController {
     @PostMapping("/review-submissions")
     public DriverResponse resubmitForReview(@AuthenticationPrincipal Jwt jwt) {
         return driverService.resubmitForReviewResponse(userId(jwt));
+    }
+
+    @PutMapping("/operational-address")
+    public DriverResponse setOperationalAddress(
+            @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody AddressRequest request) {
+        return driverService.setOperationalAddress(userId(jwt), request);
+    }
+
+    @DeleteMapping("/operational-address")
+    public DriverResponse useRegistrationAddressForOperation(
+            @AuthenticationPrincipal Jwt jwt) {
+        return driverService.useRegistrationAddressForOperation(userId(jwt));
     }
 
     @GetMapping("/invites")
@@ -116,6 +130,13 @@ public class DriverController {
         Vehicle vehicle = vehicleService.update(userId(jwt), vehicleId, request.brand(), request.model(),
                 request.year(), request.licensePlate(), request.passengerCapacity(), request.color());
         return VehicleResponse.from(vehicle);
+    }
+
+    @PutMapping("/vehicles/{vehicleId}/default")
+    public VehicleResponse setDefaultVehicle(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long vehicleId) {
+        return VehicleResponse.from(vehicleService.setDefault(userId(jwt), vehicleId));
     }
 
     @DeleteMapping("/vehicles/{vehicleId}")

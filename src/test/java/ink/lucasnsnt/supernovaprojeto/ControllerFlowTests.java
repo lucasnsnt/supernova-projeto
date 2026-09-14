@@ -9,6 +9,7 @@ import ink.lucasnsnt.supernovaprojeto.models.enums.InstitutionType;
 import ink.lucasnsnt.supernovaprojeto.models.enums.Role;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverInviteRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.UserRepository;
+import ink.lucasnsnt.supernovaprojeto.repositories.VehicleRepository;
 import ink.lucasnsnt.supernovaprojeto.services.DriverService;
 import ink.lucasnsnt.supernovaprojeto.services.InstitutionService;
 import ink.lucasnsnt.supernovaprojeto.services.StudentScheduleService;
@@ -37,6 +38,7 @@ class ControllerFlowTests {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;
+    @Autowired private VehicleRepository vehicleRepository;
     @Autowired private DriverInviteRepository inviteRepository;
     @Autowired private StudentService studentService;
     @Autowired private StudentScheduleService scheduleService;
@@ -100,7 +102,35 @@ class ControllerFlowTests {
         mockMvc.perform(post("/api/drivers/me/vehicles")
                         .with(jwtFor(driverUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(vehicleBody))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.defaultVehicle").value(true));
+
+        String replacementVehicleBody = """
+                {"brand":"Fiat","model":"Ducato","year":2022,"licensePlate":"DEF4G56",
+                 "passengerCapacity":15,"color":"Branca"}
+                """;
+        mockMvc.perform(post("/api/drivers/me/vehicles")
+                        .with(jwtFor(driverUser)).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON).content(replacementVehicleBody))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.defaultVehicle").value(false));
+        long replacementVehicleId = vehicleRepository.findByLicensePlateIgnoreCase("DEF4G56")
+                .orElseThrow().getId();
+
+        mockMvc.perform(put("/api/drivers/me/vehicles/{id}/default", replacementVehicleId)
+                        .with(jwtFor(driverUser)).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.defaultVehicle").value(true));
+
+        mockMvc.perform(put("/api/drivers/me/operational-address")
+                        .with(jwtFor(driverUser)).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"street":"Rua da Garagem","number":"50","neighborhood":"Centro",
+                                 "city":"Salvador","state":"BA","zipCode":"40000-100"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.operationalAddress.street").value("Rua da Garagem"));
 
         mockMvc.perform(post("/api/drivers/me/invites")
                         .with(jwtFor(driverUser)).with(csrf())
