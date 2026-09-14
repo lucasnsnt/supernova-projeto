@@ -22,4 +22,13 @@ public class DailyTransportProperties {
     private Duration departureChangeLock = Duration.ofMinutes(30);
     private Duration maximumDepartureAdjustment = Duration.ofMinutes(30);
     private Duration maximumReturnWait = Duration.ofMinutes(30);
+    private Google google = new Google();
+
+    @Getter
+    @Setter
+    public static class Google {
+        private boolean enabled;
+        private String projectId;
+        private String endpoint = "https://routeoptimization.googleapis.com";
+    }
 }
