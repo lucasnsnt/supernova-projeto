@@ -29,6 +29,13 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     })
     Optional<Trip> findByIdAndDriverId(Long id, Long driverId);
 
+    @EntityGraph(attributePaths = {
+            "vehicle", "driver", "driver.user", "participants", "participants.student",
+            "participants.student.user", "participants.student.institution", "participants.confirmation"
+    })
+    List<Trip> findDistinctByParticipantsStudentIdAndServiceDateOrderByPlannedDepartureAt(
+            Long studentId, LocalDate serviceDate);
+
     List<Trip> findAllByStatusAndPlannedDepartureAtBetween(
             TripStatus status, LocalDateTime start, LocalDateTime end);
 }

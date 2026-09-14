@@ -10,6 +10,10 @@ import ink.lucasnsnt.supernovaprojeto.dtos.vehicle.VehicleRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.vehicle.VehicleResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.common.AddressRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.DailyConfirmationResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.DepartureUpdateRequest;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripCancellationRequest;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripVehicleUpdateRequest;
 import ink.lucasnsnt.supernovaprojeto.models.DriverInvite;
 import ink.lucasnsnt.supernovaprojeto.models.Vehicle;
 import ink.lucasnsnt.supernovaprojeto.services.AccountService;
@@ -18,6 +22,7 @@ import ink.lucasnsnt.supernovaprojeto.services.DriverService;
 import ink.lucasnsnt.supernovaprojeto.services.DriverStudentLinkService;
 import ink.lucasnsnt.supernovaprojeto.services.VehicleService;
 import ink.lucasnsnt.supernovaprojeto.services.DailyConfirmationService;
+import ink.lucasnsnt.supernovaprojeto.services.TripService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,6 +47,7 @@ public class DriverController {
     private final DriverStudentLinkService linkService;
     private final VehicleService vehicleService;
     private final DailyConfirmationService confirmationService;
+    private final TripService tripService;
 
     @GetMapping
     public DriverResponse getProfile(@AuthenticationPrincipal Jwt jwt) {
@@ -115,6 +121,51 @@ public class DriverController {
             @RequestParam LocalDate date) {
         driverService.requireOperationalView(userId(jwt));
         return confirmationService.findByDriver(userId(jwt), date);
+    }
+
+    @GetMapping("/trips")
+    public List<TripResponse> findTrips(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam LocalDate date) {
+        return tripService.findByDriver(userId(jwt), date);
+    }
+
+    @PutMapping("/trips/{tripId}/departure")
+    public TripResponse updateTripDeparture(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long tripId,
+            @Valid @RequestBody DepartureUpdateRequest request) {
+        return tripService.updateDeparture(userId(jwt), tripId, request.departureAt(), request.reason());
+    }
+
+    @PutMapping("/trips/{tripId}/vehicle")
+    public TripResponse changeTripVehicle(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long tripId,
+            @Valid @RequestBody TripVehicleUpdateRequest request) {
+        return tripService.changeVehicle(userId(jwt), tripId, request.vehicleId());
+    }
+
+    @PostMapping("/trips/{tripId}/start")
+    public TripResponse startTrip(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long tripId) {
+        return tripService.start(userId(jwt), tripId);
+    }
+
+    @PostMapping("/trips/{tripId}/completion")
+    public TripResponse completeTrip(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long tripId) {
+        return tripService.complete(userId(jwt), tripId);
+    }
+
+    @PostMapping("/trips/{tripId}/cancellation")
+    public TripResponse cancelTrip(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long tripId,
+            @Valid @RequestBody TripCancellationRequest request) {
+        return tripService.cancel(userId(jwt), tripId, request.reason());
     }
 
     @GetMapping("/vehicles")
