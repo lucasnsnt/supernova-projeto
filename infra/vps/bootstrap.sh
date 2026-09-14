@@ -54,6 +54,7 @@ SQL
     "ALLOWED_ORIGINS=$frontend_origin" \
     "SECURE_COOKIES=true" \
     "MAIL_DELIVERY=log" \
+    "MAIL_HEALTH_ENABLED=false" \
     >"$app_dir/supernova.env"
 fi
 

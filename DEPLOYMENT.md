@@ -30,7 +30,9 @@ Ele cria:
 
 Depois que o registro DNS existir, gere o certificado conforme a instrução
 exibida pelo script. O arquivo de ambiente inicia com `MAIL_DELIVERY=log`; altere
-para `smtp` somente depois de preencher as configurações de e-mail.
+para `smtp` somente depois de preencher as configurações de e-mail. Ao habilitar
+o SMTP, defina também `MAIL_HEALTH_ENABLED=true` para que o Actuator monitore a
+conexão com o provedor.
 
 ## Segredos do ambiente `production` no GitHub
 
