@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/invites/preview").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(
                         jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
