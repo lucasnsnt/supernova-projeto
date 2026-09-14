@@ -119,6 +119,8 @@ public class AuthService {
                 .city(address.city().trim())
                 .state(address.state().trim().toUpperCase())
                 .zipCode(address.zipCode().trim())
+                .latitude(address.latitude())
+                .longitude(address.longitude())
                 .build();
     }
 }

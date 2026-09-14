@@ -90,5 +90,7 @@ public class InstitutionService {
         target.setCity(source.city().trim());
         target.setState(source.state().trim().toUpperCase());
         target.setZipCode(source.zipCode().trim());
+        target.setLatitude(source.latitude());
+        target.setLongitude(source.longitude());
     }
 }

@@ -222,8 +222,8 @@ public class DriverService {
         target.setCity(source.city().trim());
         target.setState(source.state().trim().toUpperCase());
         target.setZipCode(source.zipCode().trim());
-        target.setLatitude(null);
-        target.setLongitude(null);
+        target.setLatitude(source.latitude());
+        target.setLongitude(source.longitude());
     }
 
     private Address newAddress(AddressRequest source) {

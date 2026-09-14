@@ -143,10 +143,13 @@ class ControllerFlowTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"street":"Rua da Garagem","number":"50","neighborhood":"Centro",
-                                 "city":"Salvador","state":"BA","zipCode":"40000-100"}
+                                 "city":"Salvador","state":"BA","zipCode":"40000-100",
+                                 "latitude":-12.9714,"longitude":-38.5014}
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.operationalAddress.street").value("Rua da Garagem"));
+                .andExpect(jsonPath("$.operationalAddress.street").value("Rua da Garagem"))
+                .andExpect(jsonPath("$.operationalAddress.latitude").value(-12.9714))
+                .andExpect(jsonPath("$.operationalAddress.longitude").value(-38.5014));
 
         mockMvc.perform(post("/api/drivers/me/invites")
                         .with(jwtFor(driverUser)).with(csrf())
