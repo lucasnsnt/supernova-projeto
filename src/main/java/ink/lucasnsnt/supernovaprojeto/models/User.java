@@ -41,7 +41,7 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime registrationDate;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private LocalDateTime emailVerifiedAt;
 
     @Enumerated(EnumType.STRING)

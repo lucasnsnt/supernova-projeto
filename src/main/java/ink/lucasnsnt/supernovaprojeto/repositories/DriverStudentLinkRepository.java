@@ -3,6 +3,7 @@ package ink.lucasnsnt.supernovaprojeto.repositories;
 import ink.lucasnsnt.supernovaprojeto.models.DriverStudentLink;
 import ink.lucasnsnt.supernovaprojeto.models.enums.DriverStudentLinkStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,8 +18,12 @@ public interface DriverStudentLinkRepository extends JpaRepository<DriverStudent
     Optional<DriverStudentLink> findFirstByStudentIdAndStatus(
             Long studentId, DriverStudentLinkStatus status);
 
+    @EntityGraph(attributePaths = {
+            "student", "student.user", "student.user.address", "student.institution", "student.schedules"
+    })
     List<DriverStudentLink> findAllByDriverId(Long driverId);
 
+    @EntityGraph(attributePaths = {"driver", "driver.user"})
     List<DriverStudentLink> findAllByStudentId(Long studentId);
 
     List<DriverStudentLink> findAllByDriverIdAndStatus(Long driverId, DriverStudentLinkStatus status);

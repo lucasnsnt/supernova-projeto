@@ -7,6 +7,8 @@ import ink.lucasnsnt.supernovaprojeto.models.Driver;
 import ink.lucasnsnt.supernovaprojeto.models.DriverInvite;
 import ink.lucasnsnt.supernovaprojeto.models.enums.InviteStatus;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverInviteRepository;
+import ink.lucasnsnt.supernovaprojeto.dtos.invite.InvitePreviewResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.invite.InviteResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -18,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.List;
 
 @Service
 @Validated
@@ -96,6 +99,25 @@ public class DriverInviteService {
         }
         markRevoked(invite);
         return invite;
+    }
+
+    @Transactional
+    public InvitePreviewResponse preview(@NotBlank String token) {
+        DriverInvite invite = findUsableByToken(token);
+        return new InvitePreviewResponse(invite.getDriver().getId(),
+                invite.getDriver().getUser().getName(), invite.getExpiresAt());
+    }
+
+    @Transactional
+    public List<InviteResponse> findAllByDriver(@NotNull Long driverId) {
+        driverService.requireOperationalView(driverId);
+        List<DriverInvite> invites = inviteRepository.findAllByDriverId(driverId);
+        invites.stream()
+                .filter(invite -> invite.getStatus() == InviteStatus.ACTIVE && isExpired(invite))
+                .forEach(this::markExpired);
+        return invites.stream()
+                .map(InviteResponse::from)
+                .toList();
     }
 
     private boolean isExpired(DriverInvite invite) {
