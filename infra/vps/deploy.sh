@@ -17,7 +17,7 @@ SUPERNOVA_IMAGE="$new_image" docker compose -f "$compose_file" up -d --remove-or
 
 healthy=false
 for attempt in $(seq 1 24); do
-  if curl --fail --silent "$health_url" >/dev/null; then
+  if curl --fail --silent --connect-timeout 2 --max-time 4 "$health_url" >/dev/null; then
     healthy=true
     break
   fi
