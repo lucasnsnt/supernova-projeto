@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 
 @Entity
 @Table(name = "users")
@@ -40,6 +41,9 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime registrationDate;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime emailVerifiedAt;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -61,11 +65,12 @@ public class User {
         }
     }
 
-    private byte age(){
-        if(dateOfBirth == null){
+    @Transient
+    public int getAge() {
+        if (dateOfBirth == null) {
             return 0;
         }
-        return (byte) ((LocalDate.now().getYear() + LocalDate.now().getMonthValue()) - dateOfBirth.getYear());
-    };
+        return Period.between(dateOfBirth, LocalDate.now()).getYears();
+    }
 
 }
