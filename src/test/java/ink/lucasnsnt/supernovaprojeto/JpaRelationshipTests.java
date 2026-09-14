@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -119,6 +120,7 @@ class JpaRelationshipTests {
                 .email(email)
                 .password("encoded-password")
                 .dateOfBirth(LocalDate.of(2000, 1, 1))
+                .emailVerifiedAt(LocalDateTime.now())
                 .role(role)
                 .address(address("Rua Principal", role.name()))
                 .build();
