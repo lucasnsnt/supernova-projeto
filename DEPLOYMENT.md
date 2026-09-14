@@ -9,6 +9,8 @@
 
 O backend de produção responde em `https://api.supernova.lucasnsnt.ink` por meio
 do Nginx. Nenhuma porta da aplicação ou do banco deve ser publicada na internet.
+A API possui limite de 384 MB e 0,75 CPU para coexistir com os demais serviços
+da VPS sem poder consumir todos os recursos do host.
 
 ## Fluxo Git
 
