@@ -12,6 +12,7 @@ import ink.lucasnsnt.supernovaprojeto.models.enums.Role;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverInviteRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.UserRepository;
+import ink.lucasnsnt.supernovaprojeto.dtos.driver.DriverResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Validated
@@ -73,6 +75,11 @@ public class DriverService {
     }
 
     @Transactional
+    public DriverResponse approveResponse(@NotNull Long driverId) {
+        return DriverResponse.from(approve(driverId));
+    }
+
+    @Transactional
     public Driver reject(@NotNull Long driverId, @NotBlank String reason) {
         Driver driver = findById(driverId);
         requireStatus(driver, DriverStatus.PENDING);
@@ -80,6 +87,11 @@ public class DriverService {
         driver.setStatusReason(reason);
         driver.setReviewedAt(LocalDateTime.now(clock));
         return driver;
+    }
+
+    @Transactional
+    public DriverResponse rejectResponse(@NotNull Long driverId, @NotBlank String reason) {
+        return DriverResponse.from(reject(driverId, reason));
     }
 
     @Transactional
@@ -93,7 +105,12 @@ public class DriverService {
     }
 
     @Transactional
-    public Driver suspend(@NotNull Long driverId, String reason) {
+    public DriverResponse resubmitForReviewResponse(@NotNull Long driverId) {
+        return DriverResponse.from(resubmitForReview(driverId));
+    }
+
+    @Transactional
+    public Driver suspend(@NotNull Long driverId, @NotBlank String reason) {
         Driver driver = findById(driverId);
         requireStatus(driver, DriverStatus.APPROVED);
         driver.setStatus(DriverStatus.SUSPENDED);
@@ -109,6 +126,11 @@ public class DriverService {
     }
 
     @Transactional
+    public DriverResponse suspendResponse(@NotNull Long driverId, @NotBlank String reason) {
+        return DriverResponse.from(suspend(driverId, reason));
+    }
+
+    @Transactional
     public Driver reactivate(@NotNull Long driverId) {
         Driver driver = findById(driverId);
         requireStatus(driver, DriverStatus.SUSPENDED);
@@ -118,6 +140,11 @@ public class DriverService {
         return driver;
     }
 
+    @Transactional
+    public DriverResponse reactivateResponse(@NotNull Long driverId) {
+        return DriverResponse.from(reactivate(driverId));
+    }
+
     @Transactional(readOnly = true)
     public Driver requireApproved(@NotNull Long driverId) {
         Driver driver = findById(driverId);
@@ -125,6 +152,29 @@ public class DriverService {
             throw new BusinessRuleException("O motorista precisa estar aprovado para executar esta ação");
         }
         return driver;
+    }
+
+    @Transactional(readOnly = true)
+    public Driver requireOperationalView(@NotNull Long driverId) {
+        Driver driver = findById(driverId);
+        if (driver.getStatus() != DriverStatus.APPROVED
+                && driver.getStatus() != DriverStatus.SUSPENDED) {
+            throw new BusinessRuleException("O motorista com este status pode visualizar apenas a própria análise");
+        }
+        return driver;
+    }
+
+    @Transactional(readOnly = true)
+    public List<DriverResponse> findAll(DriverStatus status) {
+        List<Driver> drivers = status == null
+                ? driverRepository.findAll()
+                : driverRepository.findAllByStatus(status);
+        return drivers.stream().map(DriverResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public DriverResponse getDetails(@NotNull Long driverId) {
+        return DriverResponse.from(findById(driverId));
     }
 
     private void requireStatus(Driver driver, DriverStatus expected) {

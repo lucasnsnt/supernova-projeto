@@ -51,18 +51,49 @@ public class VehicleService {
 
     @Transactional(readOnly = true)
     public List<Vehicle> findAllByDriver(@NotNull Long driverId) {
-        driverService.requireApproved(driverId);
+        driverService.requireOperationalView(driverId);
         return vehicleRepository.findAllByDriverId(driverId);
+    }
+
+    @Transactional
+    public Vehicle update(
+            @NotNull Long driverId,
+            @NotNull Long vehicleId,
+            @NotBlank String brand,
+            @NotBlank String model,
+            Integer year,
+            @NotBlank String licensePlate,
+            @Positive int passengerCapacity,
+            String color) {
+        driverService.requireApproved(driverId);
+        Vehicle vehicle = findOwnedVehicle(driverId, vehicleId);
+        vehicleRepository.findByLicensePlateIgnoreCase(licensePlate)
+                .filter(found -> !found.getId().equals(vehicleId))
+                .ifPresent(found -> {
+                    throw new ResourceConflictException("A placa já está cadastrada");
+                });
+        vehicle.setBrand(brand.trim());
+        vehicle.setModel(model.trim());
+        vehicle.setYear(year);
+        vehicle.setLicensePlate(licensePlate.trim().toUpperCase());
+        vehicle.setPassengerCapacity(passengerCapacity);
+        vehicle.setColor(color);
+        return vehicle;
     }
 
     @Transactional
     public void delete(@NotNull Long driverId, @NotNull Long vehicleId) {
         driverService.requireApproved(driverId);
+        Vehicle vehicle = findOwnedVehicle(driverId, vehicleId);
+        vehicleRepository.delete(vehicle);
+    }
+
+    private Vehicle findOwnedVehicle(Long driverId, Long vehicleId) {
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo", vehicleId));
         if (!vehicle.getDriver().getId().equals(driverId)) {
             throw new ResourceNotFoundException("Veículo", vehicleId);
         }
-        vehicleRepository.delete(vehicle);
+        return vehicle;
     }
 }

@@ -9,6 +9,8 @@ import ink.lucasnsnt.supernovaprojeto.models.DriverStudentLink;
 import ink.lucasnsnt.supernovaprojeto.models.Student;
 import ink.lucasnsnt.supernovaprojeto.models.enums.DriverStudentLinkStatus;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverStudentLinkRepository;
+import ink.lucasnsnt.supernovaprojeto.dtos.link.LinkedStudentResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.link.StudentLinkResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -59,12 +61,24 @@ public class DriverStudentLinkService {
     }
 
     @Transactional
+    public StudentLinkResponse acceptInviteResponse(
+            @NotNull Long studentId, @NotBlank String token) {
+        return StudentLinkResponse.from(acceptInvite(studentId, token));
+    }
+
+    @Transactional
     public DriverStudentLink endByStudent(@NotNull Long studentId, @NotNull Long linkId) {
         DriverStudentLink link = findLink(linkId);
         if (!link.getStudent().getId().equals(studentId)) {
             throw new ResourceNotFoundException("Vínculo", linkId);
         }
         return end(link);
+    }
+
+    @Transactional
+    public StudentLinkResponse endByStudentResponse(
+            @NotNull Long studentId, @NotNull Long linkId) {
+        return StudentLinkResponse.from(endByStudent(studentId, linkId));
     }
 
     @Transactional
@@ -77,6 +91,12 @@ public class DriverStudentLinkService {
         return end(link);
     }
 
+    @Transactional
+    public LinkedStudentResponse endByDriverResponse(
+            @NotNull Long driverId, @NotNull Long linkId) {
+        return LinkedStudentResponse.from(endByDriver(driverId, linkId));
+    }
+
     @Transactional(readOnly = true)
     public List<Student> findStudentsEligibleForRoute(@NotNull Long driverId) {
         driverService.requireApproved(driverId);
@@ -84,6 +104,22 @@ public class DriverStudentLinkService {
                 .stream()
                 .map(DriverStudentLink::getStudent)
                 .filter(Student::isProfileComplete)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<StudentLinkResponse> findHistoryByStudent(@NotNull Long studentId) {
+        studentService.findById(studentId);
+        return linkRepository.findAllByStudentId(studentId).stream()
+                .map(StudentLinkResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LinkedStudentResponse> findHistoryByDriver(@NotNull Long driverId) {
+        driverService.requireOperationalView(driverId);
+        return linkRepository.findAllByDriverId(driverId).stream()
+                .map(LinkedStudentResponse::from)
                 .toList();
     }
 

@@ -1,6 +1,8 @@
 package ink.lucasnsnt.supernovaprojeto.services;
 
 import ink.lucasnsnt.supernovaprojeto.dtos.student.StudentProfileStatus;
+import ink.lucasnsnt.supernovaprojeto.dtos.institution.InstitutionResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.student.StudentDetailsResponse;
 import ink.lucasnsnt.supernovaprojeto.exceptions.BusinessRuleException;
 import ink.lucasnsnt.supernovaprojeto.exceptions.ResourceConflictException;
 import ink.lucasnsnt.supernovaprojeto.exceptions.ResourceNotFoundException;
@@ -26,6 +28,7 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final UserRepository userRepository;
     private final InstitutionRepository institutionRepository;
+    private final AccountService accountService;
 
     @Transactional
     public Student register(@NotNull Long userId) {
@@ -54,8 +57,14 @@ public class StudentService {
         Student student = findById(studentId);
         Institution institution = institutionRepository.findById(institutionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Instituição", institutionId));
-        student.setInstitution(institution);
+        student.changeInstitution(institution);
         return student;
+    }
+
+    @Transactional
+    public InstitutionResponse selectInstitutionResponse(
+            @NotNull Long studentId, @NotNull Long institutionId) {
+        return InstitutionResponse.from(selectInstitution(studentId, institutionId).getInstitution());
     }
 
     @Transactional(readOnly = true)
@@ -71,5 +80,15 @@ public class StudentService {
                 hasOutbound,
                 hasReturn,
                 student.isProfileComplete());
+    }
+
+    @Transactional(readOnly = true)
+    public StudentDetailsResponse getDetails(@NotNull Long studentId) {
+        Student student = findById(studentId);
+        InstitutionResponse institution = student.getInstitution() == null
+                ? null
+                : InstitutionResponse.from(student.getInstitution());
+        return new StudentDetailsResponse(
+                accountService.findOwnAccount(studentId), institution, getProfileStatus(studentId));
     }
 }
