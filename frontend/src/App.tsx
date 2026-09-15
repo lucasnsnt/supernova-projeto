@@ -10,6 +10,7 @@ import { RegisterPage } from './pages/RegisterPage'
 import { SchedulePage } from './features/student/SchedulePage'
 import { TripsPage } from './pages/TripsPage'
 import { StudentsPage } from './features/driver/StudentsPage'
+import { NotificationsPage } from './features/notifications/NotificationsPage'
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } })
 
@@ -24,7 +25,7 @@ export default function App() {
       <Route path="alunos" element={<StudentsPage />} />
       <Route path="motoristas" element={<PlaceholderPage title="Motoristas" />} />
       <Route path="instituicoes" element={<PlaceholderPage title="Instituições" />} />
-      <Route path="notificacoes" element={<PlaceholderPage title="Notificações" />} />
+      <Route path="notificacoes" element={<NotificationsPage />} />
     </Route></Route>
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes></AuthProvider></BrowserRouter></QueryClientProvider>

@@ -1,6 +1,8 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import type { Role } from '../auth/types'
+import { useQuery } from '@tanstack/react-query'
+import { unreadCount } from '../features/notifications/api'
 
 type NavigationItem = { to: string; label: string; symbol: string }
 const navigation: Record<Role, NavigationItem[]> = {
@@ -11,6 +13,7 @@ const navigation: Record<Role, NavigationItem[]> = {
 
 export function AppShell() {
   const { session, logout } = useAuth()
+  const unread = useQuery({ queryKey: ['unread-notifications'], queryFn: unreadCount, refetchInterval: 15_000, enabled: Boolean(session) })
   if (!session) return null
   const items = navigation[session.role]
   return (
@@ -19,7 +22,7 @@ export function AppShell() {
         <NavLink to="/" className="brand"><span>S</span> Supernova</NavLink>
         <nav className="desktop-nav" aria-label="Navegação principal">{items.map((item) => <NavigationLink key={item.to} item={item} />)}</nav>
         <div className="topbar-actions">
-          <NavLink to="/notificacoes" className="icon-button" aria-label="Notificações">●</NavLink>
+          <NavLink to="/notificacoes" className="icon-button notification-link" aria-label={`${unread.data?.count ?? 0} notificações não lidas`}>●{Boolean(unread.data?.count) && <b>{unread.data?.count}</b>}</NavLink>
           <button className="text-button" onClick={() => void logout()}>Sair</button>
         </div>
       </header>
