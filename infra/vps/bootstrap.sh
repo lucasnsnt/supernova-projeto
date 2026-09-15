@@ -59,6 +59,7 @@ SQL
     "ALLOWED_ORIGINS=$frontend_origin" \
     "SECURE_COOKIES=true" \
     "MAIL_DELIVERY=log" \
+    "MAIL_FROM=no-reply@mail.lucasnsnt.ink" \
     "MAIL_HEALTH_ENABLED=false" \
     "GOOGLE_ROUTE_OPTIMIZATION_ENABLED=false" \
     "GOOGLE_CLOUD_PROJECT=" \
