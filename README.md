@@ -13,6 +13,9 @@ frontend/  aplicação web React e TypeScript
 
 ## Backend
 
+Para rodar front e backend localmente, com banco e códigos de e-mail isolados da
+VPS, siga [Desenvolvimento local](docs/LOCAL_DEVELOPMENT.md).
+
 Para executar os testes:
 
 ```bash

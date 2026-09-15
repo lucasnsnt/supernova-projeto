@@ -33,3 +33,8 @@ build/
 .vscode/
 AGENTS.md
 PROJECT_CONTEXT.md
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.local.properties.example
+backend/.local/
