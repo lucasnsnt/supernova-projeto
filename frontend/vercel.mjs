@@ -1,17 +1,11 @@
-const backendValue = process.env.URL_BACKEND
-if (!backendValue) throw new Error('Configure URL_BACKEND neste ambiente da Vercel.')
-
-const backend = new URL(backendValue)
-if (backend.protocol !== 'https:' || backend.pathname !== '/' || backend.search || backend.hash || backend.username || backend.password) {
-  throw new Error('URL_BACKEND deve ser uma origem HTTPS, sem /api, credenciais ou parâmetros.')
-}
+import { deploymentEnv, routes } from '@vercel/config/v1'
 
 export const config = {
   framework: 'vite',
   buildCommand: 'npm run build',
   outputDirectory: 'dist',
   rewrites: [
-    { source: '/api/:path*', destination: `${backendValue.replace(/\/$/, '')}/api/:path*` },
+    routes.rewrite('/api/:path*', `${deploymentEnv('URL_BACKEND')}/api/:path*`),
     { source: '/(.*)', destination: '/index.html' },
   ],
 }
