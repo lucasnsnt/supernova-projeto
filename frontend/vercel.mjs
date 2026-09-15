@@ -11,7 +11,7 @@ export const config = {
   buildCommand: 'npm run build',
   outputDirectory: 'dist',
   rewrites: [
-    { source: '/api/:path*', destination: `${backend.origin}/api/:path*` },
+    { source: '/api/:path*', destination: `${backendValue.replace(/\/$/, '')}/api/:path*` },
     { source: '/(.*)', destination: '/index.html' },
   ],
 }
