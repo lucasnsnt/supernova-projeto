@@ -7,7 +7,7 @@ export type Invite = { id: number; token: string; status: string; expiresAt: str
 export type Vehicle = { id: number; brand: string; model: string; year: number | null; licensePlate: string; passengerCapacity: number; color: string | null; defaultVehicle: boolean }
 
 export const driverConfirmations = () => apiFetch<DailyConfirmation[]>(`/api/drivers/me/daily-confirmations?date=${today()}`)
-export const driverTrips = () => apiFetch<Trip[]>(`/api/drivers/me/trips?date=${today()}`)
+export const driverTrips = (date = today()) => apiFetch<Trip[]>(`/api/drivers/me/trips?date=${date}`)
 export const linkedStudents = () => apiFetch<LinkedStudent[]>('/api/drivers/me/students')
 export const invites = () => apiFetch<Invite[]>('/api/drivers/me/invites')
 export const createInvite = () => apiFetch<Invite>('/api/drivers/me/invites', { method: 'POST', body: JSON.stringify({ validityDays: 7, replaceCurrent: true }) })
@@ -17,3 +17,6 @@ export const tripAction = (id: number, action: 'start' | 'completion' | 'replann
 export const cancelTrip = (id: number, reason: string) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/cancellation`, { method: 'POST', body: JSON.stringify({ reason }) })
 
 export const setDefaultVehicle = (id: number) => apiFetch<Vehicle>(`/api/drivers/me/vehicles/${id}/default`, { method: 'PUT' })
+
+export const changeTripVehicle = (id: number, vehicleId: number) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/vehicle`, { method: 'PUT', body: JSON.stringify({ vehicleId }) })
+export const updateDeparture = (id: number, departureAt: string, reason: string | null) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/departure`, { method: 'PUT', body: JSON.stringify({ departureAt, reason }) })

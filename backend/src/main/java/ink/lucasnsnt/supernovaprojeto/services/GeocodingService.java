@@ -1,5 +1,6 @@
 package ink.lucasnsnt.supernovaprojeto.services;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ink.lucasnsnt.supernovaprojeto.config.DailyTransportProperties;
 import ink.lucasnsnt.supernovaprojeto.exceptions.BusinessRuleException;
 import ink.lucasnsnt.supernovaprojeto.models.Address;
@@ -77,8 +78,12 @@ public class GeocodingService {
         return new BusinessRuleException("Não foi possível localizar o endereço com precisão. Confira rua, número, cidade e CEP");
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record GeocodeResponse(String status, List<GeocodeResult> results) {}
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record GeocodeResult(Boolean partial_match, Geometry geometry) {}
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record Geometry(Location location, String location_type) {}
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record Location(BigDecimal lat, BigDecimal lng) {}
 }

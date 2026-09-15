@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { answerConfirmation, studentConfirmations, studentTrips, time } from './api'
+import { answerConfirmation, studentConfirmations, studentTrips, time, today, tomorrow } from './api'
 import { StudentReadiness } from './StudentReadiness'
 
 export function StudentTodayPage() {
   const queryClient = useQueryClient()
-  const confirmations = useQuery({ queryKey: ['student-confirmations', 'today'], queryFn: () => studentConfirmations() })
-  const trips = useQuery({ queryKey: ['student-trips', 'today'], queryFn: () => studentTrips() })
+  const confirmations = useQuery({ queryKey: ['student-confirmations', today(), tomorrow()], queryFn: async () => (await Promise.all([studentConfirmations(today()), studentConfirmations(tomorrow())])).flat(), refetchInterval: 15_000 })
+  const trips = useQuery({ queryKey: ['trips', 'STUDENT', today()], queryFn: () => studentTrips(), refetchInterval: 15_000 })
   const answer = useMutation({
     mutationFn: ({ id, value }: { id: number; value: 'YES' | 'NO' }) => answerConfirmation(id, value),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['student-confirmations'] }),
@@ -17,12 +17,14 @@ export function StudentTodayPage() {
     <StudentReadiness />
     {confirmations.isLoading && <section className="status-card">Carregando confirmações…</section>}
     {confirmations.isError && <section className="alert-card">Não foi possível carregar suas confirmações.</section>}
+    {answer.error && <p role="alert" className="form-error">{answer.error.message}</p>}
     {pending.map((item) => <section className="action-card" key={item.id}>
-      <div><span className="tag">Resposta necessária</span><h2>Você vai na {item.direction === 'IDA' ? 'ida' : 'volta'}?</h2><p className="muted">Horário da agenda: {item.scheduledTime.slice(0, 5)} · responda até {time(item.responseDeadline)}</p></div>
+      <div><span className="tag">Resposta necessária</span><h2>Você vai na {item.direction === 'IDA' ? 'ida' : 'volta'}?</h2><p className="muted">{item.serviceDate.split('-').reverse().join('/')} · Horário da agenda: {item.scheduledTime.slice(0, 5)} · responda até {time(item.responseDeadline)}</p></div>
       <div className="button-row"><button className="secondary-button" disabled={answer.isPending} onClick={() => answer.mutate({ id: item.id, value: 'NO' })}>Não vou</button><button className="primary-button compact" disabled={answer.isPending} onClick={() => answer.mutate({ id: item.id, value: 'YES' })}>Sim, eu vou</button></div>
     </section>)}
-    {confirmations.isSuccess && pending.length === 0 && <section className="status-card"><div className="status-icon">✓</div><div><h2>Nenhuma confirmação pendente</h2><p className="muted">Não há solicitações de resposta para hoje.</p></div></section>}
+    {confirmations.isSuccess && pending.length === 0 && <section className="status-card"><div className="status-icon">✓</div><div><h2>Nenhuma confirmação pendente</h2><p className="muted">Não há solicitações de resposta para hoje ou amanhã.</p></div></section>}
     <section><div className="section-heading"><h2>Viagens de hoje</h2></div><div className="card-list">
+      {trips.error && <p role="alert" className="form-error">{trips.error.message}</p>}
       {trips.data?.map((trip) => <article className="trip-card" key={trip.id}><div><span className="tag neutral">{trip.direction === 'IDA' ? 'Ida' : 'Volta'}</span><h3>{time(trip.departureAt)}</h3><p className="muted">{trip.vehicle ? `${trip.vehicle.model} · ${trip.vehicle.licensePlate}` : 'Veículo a definir'}</p></div><strong className="trip-status">{trip.status.replaceAll('_', ' ')}</strong></article>)}
       {!trips.isLoading && trips.data?.length === 0 && <p className="empty-copy">Nenhuma viagem planejada para hoje.</p>}
     </div></section>

@@ -83,7 +83,7 @@ class GeocodingServiceTests {
         assertThat(address.getLatitude()).isNull();
     }
     private String response(boolean partial, String type) {
-        return "{\"status\":\"OK\",\"results\":[{\"partial_match\":" + partial
+        return "{\"status\":\"OK\",\"results\":[{\"formatted_address\":\"Rua A, Brasil\",\"address_components\":[],\"partial_match\":" + partial
                 + ",\"geometry\":{\"location_type\":\"" + type
                 + "\",\"location\":{\"lat\":-12.97,\"lng\":-38.50}}}]}";
     }

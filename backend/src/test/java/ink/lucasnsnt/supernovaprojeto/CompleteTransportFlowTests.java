@@ -124,6 +124,10 @@ class CompleteTransportFlowTests {
         driver = login("motorista@complete.test"); student = login("aluno@complete.test");
         Number tripId = (Number) read(get("/api/drivers/me/trips?date=2026-09-15"), driver, "$[0].id");
         assertThat(read(get("/api/students/me/trips?date=2026-09-15"), student, "$[0].status").toString()).isEqualTo("PLANNED");
+        assertThat(read(get("/api/drivers/me/trips?date=2026-09-15"), driver,
+                "$[0].participants[0].pickupAddress.street").toString()).isEqualTo("Rua MVP");
+        assertThat(read(get("/api/drivers/me/trips?date=2026-09-15"), driver,
+                "$[0].participants[0].dropoffAddress.number").toString()).isEqualTo("10");
         send(post("/api/drivers/me/trips/{id}/start", tripId), driver, null);
         assertThat(read(get("/api/students/me/trips?date=2026-09-15"), student, "$[0].status").toString()).isEqualTo("IN_PROGRESS");
         send(post("/api/drivers/me/trips/{id}/completion", tripId), driver, null);
