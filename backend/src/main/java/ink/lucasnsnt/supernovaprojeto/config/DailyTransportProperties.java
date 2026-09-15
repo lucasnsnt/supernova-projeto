@@ -23,6 +23,15 @@ public class DailyTransportProperties {
     private Duration maximumDepartureAdjustment = Duration.ofMinutes(30);
     private Duration maximumReturnWait = Duration.ofMinutes(30);
     private Google google = new Google();
+    private Geocoding geocoding = new Geocoding();
+
+    @Getter
+    @Setter
+    public static class Geocoding {
+        private boolean enabled;
+        private String apiKey;
+        private String endpoint = "https://maps.googleapis.com";
+    }
 
     @Getter
     @Setter

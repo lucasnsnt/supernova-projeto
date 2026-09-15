@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { apiFetch, setAccessToken } from '../lib/api'
 import type { Account, AuthSession, RegisterPayload } from './types'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 type Credentials = { email: string; password: string }
 type AuthContextValue = {
@@ -40,8 +40,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false))
   }, [])
 
+  const account = useQuery({
+    queryKey: ['session-account', session?.userId],
+    queryFn: () => apiFetch<Account>('/api/me'),
+    enabled: session?.role === 'DRIVER',
+    refetchInterval: 15_000,
+  })
+  const currentSession = useMemo(() => session && account.data
+    ? { ...session, driverStatus: account.data.driverStatus }
+    : session, [session, account.data])
+
   const value = useMemo<AuthContextValue>(() => ({
-    session,
+    session: currentSession,
     loading,
     async login(credentials) {
       const authenticated = await apiFetch<AuthSession>('/api/auth/login', {
@@ -70,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(null)
       }
     },
-  }), [loading, session, queryClient])
+  }), [loading, currentSession, queryClient])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
