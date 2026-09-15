@@ -9,6 +9,14 @@ fi
 readonly new_image="$1"
 readonly compose_file="/opt/supernova/compose.prod.yaml"
 readonly health_url="http://127.0.0.1:8081/actuator/health"
+readonly google_credentials_file="/opt/supernova/google-service-account.json"
+
+# A integração do Google permanece desabilitada no MVP, mas o Compose exige que
+# o arquivo declarado como secret exista. Ele poderá ser substituído pelas
+# credenciais reais antes de habilitar GOOGLE_ROUTE_OPTIMIZATION_ENABLED.
+if [[ ! -f "$google_credentials_file" ]]; then
+  install -m 0600 /dev/null "$google_credentials_file"
+fi
 
 previous_image="$(docker inspect --format '{{.Config.Image}}' supernova-api 2>/dev/null || true)"
 
