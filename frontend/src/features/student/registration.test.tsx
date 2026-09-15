@@ -38,10 +38,11 @@ describe('cadastro do aluno', () => {
   it('salva os dados sem perder coordenadas de um endereço inalterado', async () => {
     mount()
     const name = await screen.findByLabelText('Nome')
+    expect(screen.getByLabelText('Data de nascimento')).toHaveValue('01/01/2000')
     await userEvent.clear(name)
     await userEvent.type(name, 'Novo nome')
     await userEvent.click(screen.getByRole('button', { name: 'Salvar dados' }))
-    await waitFor(() => expect(api.updateProfile).toHaveBeenCalledWith(expect.objectContaining({ name: 'Novo nome', address })))
+    await waitFor(() => expect(api.updateProfile).toHaveBeenCalledWith(expect.objectContaining({ name: 'Novo nome', dateOfBirth: '2000-01-01', address })))
   })
   it('limpa coordenadas antigas quando o endereço muda', () => {
     const form = { name: 'Aluno', phone: '123', dateOfBirth: '2000-01-01', address: { ...address, street: 'Rua Nova' } }

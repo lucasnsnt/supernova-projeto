@@ -6,6 +6,8 @@ import { institutions } from '../admin/api'
 import { selectInstitution, updateProfile, type Address, type StudentDetails, type ProfilePayload } from './profile-api'
 import { StudentReadiness, useStudentRegistration } from './StudentReadiness'
 import { StudentDriverLink } from './StudentDriverLink'
+import { BirthDateInput } from '../../components/BirthDateInput'
+import { displayBirthDate, isoBirthDate } from '../../lib/birthDate'
 
 const emptyAddress: Address = { street: '', number: '', complement: '', neighborhood: '', city: '', state: '', zipCode: '', latitude: null, longitude: null }
 // oxlint-disable-next-line react/only-export-components
@@ -30,11 +32,11 @@ export function StudentProfilePage() {
 
 function ProfileForm({ details }: { details: StudentDetails }) {
   const client = useQueryClient()
-  const [form, setForm] = useState<ProfilePayload>({ name: details.account.name, phone: details.account.phone, dateOfBirth: details.account.dateOfBirth, address: { ...(details.account.address ?? emptyAddress) } })
-  const save = useMutation({ mutationFn: () => updateProfile(profilePayload(form, details.account.address)), onSuccess: () => void client.invalidateQueries({ queryKey: ['student-registration'] }) })
+  const [form, setForm] = useState<ProfilePayload>({ name: details.account.name, phone: details.account.phone, dateOfBirth: displayBirthDate(details.account.dateOfBirth), address: { ...(details.account.address ?? emptyAddress) } })
+  const save = useMutation({ mutationFn: () => updateProfile(profilePayload({ ...form, dateOfBirth: isoBirthDate(form.dateOfBirth)! }, details.account.address)), onSuccess: () => void client.invalidateQueries({ queryKey: ['student-registration'] }) })
   function submit(event: FormEvent) { event.preventDefault(); save.mutate() }
   return <section className="profile-card"><h2>Dados pessoais e endereço</h2><p className="muted">{details.account.email}</p><form className="form-stack" onSubmit={submit}>
-    <div className="form-grid">{(['name', 'phone', 'dateOfBirth'] as const).map((field, index) => <label key={field}>{['Nome', 'Telefone', 'Data de nascimento'][index]}<input required type={field === 'dateOfBirth' ? 'date' : field === 'phone' ? 'tel' : 'text'} value={form[field]} onChange={event => { save.reset(); setForm({ ...form, [field]: event.target.value }) }} /></label>)}</div>
+    <div className="form-grid">{(['name', 'phone'] as const).map((field, index) => <label key={field}>{['Nome', 'Telefone'][index]}<input required type={field === 'phone' ? 'tel' : 'text'} value={form[field]} onChange={event => { save.reset(); setForm({ ...form, [field]: event.target.value }) }} /></label>)}<label>Data de nascimento<BirthDateInput value={form.dateOfBirth} onChange={value => { save.reset(); setForm({ ...form, dateOfBirth: value }) }} /></label></div>
     <div className="form-grid">{(['street', 'number', 'complement', 'neighborhood', 'city', 'state', 'zipCode'] as const).map((field, index) => <label key={field}>{['Rua', 'Número', 'Complemento', 'Bairro', 'Cidade', 'Estado (UF)', 'CEP'][index]}<input required={field !== 'complement'} maxLength={field === 'state' ? 2 : undefined} pattern={field === 'zipCode' ? '[0-9]{5}-?[0-9]{3}' : undefined} value={form.address[field] ?? ''} onChange={event => { save.reset(); setForm({ ...form, address: { ...form.address, [field]: event.target.value } }) }} /></label>)}</div>
     {save.isError && <p className="form-error" role="alert">{save.error.message}</p>}{save.isSuccess && <p role="status">Dados salvos.</p>}
     <button className="primary-button compact" disabled={save.isPending}>{save.isPending ? 'Salvando…' : 'Salvar dados'}</button>
