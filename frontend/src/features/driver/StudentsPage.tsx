@@ -1,0 +1,20 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState, type FormEvent } from 'react'
+import { createInvite, createVehicle, invites, linkedStudents, vehicles } from './api'
+
+export function StudentsPage() {
+  const client = useQueryClient()
+  const students = useQuery({ queryKey: ['driver-students'], queryFn: linkedStudents })
+  const inviteList = useQuery({ queryKey: ['driver-invites'], queryFn: invites })
+  const vehicleList = useQuery({ queryKey: ['driver-vehicles'], queryFn: vehicles })
+  const invite = useMutation({ mutationFn: createInvite, onSuccess: () => void client.invalidateQueries({ queryKey: ['driver-invites'] }) })
+  return <div className="page-stack"><header className="page-heading"><p className="eyebrow">Sua operação</p><h1>Alunos e veículo</h1><p className="muted">Compartilhe um convite e mantenha o veículo da viagem configurado.</p></header><section><div className="section-heading"><h2>Convite ativo</h2><button className="primary-button compact" onClick={() => invite.mutate()} disabled={invite.isPending}>Gerar convite</button></div>{inviteList.data?.filter((item) => item.status === 'ACTIVE').map((item) => <div className="code-card" key={item.id}><code>{item.token}</code><button className="secondary-button" onClick={() => void navigator.clipboard.writeText(item.token)}>Copiar</button></div>)}</section><section><div className="section-heading"><h2>Alunos vinculados</h2></div><div className="card-list">{students.data?.filter((student) => student.status === 'ACTIVE').map((student) => <article className="trip-card" key={student.linkId}><div><strong>{student.name}</strong><p className="muted">{student.institutionName ?? 'Instituição pendente'} · {student.phone}</p></div><span className="trip-status">{student.profileComplete ? 'Completo' : 'Incompleto'}</span></article>)}{!students.isLoading && !students.data?.some((item) => item.status === 'ACTIVE') && <p className="empty-copy">Nenhum aluno vinculado.</p>}</div></section><section><div className="section-heading"><h2>Veículos</h2></div><div className="card-list">{vehicleList.data?.map((vehicle) => <article className="trip-card" key={vehicle.id}><div><strong>{vehicle.brand} {vehicle.model}</strong><p className="muted">{vehicle.licensePlate} · {vehicle.passengerCapacity} lugares</p></div>{vehicle.defaultVehicle && <span className="tag neutral">Padrão</span>}</article>)}</div><VehicleForm onCreated={() => void client.invalidateQueries({ queryKey: ['driver-vehicles'] })} /></section></div>
+}
+
+function VehicleForm({ onCreated }: { onCreated: () => void }) {
+  const [form, setForm] = useState({ brand: '', model: '', year: '', licensePlate: '', passengerCapacity: '', color: '' })
+  const mutation = useMutation({ mutationFn: () => createVehicle({ ...form, year: form.year ? Number(form.year) : null, passengerCapacity: Number(form.passengerCapacity) }), onSuccess: () => { setForm({ brand: '', model: '', year: '', licensePlate: '', passengerCapacity: '', color: '' }); onCreated() } })
+  function submit(event: FormEvent) { event.preventDefault(); mutation.mutate() }
+  return <form className="inline-form" onSubmit={submit}><h3>Adicionar veículo</h3>{Object.entries(form).map(([field, value]) => <input key={field} aria-label={vehicleLabels[field]} placeholder={vehicleLabels[field]} type={field === 'year' || field === 'passengerCapacity' ? 'number' : 'text'} value={value} onChange={(event) => setForm((current) => ({ ...current, [field]: event.target.value }))} required={!['year', 'color'].includes(field)} />)}<button className="primary-button compact" disabled={mutation.isPending}>Adicionar</button></form>
+}
+const vehicleLabels: Record<string, string> = { brand: 'Marca', model: 'Modelo', year: 'Ano', licensePlate: 'Placa', passengerCapacity: 'Lugares', color: 'Cor' }
