@@ -7,15 +7,17 @@
 - `prod`: PostgreSQL, cookies seguros, API em `127.0.0.1:8081` e origem permitida
   `https://supernova.lucasnsnt.ink`.
 
-O backend de produção responde em `https://api.supernova.lucasnsnt.ink` por meio
+O backend está em `backend/` e sua imagem é publicada no GHCR com o sufixo
+`-backend`. Em produção, responde em `https://api.supernova.lucasnsnt.ink` por meio
 do Nginx. Nenhuma porta da aplicação ou do banco deve ser publicada na internet.
 A API possui limite de 384 MB e 0,75 CPU para coexistir com os demais serviços
 da VPS sem poder consumir todos os recursos do host.
 
 ## Fluxo Git
 
-Pull requests para `master` e `prod` executam o workflow de CI. Um push em
-`prod` também constrói uma imagem imutável, publica no GHCR e atualiza a VPS.
+Alterações em `backend/**` nos pull requests para `master` e `prod` executam o
+workflow de CI do backend. Um push em `prod` que altere `backend/**` ou
+`infra/vps/**` também constrói uma imagem imutável, publica no GHCR e atualiza a VPS.
 O script de deploy confirma `/actuator/health` e restaura a imagem anterior se a
 nova versão não ficar saudável.
 

@@ -1,16 +1,22 @@
-name: CI
+name: Backend CI
 
 on:
   pull_request:
     branches: [master, prod]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
   push:
     branches: [master]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: backend-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -27,6 +33,8 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
+          cache-dependency-path: backend/pom.xml
 
       - name: Verify
         run: ./mvnw --batch-mode --no-transfer-progress verify
+        working-directory: backend
