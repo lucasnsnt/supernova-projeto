@@ -8,7 +8,7 @@ Monorepo da aplicação web de transporte estudantil.
 backend/   API Java 21 com Spring Boot
 docs/      decisões funcionais e técnicas
 infra/     implantação e configuração da VPS
-frontend/  aplicação web (próxima etapa)
+frontend/  aplicação web React e TypeScript
 ```
 
 ## Backend
