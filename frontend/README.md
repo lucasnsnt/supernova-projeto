@@ -31,6 +31,16 @@ Ao importar o repositório na Vercel, configure:
 - **Framework Preset:** Vite
 - **Production Branch:** `prod`
 
-O arquivo `vercel.json` mantém as rotas da SPA funcionando em acessos diretos e
-encaminha `/api/*` para o backend de produção. Nenhuma variável de ambiente é
-necessária para essa configuração inicial.
+O arquivo `vercel.mjs` mantém as rotas da SPA funcionando em acessos diretos e
+encaminha `/api/*` para a origem definida em `URL_BACKEND`.
+
+Configure `URL_BACKEND=https://api.supernova.lucasnsnt.ink` em Production, sem
+`/api` no final. Para Preview, defina explicitamente a API de testes desejada;
+não há fallback silencioso para produção. Alterar a variável requer novo deploy.
+
+`BACKEND_LOCAL` é usada somente pelo Vite local, em `.env.local`, e não precisa
+estar em Production na Vercel. O navegador continua chamando `/api` no próprio
+domínio. Nenhuma dessas variáveis usa o prefixo `VITE_`, portanto não é incorporada
+ao bundle como variável pública. O endereço da API, entretanto, não é um segredo.
+
+Veja o fluxo completo de desenvolvimento em [../docs/LOCAL_DEVELOPMENT.md](../docs/LOCAL_DEVELOPMENT.md).

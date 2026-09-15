@@ -3,6 +3,9 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import type { RegisterPayload } from '../auth/types'
 import { apiFetch } from '../lib/api'
+import { PasswordRequirements } from '../auth/PasswordRequirements'
+import { BirthDateInput } from '../components/BirthDateInput'
+import { isoBirthDate } from '../lib/birthDate'
 
 type Step = 'email' | 'code' | 'profile'
 type Authorization = { registrationToken: string; expiresAt: string }
@@ -52,7 +55,7 @@ export function RegisterPage() {
     await perform(async () => {
       const payload: RegisterPayload = {
         registrationToken, email, name: profile.name, password: profile.password,
-        phone: profile.phone, dateOfBirth: profile.dateOfBirth,
+        phone: profile.phone, dateOfBirth: isoBirthDate(profile.dateOfBirth)!,
         role: profile.role as RegisterPayload['role'],
         address: {
           street: profile.street, number: profile.number, complement: profile.complement || undefined,
@@ -109,9 +112,9 @@ export function RegisterPage() {
           <div className="form-grid">
             <Field label="Nome completo"><input value={profile.name} onChange={(event) => update('name', event.target.value)} autoComplete="name" required /></Field>
             <Field label="Telefone"><input value={profile.phone} onChange={(event) => update('phone', event.target.value)} autoComplete="tel" required /></Field>
-            <Field label="Nascimento"><input type="date" value={profile.dateOfBirth} onChange={(event) => update('dateOfBirth', event.target.value)} required /></Field>
-            <Field label="Senha"><input type="password" minLength={8} value={profile.password} onChange={(event) => update('password', event.target.value)} autoComplete="new-password" required /></Field>
+            <Field label="Nascimento"><BirthDateInput value={profile.dateOfBirth} onChange={value => update('dateOfBirth', value)} /></Field>
           </div>
+          <div className="password-field"><Field label="Senha"><input type="password" minLength={8} maxLength={64} aria-describedby="password-requirements" value={profile.password} onChange={(event) => update('password', event.target.value)} autoComplete="new-password" required /></Field><PasswordRequirements id="password-requirements" password={profile.password} /></div>
           <h2 className="form-section-title">Endereço</h2>
           <div className="form-grid">
             <Field label="Rua"><input value={profile.street} onChange={(event) => update('street', event.target.value)} required /></Field>
@@ -125,7 +128,6 @@ export function RegisterPage() {
           {profile.role === 'DRIVER'
             ? <Field label="CNH"><input value={profile.cnh} onChange={(event) => update('cnh', event.target.value)} required /></Field>
             : <Field label="Convite do motorista (opcional)"><input value={profile.driverInviteToken} onChange={(event) => update('driverInviteToken', event.target.value)} /></Field>}
-          <p className="password-hint">A senha deve conter maiúscula, minúscula, número e caractere especial.</p>
           <SubmitButton loading={submitting}>Criar conta</SubmitButton>
         </form>}
         {error && <p className="form-error standalone" role="alert">{error}</p>}
