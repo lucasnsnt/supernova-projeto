@@ -22,3 +22,15 @@ npm run lint
 npm test
 npm run build
 ```
+
+## Deploy na Vercel
+
+Ao importar o repositório na Vercel, configure:
+
+- **Root Directory:** `frontend`
+- **Framework Preset:** Vite
+- **Production Branch:** `prod`
+
+O arquivo `vercel.json` mantém as rotas da SPA funcionando em acessos diretos e
+encaminha `/api/*` para o backend de produção. Nenhuma variável de ambiente é
+necessária para essa configuração inicial.
