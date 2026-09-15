@@ -24,7 +24,7 @@ function ScheduleRow({ day, label, schedules }: { day: string; label: string; sc
   const [returnTime, setReturnTime] = useState(
     schedules.find((item) => item.direction === 'VOLTA')?.time.slice(0, 5) ?? '',
   )
-  const refresh = () => void queryClient.invalidateQueries({ queryKey: ['student-schedules'] })
+  const refresh = () => { void queryClient.invalidateQueries({ queryKey: ['student-schedules'] }); void queryClient.invalidateQueries({ queryKey: ['student-registration'] }) }
   const save = useMutation({ mutationFn: () => saveSchedule(day, outbound || null, returnTime || null), onSuccess: refresh })
   const remove = useMutation({ mutationFn: () => removeSchedule(day), onSuccess: refresh })
   function submit(event: FormEvent) { event.preventDefault(); save.mutate() }

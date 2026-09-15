@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { apiFetch, setAccessToken } from '../lib/api'
 import type { Account, AuthSession, RegisterPayload } from './types'
+import { useQueryClient } from '@tanstack/react-query'
 
 type Credentials = { email: string; password: string }
 type AuthContextValue = {
@@ -14,6 +15,7 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient()
   const [session, setSession] = useState<AuthSession | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -46,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         method: 'POST', body: JSON.stringify(credentials),
       })
       setAccessToken(authenticated.accessToken)
+      queryClient.clear()
       setSession(authenticated)
       return authenticated
     },
@@ -54,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         method: 'POST', body: JSON.stringify(payload),
       })
       setAccessToken(authenticated.accessToken)
+      queryClient.clear()
       setSession(authenticated)
       return authenticated
     },
@@ -62,10 +66,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await apiFetch<void>('/api/auth/logout', { method: 'POST' })
       } finally {
         setAccessToken(null)
+        queryClient.clear()
         setSession(null)
       }
     },
-  }), [loading, session])
+  }), [loading, session, queryClient])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
