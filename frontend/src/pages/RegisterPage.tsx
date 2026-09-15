@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import type { RegisterPayload } from '../auth/types'
 import { apiFetch } from '../lib/api'
+import { PasswordRequirements } from '../auth/PasswordRequirements'
 
 type Step = 'email' | 'code' | 'profile'
 type Authorization = { registrationToken: string; expiresAt: string }
@@ -110,7 +111,7 @@ export function RegisterPage() {
             <Field label="Nome completo"><input value={profile.name} onChange={(event) => update('name', event.target.value)} autoComplete="name" required /></Field>
             <Field label="Telefone"><input value={profile.phone} onChange={(event) => update('phone', event.target.value)} autoComplete="tel" required /></Field>
             <Field label="Nascimento"><input type="date" value={profile.dateOfBirth} onChange={(event) => update('dateOfBirth', event.target.value)} required /></Field>
-            <Field label="Senha"><input type="password" minLength={8} value={profile.password} onChange={(event) => update('password', event.target.value)} autoComplete="new-password" required /></Field>
+            <div><Field label="Senha"><input type="password" minLength={8} maxLength={64} aria-describedby="password-requirements" value={profile.password} onChange={(event) => update('password', event.target.value)} autoComplete="new-password" required /></Field><PasswordRequirements id="password-requirements" password={profile.password} /></div>
           </div>
           <h2 className="form-section-title">Endereço</h2>
           <div className="form-grid">
@@ -125,7 +126,6 @@ export function RegisterPage() {
           {profile.role === 'DRIVER'
             ? <Field label="CNH"><input value={profile.cnh} onChange={(event) => update('cnh', event.target.value)} required /></Field>
             : <Field label="Convite do motorista (opcional)"><input value={profile.driverInviteToken} onChange={(event) => update('driverInviteToken', event.target.value)} /></Field>}
-          <p className="password-hint">A senha deve conter maiúscula, minúscula, número e caractere especial.</p>
           <SubmitButton loading={submitting}>Criar conta</SubmitButton>
         </form>}
         {error && <p className="form-error standalone" role="alert">{error}</p>}
