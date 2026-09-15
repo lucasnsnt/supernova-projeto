@@ -12,7 +12,8 @@ export class ApiError extends Error {
 }
 
 let accessToken: string | null = sessionStorage.getItem('supernova_access_token')
-let csrf: { headerName: string; token: string } | null = null
+type CsrfToken = { headerName: string; token: string }
+let csrfRequest: Promise<CsrfToken> | null = null
 
 export function setAccessToken(token: string | null) {
   accessToken = token
@@ -21,11 +22,19 @@ export function setAccessToken(token: string | null) {
 }
 
 async function csrfHeaders(): Promise<Record<string, string>> {
-  if (!csrf) {
-    const response = await fetch('/api/auth/csrf', { credentials: 'include' })
-    if (!response.ok) throw new ApiError(response.status, null)
-    csrf = (await response.json()) as { headerName: string; token: string }
+  // Não reutilizar tokens entre operações: login/logout podem trocar o cookie.
+  // Operações simultâneas compartilham apenas a requisição em andamento.
+  if (!csrfRequest) {
+    csrfRequest = fetch('/api/auth/csrf', { credentials: 'include', cache: 'no-store' })
+      .then(async response => {
+        if (!response.ok) throw new ApiError(response.status, {
+          detail: 'Não foi possível atualizar a segurança da página. Recarregue a página e tente novamente.',
+        })
+        return await response.json() as CsrfToken
+      })
+      .finally(() => { csrfRequest = null })
   }
+  const csrf = await csrfRequest
   return { [csrf.headerName]: csrf.token }
 }
 
@@ -34,7 +43,8 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   const changesState = !['GET', 'HEAD', 'OPTIONS'].includes(method)
   const headers = new Headers(options.headers)
   if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
-  if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
+  // Autenticação pública não deve ser bloqueada por um JWT antigo no navegador.
+  if (accessToken && !path.startsWith('/api/auth/')) headers.set('Authorization', `Bearer ${accessToken}`)
   if (changesState) {
     const securityHeaders = await csrfHeaders()
     Object.entries(securityHeaders).forEach(([name, value]) => headers.set(name, value))
@@ -47,6 +57,9 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
       body = (await response.json()) as ApiErrorBody
     } catch {
       // Respostas vazias continuam representadas pelo status HTTP.
+    }
+    if (response.status === 403 && changesState && path.startsWith('/api/auth/') && !body?.detail && !body?.message) {
+      body = { detail: 'A validação de segurança da página falhou. Recarregue a página e tente novamente.' }
     }
     throw new ApiError(response.status, body)
   }
