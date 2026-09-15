@@ -35,4 +35,10 @@ describe('apiFetch', () => {
       expect.objectContaining({ status: 401, message: 'Credenciais inválidas' }),
     )
   })
+
+  it('aceita uma resposta bem-sucedida sem corpo', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 202 }))
+
+    await expect(apiFetch<void>('/api/auth/email-verification')).resolves.toBeUndefined()
+  })
 })
