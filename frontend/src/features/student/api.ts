@@ -3,7 +3,7 @@ import { apiFetch } from '../../lib/api'
 export type Direction = 'IDA' | 'VOLTA'
 export type ConfirmationStatus = 'PENDING' | 'YES' | 'NO' | 'NO_RESPONSE'
 export type DailyConfirmation = {
-  id: number; serviceDate: string; direction: Direction; scheduledTime: string
+  id: number; studentName?: string; serviceDate: string; direction: Direction; scheduledTime: string
   preliminaryDepartureAt: string; responseDeadline: string; status: ConfirmationStatus
 }
 export type Schedule = { id: number; dayOfWeek: string; time: string; direction: Direction }

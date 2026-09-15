@@ -9,6 +9,7 @@ import { PlaceholderPage } from './pages/PlaceholderPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { SchedulePage } from './features/student/SchedulePage'
 import { TripsPage } from './pages/TripsPage'
+import { StudentsPage } from './features/driver/StudentsPage'
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } })
 
@@ -20,7 +21,7 @@ export default function App() {
       <Route index element={<HomePage />} />
       <Route path="agenda" element={<SchedulePage />} />
       <Route path="viagens" element={<TripsPage />} />
-      <Route path="alunos" element={<PlaceholderPage title="Alunos" />} />
+      <Route path="alunos" element={<StudentsPage />} />
       <Route path="motoristas" element={<PlaceholderPage title="Motoristas" />} />
       <Route path="instituicoes" element={<PlaceholderPage title="Instituições" />} />
       <Route path="notificacoes" element={<PlaceholderPage title="Notificações" />} />
