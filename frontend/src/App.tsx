@@ -7,6 +7,8 @@ import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
 import { RegisterPage } from './pages/RegisterPage'
+import { SchedulePage } from './features/student/SchedulePage'
+import { TripsPage } from './pages/TripsPage'
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } })
 
@@ -16,8 +18,8 @@ export default function App() {
     <Route path="/cadastro" element={<RegisterPage />} />
     <Route element={<ProtectedRoute />}><Route element={<AppShell />}>
       <Route index element={<HomePage />} />
-      <Route path="agenda" element={<PlaceholderPage title="Agenda" />} />
-      <Route path="viagens" element={<PlaceholderPage title="Viagens" />} />
+      <Route path="agenda" element={<SchedulePage />} />
+      <Route path="viagens" element={<TripsPage />} />
       <Route path="alunos" element={<PlaceholderPage title="Alunos" />} />
       <Route path="motoristas" element={<PlaceholderPage title="Motoristas" />} />
       <Route path="instituicoes" element={<PlaceholderPage title="Instituições" />} />
