@@ -15,3 +15,5 @@ export const vehicles = () => apiFetch<Vehicle[]>('/api/drivers/me/vehicles')
 export const createVehicle = (body: Omit<Vehicle, 'id' | 'defaultVehicle'>) => apiFetch<Vehicle>('/api/drivers/me/vehicles', { method: 'POST', body: JSON.stringify(body) })
 export const tripAction = (id: number, action: 'start' | 'completion' | 'replanning', body?: unknown) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/${action}`, { method: 'POST', body: body ? JSON.stringify(body) : undefined })
 export const cancelTrip = (id: number, reason: string) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/cancellation`, { method: 'POST', body: JSON.stringify({ reason }) })
+
+export const setDefaultVehicle = (id: number) => apiFetch<Vehicle>(`/api/drivers/me/vehicles/${id}/default`, { method: 'PUT' })
