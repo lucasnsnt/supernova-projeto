@@ -12,6 +12,7 @@ import { StudentsPage } from './features/driver/StudentsPage'
 import { NotificationsPage } from './features/notifications/NotificationsPage'
 import { DriversPage } from './features/admin/DriversPage'
 import { InstitutionsPage } from './features/admin/InstitutionsPage'
+import { StudentProfilePage } from './features/student/StudentProfilePage'
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } })
 
@@ -22,6 +23,7 @@ export default function App() {
     <Route element={<ProtectedRoute />}><Route element={<AppShell />}>
       <Route index element={<HomePage />} />
       <Route path="agenda" element={<SchedulePage />} />
+      <Route path="meu-cadastro" element={<StudentProfilePage />} />
       <Route path="viagens" element={<TripsPage />} />
       <Route path="alunos" element={<StudentsPage />} />
       <Route path="motoristas" element={<DriversPage />} />
