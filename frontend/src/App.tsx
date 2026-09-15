@@ -6,13 +6,14 @@ import { AppShell } from './layout/AppShell'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
+import { RegisterPage } from './pages/RegisterPage'
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } })
 
 export default function App() {
   return <QueryClientProvider client={queryClient}><BrowserRouter><AuthProvider><Routes>
     <Route path="/login" element={<LoginPage />} />
-    <Route path="/cadastro" element={<PlaceholderPage title="Criar conta" />} />
+    <Route path="/cadastro" element={<RegisterPage />} />
     <Route element={<ProtectedRoute />}><Route element={<AppShell />}>
       <Route index element={<HomePage />} />
       <Route path="agenda" element={<PlaceholderPage title="Agenda" />} />

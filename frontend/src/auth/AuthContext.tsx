@@ -1,12 +1,13 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { apiFetch, setAccessToken } from '../lib/api'
-import type { Account, AuthSession } from './types'
+import type { Account, AuthSession, RegisterPayload } from './types'
 
 type Credentials = { email: string; password: string }
 type AuthContextValue = {
   session: AuthSession | null
   loading: boolean
   login: (credentials: Credentials) => Promise<AuthSession>
+  register: (payload: RegisterPayload) => Promise<AuthSession>
   logout: () => Promise<void>
 }
 
@@ -43,6 +44,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async login(credentials) {
       const authenticated = await apiFetch<AuthSession>('/api/auth/login', {
         method: 'POST', body: JSON.stringify(credentials),
+      })
+      setAccessToken(authenticated.accessToken)
+      setSession(authenticated)
+      return authenticated
+    },
+    async register(payload) {
+      const authenticated = await apiFetch<AuthSession>('/api/auth/register', {
+        method: 'POST', body: JSON.stringify(payload),
       })
       setAccessToken(authenticated.accessToken)
       setSession(authenticated)

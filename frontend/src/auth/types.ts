@@ -18,3 +18,24 @@ export type Account = {
   role: Role
   driverStatus: AuthSession['driverStatus']
 }
+
+export type RegisterPayload = {
+  registrationToken: string
+  name: string
+  email: string
+  password: string
+  phone: string
+  dateOfBirth: string
+  role: Exclude<Role, 'ADMIN'>
+  address: {
+    street: string
+    number: string
+    complement?: string
+    neighborhood: string
+    city: string
+    state: string
+    zipCode: string
+  }
+  cnh?: string
+  driverInviteToken?: string
+}

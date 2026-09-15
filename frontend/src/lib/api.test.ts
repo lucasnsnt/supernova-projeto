@@ -25,7 +25,7 @@ describe('apiFetch', () => {
 
   it('preserva a mensagem de erro devolvida pela API', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify({ message: 'Credenciais inválidas' }), {
+      new Response(JSON.stringify({ detail: 'Credenciais inválidas' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       }),

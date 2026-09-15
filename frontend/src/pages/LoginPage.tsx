@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 
 export function LoginPage() {
@@ -42,7 +42,7 @@ export function LoginPage() {
           {error && <p className="form-error" role="alert">{error}</p>}
           <button className="primary-button" disabled={submitting}>{submitting ? 'Entrando…' : 'Entrar'}</button>
         </form>
-        <p className="auth-footer">Ainda não tem uma conta? <a href="/cadastro">Cadastre-se</a></p>
+        <p className="auth-footer">Ainda não tem uma conta? <Link to="/cadastro">Cadastre-se</Link></p>
       </section>
     </main>
   )

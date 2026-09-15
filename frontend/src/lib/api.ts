@@ -1,11 +1,11 @@
-export type ApiErrorBody = { message?: string; errors?: Record<string, string> }
+export type ApiErrorBody = { message?: string; detail?: string; errors?: Record<string, string> }
 
 export class ApiError extends Error {
   readonly status: number
   readonly body: ApiErrorBody | null
 
   constructor(status: number, body: ApiErrorBody | null) {
-    super(body?.message ?? 'Não foi possível concluir a solicitação.')
+    super(body?.detail ?? body?.message ?? 'Não foi possível concluir a solicitação.')
     this.status = status
     this.body = body
   }
