@@ -5,6 +5,9 @@ import ink.lucasnsnt.supernovaprojeto.models.*;
 import ink.lucasnsnt.supernovaprojeto.models.enums.*;
 import ink.lucasnsnt.supernovaprojeto.repositories.*;
 import ink.lucasnsnt.supernovaprojeto.services.InAppNotificationService;
+import ink.lucasnsnt.supernovaprojeto.services.GeocodingService;
+import ink.lucasnsnt.supernovaprojeto.services.DriverService;
+import ink.lucasnsnt.supernovaprojeto.exceptions.BusinessRuleException;
 import ink.lucasnsnt.supernovaprojeto.services.TripPlanningService;
 import ink.lucasnsnt.supernovaprojeto.services.routing.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +32,8 @@ class TripPlanningServiceTests {
     private RoutePlanningGateway routeGateway;
     private InAppNotificationService notificationService;
     private TripPlanningService service;
+    private GeocodingService geocodingService;
+    private DriverService driverService;
 
     @BeforeEach
     void setUp() {
@@ -38,12 +43,15 @@ class TripPlanningServiceTests {
         vehicleRepository = mock(VehicleRepository.class);
         routeGateway = mock(RoutePlanningGateway.class);
         notificationService = mock(InAppNotificationService.class);
+        geocodingService = mock(GeocodingService.class);
+        driverService = mock(DriverService.class);
         ZoneId zone = ZoneId.of("America/Bahia");
         Clock clock = Clock.fixed(
                 LocalDateTime.of(2026, 9, 15, 11, 30).atZone(zone).toInstant(), zone);
         service = new TripPlanningService(
                 confirmationRepository, participantRepository, tripRepository, vehicleRepository,
-                routeGateway, notificationService, new DailyTransportProperties(), clock);
+                routeGateway, notificationService, new DailyTransportProperties(), clock,
+                geocodingService, driverService);
     }
 
     @Test
@@ -133,6 +141,42 @@ class TripPlanningServiceTests {
         verify(routeGateway).optimize(any(RoutePlanningRequest.class));
         verify(notificationService).create(eq(20L), eq(NotificationType.TRIP_PLANNED),
                 anyString(), anyString(), same(trip), same(confirmation));
+    }
+
+    @Test
+    void shouldNotPlanConfirmationsOfSuspendedDriver() {
+        DailyConfirmation confirmation = confirmation(101L, 20L, LocalTime.of(12, 0), true);
+        confirmation.getDriver().setStatus(DriverStatus.SUSPENDED);
+        when(confirmationRepository.findAllByStatusAndResponseDeadlineLessThanEqualOrderByResponseDeadline(
+                eq(DailyConfirmationStatus.YES), any())).thenReturn(List.of(confirmation));
+        assertThat(service.planReadyConfirmations()).isZero();
+        verifyNoInteractions(routeGateway, tripRepository);
+    }
+
+    @Test
+    void shouldRequireApprovalBeforeReplanning() {
+        doThrow(new BusinessRuleException("Motorista suspenso")).when(driverService).requireApproved(10L);
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.replan(10L, 40L))
+                .isInstanceOf(BusinessRuleException.class);
+        verifyNoInteractions(tripRepository, routeGateway);
+    }
+
+    @Test
+    void shouldRetainConfirmedStudentWhenGeocodingFails() {
+        DailyConfirmation confirmation = confirmation(101L, 20L, LocalTime.of(12, 0), false);
+        when(confirmationRepository.findAllByStatusAndResponseDeadlineLessThanEqualOrderByResponseDeadline(
+                eq(DailyConfirmationStatus.YES), any())).thenReturn(List.of(confirmation));
+        when(vehicleRepository.findFirstByDriverIdAndDefaultVehicleTrue(10L))
+                .thenReturn(Optional.of(vehicle(confirmation.getDriver(), 15)));
+        doThrow(new BusinessRuleException("Confira rua, número, cidade e CEP"))
+                .when(geocodingService).resolve(any());
+        assertThat(service.planReadyConfirmations()).isOne();
+        var captor = org.mockito.ArgumentCaptor.forClass(Trip.class);
+        verify(tripRepository).save(captor.capture());
+        assertThat(captor.getValue().getStatus()).isEqualTo(TripStatus.NEEDS_ATTENTION);
+        assertThat(captor.getValue().getParticipants()).hasSize(1);
+        assertThat(captor.getValue().getPlanningIssue()).contains("Confira rua");
+        verifyNoInteractions(routeGateway);
     }
 
     private RoutePlanningResult successful(RoutePlanningRequest request) {

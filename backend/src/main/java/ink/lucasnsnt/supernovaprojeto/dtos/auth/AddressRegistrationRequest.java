@@ -32,7 +32,7 @@ public record AddressRegistrationRequest(
     }
 
     @AssertTrue(message = "latitude e longitude devem ser informadas juntas")
-    public boolean hasCompleteCoordinates() {
+    public boolean isCoordinatesComplete() {
         return (latitude == null) == (longitude == null);
     }
 }

@@ -33,6 +33,8 @@ public class TripPlanningService {
     private final InAppNotificationService notificationService;
     private final DailyTransportProperties properties;
     private final Clock clock;
+    private final GeocodingService geocodingService;
+    private final DriverService driverService;
 
     @Transactional
     public int planReadyConfirmations() {
@@ -41,6 +43,7 @@ public class TripPlanningService {
                 .findAllByStatusAndResponseDeadlineLessThanEqualOrderByResponseDeadline(
                         DailyConfirmationStatus.YES, now)
                 .stream()
+                .filter(confirmation -> confirmation.getDriver().getStatus() == DriverStatus.APPROVED)
                 .filter(confirmation -> !participantRepository.existsByConfirmationId(confirmation.getId()))
                 .collect(Collectors.groupingBy(
                         confirmation -> new PlanningKey(
@@ -64,6 +67,7 @@ public class TripPlanningService {
 
     @Transactional
     public TripResponse replan(Long driverId, Long tripId) {
+        driverService.requireApproved(driverId);
         Trip trip = tripRepository.findByIdAndDriverId(tripId, driverId)
                 .orElseThrow(() -> new ResourceNotFoundException("Viagem", tripId));
         if (trip.getStatus() != TripStatus.NEEDS_ATTENTION) {
@@ -169,6 +173,15 @@ public class TripPlanningService {
         Address base = first.getDriver().getOperationalAddress() == null
                 ? first.getDriver().getUser().getAddress()
                 : first.getDriver().getOperationalAddress();
+        try {
+            geocodingService.resolve(base);
+            for (DailyConfirmation confirmation : confirmations) {
+                geocodingService.resolve(confirmation.getStudent().getUser().getAddress());
+                geocodingService.resolve(confirmation.getStudent().getInstitution().getAddress());
+            }
+        } catch (BusinessRuleException exception) {
+            return RoutePlanningResult.unavailable(exception.getMessage());
+        }
         List<RoutePassenger> passengers = confirmations.stream().map(this::passenger).toList();
         if (point(base) == null || passengers.stream().anyMatch(this::hasMissingPoint)) {
             return RoutePlanningResult.unavailable("Existem endereços sem coordenadas válidas");

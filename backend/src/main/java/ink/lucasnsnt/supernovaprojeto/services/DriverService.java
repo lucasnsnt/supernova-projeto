@@ -38,6 +38,7 @@ public class DriverService {
     private final DriverInviteRepository inviteRepository;
     private final AddressRepository addressRepository;
     private final Clock clock;
+    private final GeocodingService geocodingService;
 
     @Transactional
     public Driver register(@NotNull Long userId, @NotBlank String cnh) {
@@ -224,6 +225,7 @@ public class DriverService {
         target.setZipCode(source.zipCode().trim());
         target.setLatitude(source.latitude());
         target.setLongitude(source.longitude());
+        geocodingService.resolve(target);
     }
 
     private Address newAddress(AddressRequest source) {

@@ -13,6 +13,7 @@ import ink.lucasnsnt.supernovaprojeto.models.Driver;
 import ink.lucasnsnt.supernovaprojeto.models.User;
 import ink.lucasnsnt.supernovaprojeto.models.enums.DriverStatus;
 import ink.lucasnsnt.supernovaprojeto.models.enums.Role;
+import ink.lucasnsnt.supernovaprojeto.repositories.AddressRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.UserRepository;
 import jakarta.validation.Valid;
@@ -40,6 +41,8 @@ public class AccountService {
     private final EmailVerificationService emailVerificationService;
     private final PasswordEncoder passwordEncoder;
     private final Clock clock;
+    private final GeocodingService geocodingService;
+    private final AddressRepository addressRepository;
 
     @Transactional(readOnly = true)
     public AccountResponse findOwnAccount(@NotNull Long userId) {
@@ -137,7 +140,13 @@ public class AccountService {
         user.setName(name.trim());
         user.setPhone(phone.trim());
         user.setDateOfBirth(dateOfBirth);
-        copyAddress(user.getAddress(), address);
+        if (user.getAddress() == null) {
+            Address created = new Address();
+            copyAddress(created, address);
+            user.setAddress(addressRepository.save(created));
+        } else {
+            copyAddress(user.getAddress(), address);
+        }
     }
 
     private void copyAddress(Address target, AddressRequest source) {
@@ -150,5 +159,6 @@ public class AccountService {
         target.setZipCode(source.zipCode().trim());
         target.setLatitude(source.latitude());
         target.setLongitude(source.longitude());
+        geocodingService.resolve(target);
     }
 }

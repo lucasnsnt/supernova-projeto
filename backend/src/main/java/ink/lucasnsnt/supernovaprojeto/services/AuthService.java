@@ -41,6 +41,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final Clock clock;
+    private final GeocodingService geocodingService;
 
     @Transactional
     public IssuedTokens register(@Valid RegisterRequest request) {
@@ -102,7 +103,7 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthResponse toResponse(IssuedTokens tokens) {
-        User user = tokens.user();
+        User user = userRepository.findById(tokens.user().getId()).orElseThrow();
         DriverStatus driverStatus = user.getDriver() == null ? null : user.getDriver().getStatus();
         boolean profileComplete = user.getStudent() != null && user.getStudent().isProfileComplete();
         return new AuthResponse(
@@ -111,7 +112,7 @@ public class AuthService {
     }
 
     private Address toAddress(AddressRegistrationRequest address) {
-        return Address.builder()
+        Address resolved = Address.builder()
                 .street(address.street().trim())
                 .number(address.number().trim())
                 .complement(address.complement())
@@ -122,5 +123,7 @@ public class AuthService {
                 .latitude(address.latitude())
                 .longitude(address.longitude())
                 .build();
+        geocodingService.resolve(resolved);
+        return resolved;
     }
 }

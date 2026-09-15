@@ -49,6 +49,36 @@ class ControllerFlowTests {
     @Autowired private InAppNotificationService notificationService;
 
     @Test
+    void studentShouldSavePreviouslyMissingAddress() throws Exception {
+        User user = saveUser("Aluno sem endereço", "missing-address@test.local", Role.STUDENT);
+        user.setAddress(null);
+        userRepository.save(user);
+        studentService.register(user.getId());
+        mockMvc.perform(put("/api/students/me/profile").with(jwtFor(user)).with(csrf())
+                .contentType(MediaType.APPLICATION_JSON).content("""
+                        {"name":"Aluno","phone":"71999999999","dateOfBirth":"2000-01-01",
+                         "address":{"street":"Rua Nova","number":"10","neighborhood":"Centro",
+                                    "city":"Salvador","state":"BA","zipCode":"40000000"}}
+                        """))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.address.street").value("Rua Nova"));
+        mockMvc.perform(get("/api/students/me").with(jwtFor(user)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.account.address.street").value("Rua Nova"));
+    }
+
+    @Test
+    void shouldRejectAnIncompleteCoordinatePair() throws Exception {
+        User user = saveUser("Aluno coordenadas", "coordinate-validation@test.local", Role.STUDENT);
+        studentService.register(user.getId());
+        mockMvc.perform(put("/api/students/me/profile").with(jwtFor(user)).with(csrf())
+                .contentType(MediaType.APPLICATION_JSON).content("""
+                        {"name":"Aluno","phone":"71999999999","dateOfBirth":"2000-01-01",
+                         "address":{"street":"Rua","number":"10","neighborhood":"Centro",
+                                    "city":"Salvador","state":"BA","zipCode":"40000000","latitude":-12.97}}
+                        """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void studentShouldConfigureOneWayScheduleUsingOnlyOwnJwtIdentity() throws Exception {
         User studentUser = saveUser("Aluno Controller", "student-controller@test.local", Role.STUDENT);
         studentService.register(studentUser.getId());
