@@ -1,0 +1,63 @@
+name: Migrate production database to Neon
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type MIGRATE_TO_NEON to run the production cutover
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-database-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    if: inputs.confirmation == 'MIGRATE_TO_NEON'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          install -d -m 0700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 0600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+
+      - name: Upload migration script
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ vars.VPS_SSH_PORT || '22' }}
+        run: |
+          scp -P "$VPS_PORT" infra/vps/migrate-to-neon.sh \
+            "$VPS_USER@$VPS_HOST:/opt/supernova/migrate-to-neon.sh"
+
+      - name: Backup, migrate, validate and cut over
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ vars.VPS_SSH_PORT || '22' }}
+          NEON_DATABASE_URL_UNPOOLED: ${{ secrets.NEON_DATABASE_URL_UNPOOLED }}
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+          VPS_SUDO_PASSWORD: ${{ secrets.VPS_SUDO_PASSWORD }}
+        run: |
+          direct_b64="$(printf '%s' "$NEON_DATABASE_URL_UNPOOLED" | base64 -w0)"
+          pooled_b64="$(printf '%s' "$NEON_DATABASE_URL" | base64 -w0)"
+          sudo_b64="$(printf '%s' "$VPS_SUDO_PASSWORD" | base64 -w0)"
+          ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
+            "chmod 0700 /opt/supernova/migrate-to-neon.sh && NEON_DATABASE_URL_UNPOOLED_B64='$direct_b64' NEON_DATABASE_URL_B64='$pooled_b64' VPS_SUDO_PASSWORD_B64='$sudo_b64' /opt/supernova/migrate-to-neon.sh"
+
+      - name: Verify public API health
+        run: curl --fail --silent --show-error --retry 5 --retry-delay 3 https://api.supernova.lucasnsnt.ink/actuator/health
