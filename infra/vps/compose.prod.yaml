@@ -32,7 +32,8 @@ services:
     security_opt:
       - no-new-privileges:true
     secrets:
-      - google_credentials
+      - source: google_credentials
+        target: google-service-account.json
     logging:
       driver: json-file
       options:
