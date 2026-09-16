@@ -110,13 +110,13 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Deploy frontend after backend health check
-        working-directory: frontend
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          URL_BACKEND: ${{ vars.VERCEL_URL_BACKEND }}
         run: |
-          npm ci
+          npm ci --prefix frontend
           npx vercel@59.19.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
           npx vercel@59.19.0 build --prod --token="$VERCEL_TOKEN"
           npx vercel@59.19.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
