@@ -19,9 +19,17 @@ cp .env.local.properties.example .env.local.properties
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
-A API fica em `http://127.0.0.1:8080`. O perfil `local` usa H2 em arquivo
-(`backend/.local/`), com migrations Flyway. Os dados sobrevivem a reinícios e
-não se misturam com o banco da VPS. Os testes continuam usando bancos isolados.
+A API fica em `http://127.0.0.1:8080`. O perfil `local` usa H2 em arquivo por
+padrão, com migrations Flyway. Defina `LOCAL_DATABASE_PATH` com um caminho
+absoluto em `.env.local.properties`: assim os dados sobrevivem a reinícios e o
+banco não muda quando a aplicação é iniciada pelo terminal ou pela IDE. Defina
+também um `JWT_SECRET` local estável para não invalidar todas as sessões a cada
+reinício. Os testes continuam usando bancos isolados.
+
+Para aproximar o ambiente local da produção, é possível usar PostgreSQL. Crie
+um banco e usuário exclusivos de desenvolvimento e configure `DATABASE_URL`,
+`DATABASE_USERNAME` e `DATABASE_PASSWORD` conforme o arquivo de exemplo. Nunca
+use localmente as credenciais ou o banco de produção.
 
 Os códigos de cadastro são exibidos no terminal do backend. Eles **não** são
 enviados por e-mail neste ambiente. Solicite o código no frontend, copie os seis

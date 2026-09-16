@@ -15,6 +15,7 @@ let accessToken: string | null = sessionStorage.getItem('supernova_access_token'
 type CsrfToken = { headerName: string; token: string }
 let csrfRequest: Promise<CsrfToken> | null = null
 let refreshRequest: Promise<void> | null = null
+export const AUTH_EXPIRED_EVENT = 'supernova:auth-expired'
 
 export function setAccessToken(token: string | null) {
   accessToken = token
@@ -58,6 +59,11 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}, retry
     if (!refreshRequest) {
       refreshRequest = apiFetch<{ accessToken: string }>('/api/auth/refresh', { method: 'POST' })
         .then(tokens => setAccessToken(tokens.accessToken))
+        .catch(error => {
+          setAccessToken(null)
+          window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT))
+          throw error
+        })
         .finally(() => { refreshRequest = null })
     }
     await refreshRequest

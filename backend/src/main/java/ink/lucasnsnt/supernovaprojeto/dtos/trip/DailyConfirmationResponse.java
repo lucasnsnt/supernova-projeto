@@ -14,6 +14,7 @@ public record DailyConfirmationResponse(
         String driverName,
         Long studentId,
         String studentName,
+        String institutionName,
         LocalDate serviceDate,
         Direction direction,
         LocalTime scheduledTime,
@@ -30,6 +31,9 @@ public record DailyConfirmationResponse(
                 confirmation.getDriver().getUser().getName(),
                 confirmation.getStudent().getId(),
                 confirmation.getStudent().getUser().getName(),
+                confirmation.getStudent().getInstitution() == null
+                        ? null
+                        : confirmation.getStudent().getInstitution().getName(),
                 confirmation.getServiceDate(),
                 confirmation.getDirection(),
                 confirmation.getScheduledTime(),
