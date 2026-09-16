@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from './AuthContext'
 import { apiFetch } from '../lib/api'
-vi.mock('../lib/api', () => ({ apiFetch: vi.fn(), setAccessToken: vi.fn() }))
+vi.mock('../lib/api', () => ({ apiFetch: vi.fn(), setAccessToken: vi.fn(), AUTH_EXPIRED_EVENT: 'supernova:auth-expired' }))
 afterEach(() => { cleanup(); vi.resetAllMocks() })
 function Consumer() { const { session, login } = useAuth(); return <><p>{session?.driverStatus}</p><button onClick={() => void login({ email: 'driver@example.test', password: 'test' })}>Entrar</button></> }
 it('atualiza aprovação usando o cadastro atual sem novo login', async () => {
