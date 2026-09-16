@@ -7,6 +7,7 @@ import ink.lucasnsnt.supernovaprojeto.models.enums.InstitutionType;
 import ink.lucasnsnt.supernovaprojeto.models.enums.Role;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverStudentLinkRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.StudentScheduleRepository;
+import ink.lucasnsnt.supernovaprojeto.repositories.StudentRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.UserRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.VehicleRepository;
 import jakarta.persistence.EntityManager;
@@ -37,6 +38,9 @@ class JpaRelationshipTests {
 
     @Autowired
     private StudentScheduleRepository studentScheduleRepository;
+
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Autowired
     private DriverStudentLinkRepository driverStudentLinkRepository;
@@ -112,6 +116,12 @@ class JpaRelationshipTests {
                 .findFirstByDriverIdAndStudentIdAndStatus(
                         persistedDriver.getId(), persistedStudent.getId(), DriverStudentLinkStatus.ACTIVE))
                 .isPresent();
+        Student adminStudent = studentRepository.findAll().getFirst();
+        assertThat(adminStudent.getUser().getAddress().getCity()).isEqualTo("Salvador");
+        assertThat(adminStudent.getInstitution().getAddress().getStreet())
+                .isEqualTo("Avenida Universitaria");
+        assertThat(adminStudent.getDriverLinks().getFirst().getDriver().getUser().getName())
+                .isEqualTo("Motorista");
     }
 
     private User user(String name, String email, Role role) {
