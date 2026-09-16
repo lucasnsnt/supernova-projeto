@@ -8,8 +8,11 @@ services:
     restart: unless-stopped
     env_file:
       - ${SUPERNOVA_ENV_FILE:-/opt/supernova/supernova.env}
+      - path: ${SUPERNOVA_BOOTSTRAP_ENV_FILE:-/home/lucas/supernova-bootstrap.env}
+        required: false
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      ORS_GEOCODING_ENABLED: "true"
       GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/google-service-account.json
       JAVA_TOOL_OPTIONS: >-
         -XX:MaxRAMPercentage=55.0

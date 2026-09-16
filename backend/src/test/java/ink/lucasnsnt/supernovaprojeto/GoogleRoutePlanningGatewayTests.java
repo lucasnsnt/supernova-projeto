@@ -41,6 +41,10 @@ class GoogleRoutePlanningGatewayTests {
                 .andExpect(header("Authorization", "Bearer test-token"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.model.shipments[0].label").value("101"))
+                .andExpect(jsonPath("$.model.shipments[0].pickups[0].arrivalLocation.latitude").value(-12.98))
+                .andExpect(jsonPath("$.model.shipments[0].pickups[0].arrivalLocation.latitudeLongitude").doesNotExist())
+                .andExpect(jsonPath("$.model.vehicles[0].startLocation.longitude").value(-38.5014))
+                .andExpect(jsonPath("$.model.vehicles[0].costPerHour").value(1.0))
                 .andExpect(jsonPath("$.model.vehicles[0].loadLimits.passengers.maxLoad").value("4"))
                 .andRespond(withSuccess("""
                         {
@@ -70,6 +74,25 @@ class GoogleRoutePlanningGatewayTests {
             assertThat(stop.dropoffOrder()).isEqualTo(2);
             assertThat(stop.estimatedPickupAt()).isEqualTo(LocalDateTime.of(2026, 9, 15, 6, 0));
             assertThat(stop.estimatedDropoffAt()).isEqualTo(LocalDateTime.of(2026, 9, 15, 6, 30));
+        });
+        server.verify();
+    }
+
+    @Test
+    void shouldMapProtoJsonOmittedZeroAndFalseFields() {
+        server.expect(requestTo("https://routeoptimization.googleapis.com/v1/projects/test-project:optimizeTours"))
+                .andRespond(withSuccess("""
+                        {"metrics":{"totalCost":1},"routes":[{
+                          "vehicleStartTime":"2026-09-15T08:45:00Z","vehicleLabel":"driver-10",
+                          "visits":[{"isPickup":true,"startTime":"2026-09-15T09:00:00Z","shipmentLabel":"101"},
+                                    {"startTime":"2026-09-15T09:30:00Z","visitRequestIndex":0}]}]}
+                        """, MediaType.APPLICATION_JSON));
+        var result = gateway.optimize(request());
+        assertThat(result.feasible()).isTrue();
+        assertThat(result.stops()).singleElement().satisfies(stop -> {
+            assertThat(stop.confirmationId()).isEqualTo(101L);
+            assertThat(stop.pickupOrder()).isOne();
+            assertThat(stop.dropoffOrder()).isEqualTo(2);
         });
         server.verify();
     }

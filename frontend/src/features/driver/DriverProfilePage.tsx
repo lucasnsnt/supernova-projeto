@@ -3,7 +3,9 @@ import { useState, type FormEvent } from 'react'
 import { useAuth } from '../../auth/AuthContext'
 import { BirthDateInput } from '../../components/BirthDateInput'
 import { displayBirthDate, isoBirthDate } from '../../lib/birthDate'
-import { driverProfile, resubmitProfile, updateRejectedProfile, type Address, type DriverProfile } from './api'
+import { driverProfile, resubmitProfile, setOperationalAddress, updateRejectedProfile, type Address, type DriverProfile } from './api'
+import { PostalCodeInput } from '../../components/PostalCodeInput'
+import { AddressMap } from '../location/AddressMap'
 
 export function DriverProfilePage() {
   const { session } = useAuth()
@@ -28,18 +30,26 @@ function Profile({ profile }: { profile: DriverProfile }) {
     <section className="profile-card"><h2>Dados pessoais</h2><p className="muted">{profile.email}</p><form className="form-stack" onSubmit={submit}>
       <div className="form-grid"><Field label="Nome"><input required disabled={!editable} value={form.name} onChange={event => setForm({ ...form, name: event.target.value })} /></Field><Field label="Telefone"><input required disabled={!editable} value={form.phone} onChange={event => setForm({ ...form, phone: event.target.value })} /></Field><Field label="Data de nascimento"><BirthDateInput disabled={!editable} value={form.dateOfBirth} onChange={value => setForm({ ...form, dateOfBirth: value })} /></Field><Field label="CNH"><input required disabled={!editable} value={form.cnh} onChange={event => setForm({ ...form, cnh: event.target.value })} /></Field></div>
       <h3>Endereço de cadastro</h3><AddressFields disabled={!editable} address={form.address} onChange={address => setForm({ ...form, address })} />
+      {editable && <AddressMap address={form.address} latitude={form.address.latitude} longitude={form.address.longitude} onConfirm={(latitude, longitude) => setForm({ ...form, address: { ...form.address, latitude, longitude } })} />}
       {save.isError && <p role="alert" className="form-error">{save.error.message}</p>}{save.isSuccess && <p role="status">Correções salvas. Reenvie o cadastro para uma nova análise.</p>}
       {editable && <div className="button-row"><button className="secondary-button" disabled={save.isPending}>Salvar correções</button><button type="button" className="primary-button compact" disabled={save.isPending || resubmit.isPending} onClick={() => resubmit.mutate()}>Reenviar para análise</button></div>}
       {resubmit.isError && <p role="alert" className="form-error">{resubmit.error.message}</p>}
     </form></section>
-    {profile.status === 'APPROVED' && <section className="profile-card"><h2>Endereço de início da operação</h2><p className="muted">A configuração do ponto de saída será liberada junto com a integração de mapas. Atualmente será usado o endereço de cadastro.</p></section>}
+    {profile.status === 'APPROVED' && <OperationalAddress profile={profile} />}
   </>
 }
 
 function AddressFields({ address, disabled, onChange }: { address: Address; disabled: boolean; onChange: (address: Address) => void }) {
-  const fields = ['street', 'number', 'complement', 'neighborhood', 'city', 'state', 'zipCode'] as const
-  const labels = ['Rua', 'Número', 'Complemento', 'Bairro', 'Cidade', 'Estado (UF)', 'CEP']
-  return <div className="form-grid">{fields.map((field, index) => <Field key={field} label={labels[index]}><input disabled={disabled} required={field !== 'complement'} maxLength={field === 'state' ? 2 : undefined} value={address[field] ?? ''} onChange={event => onChange({ ...address, [field]: event.target.value })} /></Field>)}</div>
+  const fields = ['street', 'number', 'complement', 'neighborhood', 'city', 'state'] as const
+  const labels = ['Rua', 'Número', 'Complemento', 'Bairro', 'Cidade', 'Estado (UF)']
+  return <div className="form-grid">{fields.map((field, index) => <Field key={field} label={labels[index]}><input disabled={disabled} required={field !== 'complement'} maxLength={field === 'state' ? 2 : undefined} value={address[field] ?? ''} onChange={event => onChange({ ...address, [field]: event.target.value, ...(field === 'complement' ? {} : { latitude: null, longitude: null }) })} /></Field>)}<PostalCodeInput disabled={disabled} value={address.zipCode} onChange={zipCode => onChange({ ...address, zipCode, latitude: null, longitude: null })} onResolved={resolved => onChange({ ...address, ...resolved, latitude: null, longitude: null })} /></div>
+}
+
+function OperationalAddress({ profile }: { profile: DriverProfile }) {
+  const client = useQueryClient()
+  const [address, setAddress] = useState<Address>({ ...profile.operationalAddress })
+  const save = useMutation({ mutationFn: () => setOperationalAddress({ ...address, state: address.state.toUpperCase() }), onSuccess: () => void client.invalidateQueries({ queryKey: ['driver-profile'] }) })
+  return <section className="profile-card"><h2>Endereço de início da operação</h2><p className="muted">Informe e confirme no mapa o ponto de onde o veículo sairá.</p><form className="form-stack" onSubmit={event => { event.preventDefault(); save.mutate() }}><AddressFields disabled={false} address={address} onChange={setAddress} /><AddressMap address={address} latitude={address.latitude} longitude={address.longitude} onConfirm={(latitude, longitude) => setAddress({ ...address, latitude, longitude })} />{save.isError && <p role="alert" className="form-error">{save.error.message}</p>}{save.isSuccess && <p role="status">Ponto de saída salvo.</p>}<button className="primary-button compact" disabled={save.isPending || address.latitude == null || address.longitude == null}>{save.isPending ? 'Salvando…' : 'Salvar ponto de saída'}</button></form></section>
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label>{label}{children}</label> }

@@ -8,6 +8,8 @@ import { StudentReadiness, useStudentRegistration } from './StudentReadiness'
 import { StudentDriverLink } from './StudentDriverLink'
 import { BirthDateInput } from '../../components/BirthDateInput'
 import { displayBirthDate, isoBirthDate } from '../../lib/birthDate'
+import { PostalCodeInput } from '../../components/PostalCodeInput'
+import { AddressMap } from '../location/AddressMap'
 
 const emptyAddress: Address = { street: '', number: '', complement: '', neighborhood: '', city: '', state: '', zipCode: '', latitude: null, longitude: null }
 // oxlint-disable-next-line react/only-export-components
@@ -37,7 +39,8 @@ function ProfileForm({ details }: { details: StudentDetails }) {
   function submit(event: FormEvent) { event.preventDefault(); save.mutate() }
   return <section className="profile-card"><h2>Dados pessoais e endereço</h2><p className="muted">{details.account.email}</p><form className="form-stack" onSubmit={submit}>
     <div className="form-grid">{(['name', 'phone'] as const).map((field, index) => <label key={field}>{['Nome', 'Telefone'][index]}<input required type={field === 'phone' ? 'tel' : 'text'} value={form[field]} onChange={event => { save.reset(); setForm({ ...form, [field]: event.target.value }) }} /></label>)}<label>Data de nascimento<BirthDateInput value={form.dateOfBirth} onChange={value => { save.reset(); setForm({ ...form, dateOfBirth: value }) }} /></label></div>
-    <div className="form-grid">{(['street', 'number', 'complement', 'neighborhood', 'city', 'state', 'zipCode'] as const).map((field, index) => <label key={field}>{['Rua', 'Número', 'Complemento', 'Bairro', 'Cidade', 'Estado (UF)', 'CEP'][index]}<input required={field !== 'complement'} maxLength={field === 'state' ? 2 : undefined} pattern={field === 'zipCode' ? '[0-9]{5}-?[0-9]{3}' : undefined} value={form.address[field] ?? ''} onChange={event => { save.reset(); setForm({ ...form, address: { ...form.address, [field]: event.target.value } }) }} /></label>)}</div>
+    <div className="form-grid">{(['street', 'number', 'complement', 'neighborhood', 'city', 'state'] as const).map((field, index) => <label key={field}>{['Rua', 'Número', 'Complemento', 'Bairro', 'Cidade', 'Estado (UF)'][index]}<input required={field !== 'complement'} maxLength={field === 'state' ? 2 : undefined} value={form.address[field] ?? ''} onChange={event => { save.reset(); setForm({ ...form, address: { ...form.address, [field]: event.target.value, ...(field === 'complement' ? {} : { latitude: null, longitude: null }) } }) }} /></label>)}<PostalCodeInput value={form.address.zipCode} onChange={value => setForm({ ...form, address: { ...form.address, zipCode: value, latitude: null, longitude: null } })} onResolved={address => setForm({ ...form, address: { ...form.address, ...address, latitude: null, longitude: null } })} /></div>
+    <AddressMap address={form.address} latitude={form.address.latitude} longitude={form.address.longitude} onConfirm={(latitude, longitude) => setForm({ ...form, address: { ...form.address, latitude, longitude } })} />
     {save.isError && <p className="form-error" role="alert">{save.error.message}</p>}{save.isSuccess && <p role="status">Dados salvos.</p>}
     <button className="primary-button compact" disabled={save.isPending}>{save.isPending ? 'Salvando…' : 'Salvar dados'}</button>
   </form></section>

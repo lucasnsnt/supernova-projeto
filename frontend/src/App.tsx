@@ -15,6 +15,7 @@ import { InstitutionsPage } from './features/admin/InstitutionsPage'
 import { StudentProfilePage } from './features/student/StudentProfilePage'
 import { DriverProfilePage } from './features/driver/DriverProfilePage'
 import { AdminStudentsPage } from './features/admin/AdminStudentsPage'
+import { AccountSettingsPage } from './features/account/AccountSettingsPage'
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } })
 
@@ -32,6 +33,7 @@ export default function App() {
       <Route path="alunos-admin" element={<AdminStudentsPage />} />
       <Route path="instituicoes" element={<InstitutionsPage />} />
       <Route path="notificacoes" element={<NotificationsPage />} />
+      <Route path="conta" element={<AccountSettingsPage />} />
     </Route></Route>
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes></AuthProvider></BrowserRouter></QueryClientProvider>

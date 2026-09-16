@@ -30,7 +30,7 @@ public class DailyTransportProperties {
     public static class Geocoding {
         private boolean enabled;
         private String apiKey;
-        private String endpoint = "https://maps.googleapis.com";
+        private String endpoint = "https://api.heigit.org";
     }
 
     @Getter

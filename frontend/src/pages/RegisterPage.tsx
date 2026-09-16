@@ -6,6 +6,7 @@ import { apiFetch } from '../lib/api'
 import { PasswordRequirements } from '../auth/PasswordRequirements'
 import { BirthDateInput } from '../components/BirthDateInput'
 import { isoBirthDate } from '../lib/birthDate'
+import { PostalCodeInput } from '../components/PostalCodeInput'
 
 type Step = 'email' | 'code' | 'profile'
 type Authorization = { registrationToken: string; expiresAt: string }
@@ -123,7 +124,7 @@ export function RegisterPage() {
             <Field label="Bairro"><input value={profile.neighborhood} onChange={(event) => update('neighborhood', event.target.value)} required /></Field>
             <Field label="Cidade"><input value={profile.city} onChange={(event) => update('city', event.target.value)} required /></Field>
             <Field label="Estado"><input maxLength={2} value={profile.state} onChange={(event) => update('state', event.target.value)} required /></Field>
-            <Field label="CEP"><input value={profile.zipCode} onChange={(event) => update('zipCode', event.target.value)} required /></Field>
+            <PostalCodeInput value={profile.zipCode} onChange={value => update('zipCode', value)} onResolved={address => setProfile(current => ({ ...current, ...address }))} />
           </div>
           {profile.role === 'DRIVER'
             ? <Field label="CNH"><input value={profile.cnh} onChange={(event) => update('cnh', event.target.value)} required /></Field>

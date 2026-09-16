@@ -69,6 +69,15 @@ public class AccountService {
     }
 
     @Transactional
+    public AccountResponse updateOwnProfile(
+            @NotNull Long userId, @NotBlank String name, @NotBlank String phone) {
+        User user = findUser(userId);
+        user.setName(name.trim());
+        user.setPhone(phone.trim());
+        return findOwnAccount(userId);
+    }
+
+    @Transactional
     public AccountResponse updateStudentProfile(
             @NotNull Long studentId, @Valid StudentProfileUpdateRequest request) {
         User user = requireRole(studentId, Role.STUDENT);
