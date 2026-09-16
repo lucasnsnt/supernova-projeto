@@ -19,7 +19,7 @@ export function TripsPage() {
   return <div className="page-stack">
     <header className="page-heading"><p className="eyebrow">Operação diária</p><h1>Viagens</h1><p className="muted">Acompanhe horários, paradas e situação das viagens.</p></header>
     {!allowed ? <p>As viagens estarão disponíveis após a aprovação do motorista.</p> : <>
-      <label>Data da viagem <input type="date" value={date} onChange={event => { if (event.target.value) setDate(event.target.value) }} /></label>
+      <DateNavigator value={date} onChange={setDate} />
       <div className="card-list">
         {trips.isLoading && <p>Carregando…</p>}
         {trips.error && <p role="alert" className="form-error">{trips.error.message}</p>}
@@ -29,6 +29,26 @@ export function TripsPage() {
     </>}
   </div>
 }
+
+function DateNavigator({ value, onChange }: { value: string; onChange: (date: string) => void }) {
+  const current = parseDate(value)
+  const currentToday = today()
+  const move = (days: number) => {
+    const next = new Date(current)
+    next.setUTCDate(next.getUTCDate() + days)
+    onChange(next.toISOString().slice(0, 10))
+  }
+  const label = value === currentToday ? 'Hoje' : new Intl.DateTimeFormat('pt-BR', { weekday: 'long' }).format(current)
+  const fullDate = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(current)
+  return <section className="date-navigator" aria-label="Escolher data da viagem">
+    <button type="button" className="date-arrow" aria-label="Dia anterior" onClick={() => move(-1)}>‹</button>
+    <div className="date-current"><span>{label}</span><strong>{fullDate}</strong></div>
+    <button type="button" className="date-arrow" aria-label="Próximo dia" onClick={() => move(1)}>›</button>
+    {value !== currentToday && <button type="button" className="today-button" onClick={() => onChange(currentToday)}>Voltar para hoje</button>}
+  </section>
+}
+
+function parseDate(value: string) { return new Date(`${value}T12:00:00Z`) }
 
 function TripCard({ trip, driver, onChanged }: { trip: Trip; driver: boolean; onChanged: () => void }) {
   const action = useMutation({ mutationFn: (value: 'start' | 'completion' | 'replanning') => tripAction(trip.id, value), onSuccess: onChanged })

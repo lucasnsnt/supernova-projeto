@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { apiFetch, setAccessToken } from '../lib/api'
+import { apiFetch, AUTH_EXPIRED_EVENT, setAccessToken } from '../lib/api'
 import type { Account, AuthSession, RegisterPayload } from './types'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -39,6 +39,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .catch(() => setAccessToken(null))
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(() => {
+    const expireSession = () => {
+      setAccessToken(null)
+      queryClient.clear()
+      setSession(null)
+    }
+    window.addEventListener(AUTH_EXPIRED_EVENT, expireSession)
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, expireSession)
+  }, [queryClient])
 
   const account = useQuery({
     queryKey: ['session-account', session?.userId],

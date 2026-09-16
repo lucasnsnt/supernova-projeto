@@ -36,11 +36,8 @@ it('mostra erro ao iniciar e mantém a viagem planejada', async () => {
 it('consulta a data escolhida para acompanhar o histórico', async () => {
   mount()
   await screen.findByText('Ana')
-  await userEvent.clear(screen.getByLabelText('Data da viagem'))
-  // Date inputs are more reliably changed with the native change event.
-  const { fireEvent } = await import('@testing-library/react')
-  fireEvent.change(screen.getByLabelText('Data da viagem'), { target: { value: '2026-09-14' } })
-  await waitFor(() => expect(api.driverTrips).toHaveBeenCalledWith('2026-09-14'))
+  await userEvent.click(screen.getByRole('button', { name: 'Dia anterior' }))
+  await waitFor(() => expect(api.driverTrips).toHaveBeenCalledWith('2026-09-15'))
 })
 it('aluno acompanha suas paradas sem comandos do motorista', async () => {
   role = 'STUDENT'; vi.mocked(studentTrips).mockResolvedValue([trip]); mount()

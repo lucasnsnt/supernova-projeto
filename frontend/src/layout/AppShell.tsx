@@ -3,6 +3,9 @@ import { useAuth } from '../auth/AuthContext'
 import type { Role } from '../auth/types'
 import { useQuery } from '@tanstack/react-query'
 import { unreadCount } from '../features/notifications/api'
+import { lazy, Suspense } from 'react'
+
+const NotificationBell = lazy(() => import('../components/NotificationBell'))
 
 type NavigationItem = { to: string; label: string; symbol: string }
 const navigation: Record<Role, NavigationItem[]> = {
@@ -22,7 +25,7 @@ export function AppShell() {
         <NavLink to="/" className="brand"><span>S</span> Supernova</NavLink>
         <nav className="desktop-nav" aria-label="Navegação principal">{items.map((item) => <NavigationLink key={item.to} item={item} />)}</nav>
         <div className="topbar-actions">
-          <NavLink to="/notificacoes" className="icon-button notification-link" aria-label={`${unread.data?.count ?? 0} notificações não lidas`}>●{Boolean(unread.data?.count) && <b>{unread.data?.count}</b>}</NavLink>
+          <NavLink to="/notificacoes" className="icon-button notification-link" aria-label={`${unread.data?.count ?? 0} notificações não lidas`}><Suspense fallback={<span className="notification-placeholder" />}><NotificationBell unread={Boolean(unread.data?.count)} /></Suspense>{Boolean(unread.data?.count) && <b>{unread.data?.count}</b>}</NavLink>
           <button className="text-button" onClick={() => void logout()}>Sair</button>
         </div>
       </header>
