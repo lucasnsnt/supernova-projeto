@@ -21,6 +21,8 @@ export const resubmitProfile = () => apiFetch<DriverProfile>('/api/drivers/me/re
 export const setOperationalAddress = (body: Address) => apiFetch<DriverProfile>('/api/drivers/me/operational-address', { method: 'PUT', body: JSON.stringify(body) })
 export const useRegistrationAddress = () => apiFetch<DriverProfile>('/api/drivers/me/operational-address', { method: 'DELETE' })
 export const createVehicle = (body: Omit<Vehicle, 'id' | 'defaultVehicle'>) => apiFetch<Vehicle>('/api/drivers/me/vehicles', { method: 'POST', body: JSON.stringify(body) })
+export const updateVehicle = (id: number, body: Omit<Vehicle, 'id' | 'defaultVehicle'>) => apiFetch<Vehicle>(`/api/drivers/me/vehicles/${id}`, { method: 'PUT', body: JSON.stringify(body) })
+export const deleteVehicle = (id: number) => apiFetch<void>(`/api/drivers/me/vehicles/${id}`, { method: 'DELETE' })
 export const tripAction = (id: number, action: 'start' | 'completion' | 'replanning', body?: unknown) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/${action}`, { method: 'POST', body: body ? JSON.stringify(body) : undefined })
 export const cancelTrip = (id: number, reason: string) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/cancellation`, { method: 'POST', body: JSON.stringify({ reason }) })
 
