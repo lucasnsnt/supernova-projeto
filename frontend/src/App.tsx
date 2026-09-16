@@ -14,6 +14,7 @@ import { DriversPage } from './features/admin/DriversPage'
 import { InstitutionsPage } from './features/admin/InstitutionsPage'
 import { StudentProfilePage } from './features/student/StudentProfilePage'
 import { DriverProfilePage } from './features/driver/DriverProfilePage'
+import { AdminStudentsPage } from './features/admin/AdminStudentsPage'
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } })
 
@@ -28,6 +29,7 @@ export default function App() {
       <Route path="viagens" element={<TripsPage />} />
       <Route path="alunos" element={<StudentsPage />} />
       <Route path="motoristas" element={<DriversPage />} />
+      <Route path="alunos-admin" element={<AdminStudentsPage />} />
       <Route path="instituicoes" element={<InstitutionsPage />} />
       <Route path="notificacoes" element={<NotificationsPage />} />
     </Route></Route>

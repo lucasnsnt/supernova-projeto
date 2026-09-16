@@ -18,4 +18,6 @@ public interface StudentScheduleRepository extends JpaRepository<StudentSchedule
     void deleteAllByStudentIdAndDayOfWeek(Long studentId, DayOfWeek dayOfWeek);
 
     List<StudentSchedule> findAllByStudentIdAndDirection(Long studentId, Direction direction);
+
+    long countByStudentId(Long studentId);
 }
