@@ -56,6 +56,16 @@ Enquanto `GOOGLE_ROUTE_OPTIMIZATION_ENABLED=false`, o backend permanece
 funcional, mas novos planejamentos ficam em `NEEDS_ATTENTION` até a integração
 ser habilitada e o motorista solicitar o recálculo.
 
+## Geocodificação e primeiro administrador
+
+O Compose habilita a geocodificação ORS em produção. Mantenha `ORS_API_KEY`
+somente em `/opt/supernova/supernova.env`.
+
+Para o primeiro acesso administrativo, pode ser criado temporariamente o arquivo
+`/home/lucas/supernova-bootstrap.env` com as variáveis `ADMIN_BOOTSTRAP_*`.
+O segundo `env_file` é opcional. Remova o arquivo e recrie o container assim que
+o primeiro login for confirmado; a conta persistida no PostgreSQL permanece.
+
 ## Segredos do ambiente `production` no GitHub
 
 - `VPS_HOST`

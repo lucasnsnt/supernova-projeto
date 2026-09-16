@@ -7,8 +7,8 @@ import { unreadCount } from '../features/notifications/api'
 type NavigationItem = { to: string; label: string; symbol: string }
 const navigation: Record<Role, NavigationItem[]> = {
   STUDENT: [{ to: '/', label: 'Hoje', symbol: '⌂' }, { to: '/agenda', label: 'Agenda', symbol: '▣' }, { to: '/viagens', label: 'Viagens', symbol: '↗' }, { to: '/meu-cadastro', label: 'Meu cadastro', symbol: '◉' }],
-  DRIVER: [{ to: '/', label: 'Hoje', symbol: '⌂' }, { to: '/alunos', label: 'Alunos', symbol: '◉' }, { to: '/viagens', label: 'Viagens', symbol: '↗' }],
-  ADMIN: [{ to: '/', label: 'Resumo', symbol: '⌂' }, { to: '/motoristas', label: 'Motoristas', symbol: '◉' }, { to: '/instituicoes', label: 'Instituições', symbol: '▣' }],
+  DRIVER: [{ to: '/', label: 'Hoje', symbol: '⌂' }, { to: '/alunos', label: 'Alunos', symbol: '◉' }, { to: '/viagens', label: 'Viagens', symbol: '↗' }, { to: '/meu-cadastro', label: 'Meu cadastro', symbol: '◇' }],
+  ADMIN: [{ to: '/', label: 'Resumo', symbol: '⌂' }, { to: '/motoristas', label: 'Motoristas', symbol: '◉' }, { to: '/alunos-admin', label: 'Alunos', symbol: '◇' }, { to: '/instituicoes', label: 'Instituições', symbol: '▣' }, { to: '/conta', label: 'Minha conta', symbol: '●' }],
 }
 
 export function AppShell() {

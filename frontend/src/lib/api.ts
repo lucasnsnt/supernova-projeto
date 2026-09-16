@@ -14,6 +14,7 @@ export class ApiError extends Error {
 let accessToken: string | null = sessionStorage.getItem('supernova_access_token')
 type CsrfToken = { headerName: string; token: string }
 let csrfRequest: Promise<CsrfToken> | null = null
+let refreshRequest: Promise<void> | null = null
 
 export function setAccessToken(token: string | null) {
   accessToken = token
@@ -38,7 +39,8 @@ async function csrfHeaders(): Promise<Record<string, string>> {
   return { [csrf.headerName]: csrf.token }
 }
 
-export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+export async function apiFetch<T>(path: string, options: RequestInit = {}, retryAuthentication = true): Promise<T> {
+  const requestToken = accessToken
   const method = (options.method ?? 'GET').toUpperCase()
   const changesState = !['GET', 'HEAD', 'OPTIONS'].includes(method)
   const headers = new Headers(options.headers)
@@ -51,6 +53,16 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   }
 
   const response = await fetch(path, { ...options, headers, credentials: 'include' })
+  if (response.status === 401 && accessToken && !path.startsWith('/api/auth/') && retryAuthentication) {
+    if (requestToken !== accessToken) return apiFetch<T>(path, options, false)
+    if (!refreshRequest) {
+      refreshRequest = apiFetch<{ accessToken: string }>('/api/auth/refresh', { method: 'POST' })
+        .then(tokens => setAccessToken(tokens.accessToken))
+        .finally(() => { refreshRequest = null })
+    }
+    await refreshRequest
+    return apiFetch<T>(path, options, false)
+  }
   if (!response.ok) {
     let body: ApiErrorBody | null = null
     try {

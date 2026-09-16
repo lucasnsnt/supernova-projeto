@@ -86,4 +86,58 @@ describe('apiFetch', () => {
     await expect(apiFetch('/api/auth/email-verification', { method: 'POST' })).resolves.toBeUndefined()
     expect(fetchMock).toHaveBeenCalledTimes(3)
   })
+  it('renova sessão expirada e repete a operação com CSRF atualizado', async () => {
+    setAccessToken('expired')
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(Response.json({ headerName: 'X-XSRF-TOKEN', token: 'first' }))
+      .mockResolvedValueOnce(new Response(null, { status: 401 }))
+      .mockResolvedValueOnce(Response.json({ headerName: 'X-XSRF-TOKEN', token: 'refresh' }))
+      .mockResolvedValueOnce(Response.json({ accessToken: 'renewed' }))
+      .mockResolvedValueOnce(Response.json({ headerName: 'X-XSRF-TOKEN', token: 'retry' }))
+      .mockResolvedValueOnce(Response.json({ status: 'COMPLETED' }))
+    await expect(apiFetch('/api/drivers/me/trips/1/completion', { method: 'POST' })).resolves.toEqual({ status: 'COMPLETED' })
+    expect(new Headers(fetchMock.mock.calls[5][1]?.headers).get('Authorization')).toBe('Bearer renewed')
+    expect(new Headers(fetchMock.mock.calls[5][1]?.headers).get('X-XSRF-TOKEN')).toBe('retry')
+  })
+  it('compartilha a renovação entre consultas simultâneas', async () => {
+    setAccessToken('expired')
+    let renewed = false
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async (path) => {
+      if (path === '/api/auth/csrf') return Response.json({ headerName: 'X-XSRF-TOKEN', token: 'csrf' })
+      if (path === '/api/auth/refresh') { renewed = true; return Response.json({ accessToken: 'renewed' }) }
+      return renewed ? Response.json({ ok: true }) : new Response(null, { status: 401 })
+    })
+    await Promise.all([apiFetch('/api/me'), apiFetch('/api/drivers/me/trips')])
+    expect(fetchMock.mock.calls.filter(([path]) => path === '/api/auth/refresh')).toHaveLength(1)
+  })
+  it('não repete indefinidamente quando a sessão renovada é recusada', async () => {
+    setAccessToken('expired')
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async (path) => {
+      if (path === '/api/auth/csrf') return Response.json({ headerName: 'X-XSRF-TOKEN', token: 'csrf' })
+      if (path === '/api/auth/refresh') return Response.json({ accessToken: 'renewed' })
+      return new Response(null, { status: 401 })
+    })
+    await expect(apiFetch('/api/me')).rejects.toMatchObject({ status: 401 })
+    expect(fetchMock.mock.calls.filter(([path]) => path === '/api/auth/refresh')).toHaveLength(1)
+  })
+
+  it('reutiliza o novo token quando uma resposta antiga chega após a renovação', async () => {
+    setAccessToken('expired')
+    let releaseOldResponse: (() => void) | undefined
+    let slowCalls = 0
+    const oldResponse = new Promise<void>(resolve => { releaseOldResponse = resolve })
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async path => {
+      if (path === '/api/slow' && slowCalls++ === 0) { await oldResponse; return new Response(null, { status: 401 }) }
+      if (path === '/api/auth/csrf') return Response.json({ headerName: 'X-XSRF-TOKEN', token: 'csrf' })
+      if (path === '/api/auth/refresh') return Response.json({ accessToken: 'renewed' })
+      if (path === '/api/me' && sessionStorage.getItem('supernova_access_token') === 'expired') return new Response(null, { status: 401 })
+      return Response.json({ ok: true })
+    })
+    const slow = apiFetch('/api/slow')
+    await apiFetch('/api/me')
+    releaseOldResponse?.()
+    await slow
+    expect(fetchMock.mock.calls.filter(([path]) => path === '/api/auth/refresh')).toHaveLength(1)
+  })
+
 })

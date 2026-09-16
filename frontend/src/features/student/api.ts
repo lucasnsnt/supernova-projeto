@@ -1,4 +1,5 @@
 import { apiFetch } from '../../lib/api'
+import type { Address } from './profile-api'
 
 export type Direction = 'IDA' | 'VOLTA'
 export type ConfirmationStatus = 'PENDING' | 'YES' | 'NO' | 'NO_RESPONSE'
@@ -10,11 +11,17 @@ export type Schedule = { id: number; dayOfWeek: string; time: string; direction:
 export type Trip = {
   id: number; serviceDate: string; direction: Direction; status: string
   departureAt: string | null; planningIssue: string | null
-  vehicle: { model: string; licensePlate: string } | null
-  participants: Array<{ studentName: string; institutionName: string; estimatedPickupAt: string | null }>
+  startedAt: string | null; completedAt: string | null; cancellationReason: string | null
+  vehicle: { id: number; model: string; licensePlate: string } | null
+  participants: Array<{ studentId: number; studentName: string; institutionName: string | null; pickupOrder: number; dropoffOrder: number; estimatedPickupAt: string | null; estimatedDropoffAt: string | null; pickupAddress: Address | null; dropoffAddress: Address | null }>
 }
 
 export const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bahia' })
+export const tomorrow = () => {
+  const date = new Date(`${today()}T12:00:00Z`)
+  date.setUTCDate(date.getUTCDate() + 1)
+  return date.toISOString().slice(0, 10)
+}
 export const studentConfirmations = (date = today()) => apiFetch<DailyConfirmation[]>(`/api/students/me/daily-confirmations?date=${date}`)
 export const answerConfirmation = (id: number, answer: 'YES' | 'NO') => apiFetch<DailyConfirmation>(`/api/students/me/daily-confirmations/${id}/answer`, { method: 'PUT', body: JSON.stringify({ answer }) })
 export const studentTrips = (date = today()) => apiFetch<Trip[]>(`/api/students/me/trips?date=${date}`)

@@ -69,6 +69,11 @@ Teste manualmente cadastro, código, login/logout, agenda, notificações e tela
 de cada papel. A otimização Google fica desabilitada localmente: testar rotas
 reais depende de habilitar a integração com credenciais específicas de teste.
 
+Para validar endereços no mapa, configure `ORS_GEOCODING_ENABLED=true` e
+`ORS_API_KEY` no backend, além de `VITE_GOOGLE_MAPS_API_KEY` no frontend. A
+chave do Maps é pública no bundle e deve ser restringida por origem e pela API
+Maps JavaScript no Google Cloud. A chave ORS permanece somente no backend.
+
 Nunca copie chaves, senhas ou arquivos da VPS para o repositório. Os arquivos
 privados `.env.local`, `.env.local.properties` e o banco local estão no gitignore.
 Não remova o banco local sem precisar: isso apaga suas contas e dados de teste.
@@ -83,3 +88,20 @@ Não remova o banco local sem precisar: isso apaga suas contas e dados de teste.
 As configurações da Vercel são avaliadas no build. Não é necessário executar
 Vercel para desenvolver localmente. Não coloque segredos em variáveis `VITE_*`:
 esses valores são públicos no navegador.
+
+## Primeiro administrador de produção
+
+O cadastro público nunca aceita o papel administrativo. Para criar a primeira
+conta, configure temporariamente no ambiente do backend:
+
+```properties
+ADMIN_BOOTSTRAP_ENABLED=true
+ADMIN_BOOTSTRAP_EMAIL=administrador@example.com
+ADMIN_BOOTSTRAP_PASSWORD=senha-temporaria
+ADMIN_BOOTSTRAP_NAME=Administrador
+```
+
+O bootstrap cria a conta apenas quando o e-mail ainda não existe e armazena a
+senha somente como hash BCrypt. Após confirmar o primeiro login, remova todas as
+variáveis `ADMIN_BOOTSTRAP_*` e reinicie o serviço. A senha temporária pode ser
+substituída em **Minha conta**; a nova senha precisa cumprir a política normal.

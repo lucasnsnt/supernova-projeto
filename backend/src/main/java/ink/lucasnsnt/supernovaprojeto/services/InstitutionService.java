@@ -26,6 +26,7 @@ public class InstitutionService {
 
     private final InstitutionRepository institutionRepository;
     private final StudentRepository studentRepository;
+    private final GeocodingService geocodingService;
 
     @Transactional(readOnly = true)
     public List<InstitutionResponse> findAll(String name, InstitutionType type) {
@@ -92,5 +93,6 @@ public class InstitutionService {
         target.setZipCode(source.zipCode().trim());
         target.setLatitude(source.latitude());
         target.setLongitude(source.longitude());
+        geocodingService.resolve(target);
     }
 }

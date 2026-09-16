@@ -13,6 +13,9 @@ import { NotificationsPage } from './features/notifications/NotificationsPage'
 import { DriversPage } from './features/admin/DriversPage'
 import { InstitutionsPage } from './features/admin/InstitutionsPage'
 import { StudentProfilePage } from './features/student/StudentProfilePage'
+import { DriverProfilePage } from './features/driver/DriverProfilePage'
+import { AdminStudentsPage } from './features/admin/AdminStudentsPage'
+import { AccountSettingsPage } from './features/account/AccountSettingsPage'
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } })
 
@@ -23,13 +26,19 @@ export default function App() {
     <Route element={<ProtectedRoute />}><Route element={<AppShell />}>
       <Route index element={<HomePage />} />
       <Route path="agenda" element={<SchedulePage />} />
-      <Route path="meu-cadastro" element={<StudentProfilePage />} />
+      <Route path="meu-cadastro" element={<RoleProfilePage />} />
       <Route path="viagens" element={<TripsPage />} />
       <Route path="alunos" element={<StudentsPage />} />
       <Route path="motoristas" element={<DriversPage />} />
+      <Route path="alunos-admin" element={<AdminStudentsPage />} />
       <Route path="instituicoes" element={<InstitutionsPage />} />
       <Route path="notificacoes" element={<NotificationsPage />} />
+      <Route path="conta" element={<AccountSettingsPage />} />
     </Route></Route>
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes></AuthProvider></BrowserRouter></QueryClientProvider>
+}
+
+function RoleProfilePage() {
+  return <><StudentProfilePage /><DriverProfilePage /></>
 }

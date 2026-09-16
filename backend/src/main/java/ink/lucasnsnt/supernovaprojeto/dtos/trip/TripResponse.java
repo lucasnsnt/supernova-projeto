@@ -54,7 +54,7 @@ public record TripResponse(
                 trip.getParticipants().stream()
                         .filter(participant -> visibleStudentId == null
                                 || participant.getStudent().getId().equals(visibleStudentId))
-                        .map(TripParticipantResponse::from)
+                        .map(participant -> TripParticipantResponse.from(participant, trip.getDirection()))
                         .toList());
     }
 }
