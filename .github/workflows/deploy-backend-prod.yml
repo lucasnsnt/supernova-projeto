@@ -1,10 +1,11 @@
-name: Deploy backend production
+name: Deploy production
 
 on:
   push:
     branches: [prod]
     paths:
       - "backend/**"
+      - "frontend/**"
       - "infra/vps/**"
       - ".github/workflows/deploy-backend-prod.yml"
   workflow_dispatch:
@@ -100,6 +101,25 @@ jobs:
             "docker login ghcr.io --username '$GHCR_USER' --password-stdin"
           ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
             "chmod 0750 /opt/supernova/deploy.sh && /opt/supernova/deploy.sh '$IMAGE'"
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Deploy frontend after backend health check
+        working-directory: frontend
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm ci
+          npx vercel@59.19.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx vercel@59.19.0 build --prod --token="$VERCEL_TOKEN"
+          npx vercel@59.19.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
 
       - name: Remove temporary registry credentials from VPS
         if: always()
