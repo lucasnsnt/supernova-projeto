@@ -1,5 +1,6 @@
 package ink.lucasnsnt.supernovaprojeto.services.routing;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ink.lucasnsnt.supernovaprojeto.config.DailyTransportProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -79,6 +80,9 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
     private Map<String, Object> vehicle(RoutePlanningRequest request) {
         Map<String, Object> vehicle = new LinkedHashMap<>();
         vehicle.put("label", "driver-" + request.driverId());
+        // Relative optimization weights: minimize distance and total route duration.
+        vehicle.put("costPerKilometer", 1.0);
+        vehicle.put("costPerHour", 1.0);
         vehicle.put("loadLimits", Map.of(
                 "passengers", Map.of("maxLoad", Integer.toString(request.vehicleCapacity()))));
         if (request.start() != null) {
@@ -108,8 +112,7 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
     }
 
     private Map<String, Object> location(RoutePoint point) {
-        return Map.of("latitudeLongitude", Map.of(
-                "latitude", point.latitude(), "longitude", point.longitude()));
+        return Map.of("latitude", point.latitude(), "longitude", point.longitude());
     }
 
     private RoutePlanningResult result(
@@ -135,12 +138,12 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
         List<GoogleVisit> visits = route.visits() == null ? List.of() : route.visits();
         for (int index = 0; index < visits.size(); index++) {
             GoogleVisit visit = visits.get(index);
-            if (visit.shipmentIndex() == null
-                    || visit.shipmentIndex() < 0
-                    || visit.shipmentIndex() >= request.passengers().size()) {
+            // ProtoJSON may omit scalar fields whose value is zero.
+            int shipmentIndex = visit.shipmentIndex() == null ? 0 : visit.shipmentIndex();
+            if (shipmentIndex < 0 || shipmentIndex >= request.passengers().size()) {
                 continue;
             }
-            MutableStop stop = stops.computeIfAbsent(visit.shipmentIndex(), ignored -> new MutableStop());
+            MutableStop stop = stops.computeIfAbsent(shipmentIndex, ignored -> new MutableStop());
             LocalDateTime time = localDateTime(visit.startTime());
             if (Boolean.TRUE.equals(visit.isPickup())) {
                 stop.pickupOrder = index + 1;
@@ -184,23 +187,28 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
         return LocalDateTime.ofInstant(Instant.parse(value), properties.getZoneId());
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private record GoogleOptimizeResponse(
             List<GoogleRoute> routes,
             List<GoogleSkippedShipment> skippedShipments) {
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private record GoogleRoute(
             String vehicleStartTime,
             GooglePolyline routePolyline,
             List<GoogleVisit> visits) {
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private record GooglePolyline(String points) {
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private record GoogleVisit(Integer shipmentIndex, Boolean isPickup, String startTime) {
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private record GoogleSkippedShipment(Integer index, String label) {
     }
 

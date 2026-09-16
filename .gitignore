@@ -38,3 +38,4 @@ PROJECT_CONTEXT.md
 !**/.env.example
 !**/.env.local.properties.example
 backend/.local/
+.local/

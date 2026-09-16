@@ -1,6 +1,7 @@
 package ink.lucasnsnt.supernovaprojeto.controllers;
 
 import ink.lucasnsnt.supernovaprojeto.dtos.account.AccountResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.account.AccountProfileUpdateRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.account.EmailUpdateRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.account.PasswordUpdateRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.account.PhoneUpdateRequest;
@@ -33,6 +34,13 @@ public class AccountController {
             @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody PhoneUpdateRequest request) {
         return accountService.updatePhone(userId(jwt), request.phone());
+    }
+
+    @PatchMapping("/profile")
+    public AccountResponse updateProfile(
+            @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody AccountProfileUpdateRequest request) {
+        return accountService.updateOwnProfile(userId(jwt), request.name(), request.phone());
     }
 
     @PatchMapping("/email")

@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /** Full application flow; only mail delivery and Google authentication are mocked.
- * Geocoding and route optimization use real HTTP against a local Google fixture. */
+ * Geocoding and route optimization use real HTTP against local provider fixtures. */
 @SpringBootTest(properties = {"app.transport.scheduler-cron=-",
         "app.transport.google.enabled=true", "app.transport.google.project-id=test-project",
         "app.transport.geocoding.enabled=true", "app.transport.geocoding.api-key=test-key",
@@ -176,10 +176,10 @@ class CompleteTransportFlowTests {
     private static HttpServer googleFixture() {
         try {
             var server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-            server.createContext("/maps/api/geocode/json", exchange -> {
+            server.createContext("/pelias/v1/search", exchange -> {
                 geocodes.incrementAndGet();
                 respond(exchange, """
-                        {"status":"OK","results":[{"geometry":{"location_type":"ROOFTOP","location":{"lat":-12.97,"lng":-38.50}}}]}
+                        {"features":[{"geometry":{"type":"Point","coordinates":[-38.50,-12.97]},"properties":{"confidence":0.95,"country_a":"BRA"}}]}
                         """);
             });
             server.createContext("/v1/projects/test-project:optimizeTours", exchange -> {

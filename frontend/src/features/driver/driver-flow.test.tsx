@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StudentsPage } from './StudentsPage'
 import * as api from './api'
-vi.mock('./api', () => ({ linkedStudents: vi.fn(), invites: vi.fn(), vehicles: vi.fn(), createInvite: vi.fn(), createVehicle: vi.fn(), setDefaultVehicle: vi.fn() }))
+vi.mock('./api', () => ({ linkedStudents: vi.fn(), invites: vi.fn(), vehicles: vi.fn(), createInvite: vi.fn(), createVehicle: vi.fn(), updateVehicle: vi.fn(), deleteVehicle: vi.fn(), setDefaultVehicle: vi.fn() }))
 beforeEach(() => {
   vi.resetAllMocks()
   vi.mocked(api.linkedStudents).mockResolvedValue([])
@@ -31,4 +31,15 @@ it('mostra uma falha ao gerar convite', async () => {
   mount()
   await userEvent.click(screen.getByRole('button', { name: 'Gerar convite' }))
   expect(await screen.findByRole('alert')).toHaveTextContent('Motorista precisa estar aprovado')
+})
+it('edita os dados de um veículo', async () => {
+  vi.mocked(api.updateVehicle).mockResolvedValue({} as api.Vehicle)
+  mount()
+  const edit = await screen.findAllByRole('button', { name: 'Editar' })
+  await userEvent.click(edit[0])
+  const model = screen.getByLabelText('Modelo')
+  await userEvent.clear(model)
+  await userEvent.type(model, 'Ducato Cargo')
+  await userEvent.click(screen.getByRole('button', { name: 'Salvar veículo' }))
+  await waitFor(() => expect(api.updateVehicle).toHaveBeenCalledWith(1, expect.objectContaining({ model: 'Ducato Cargo' })))
 })

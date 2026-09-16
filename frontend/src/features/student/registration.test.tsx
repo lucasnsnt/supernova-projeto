@@ -21,7 +21,7 @@ beforeEach(() => {
   vi.resetAllMocks()
   vi.mocked(api.studentDetails).mockResolvedValue(details)
   vi.mocked(api.studentLinks).mockResolvedValue([])
-  vi.mocked(institutions).mockResolvedValue([{ id: 3, name: 'Faculdade X', type: 'UNIVERSITY', address: { street: 'Rua B', number: '2', city: 'Salvador', state: 'BA' } }])
+  vi.mocked(institutions).mockResolvedValue([{ id: 3, name: 'Faculdade X', type: 'UNIVERSITY', address: { street: 'Rua B', number: '2', complement: null, neighborhood: 'Centro', city: 'Salvador', state: 'BA', zipCode: '40000-000', latitude: null, longitude: null } }])
 })
 afterEach(cleanup)
 
