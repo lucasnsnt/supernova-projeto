@@ -16,10 +16,10 @@ da VPS sem poder consumir todos os recursos do host.
 ## Fluxo Git
 
 Alterações em `backend/**` nos pull requests para `master` e `prod` executam o
-workflow de CI do backend. Um push em `prod` que altere `backend/**` ou
-`infra/vps/**` também constrói uma imagem imutável, publica no GHCR e atualiza a VPS.
-O script de deploy confirma `/actuator/health` e restaura a imagem anterior se a
-nova versão não ficar saudável.
+workflow de CI do backend. Um push em `prod` que altere `backend/**`,
+`frontend/**` ou `infra/vps/**` constrói uma imagem imutável e atualiza a VPS.
+O script confirma `/actuator/health` e restaura a imagem anterior se necessário;
+somente depois da saúde do backend ser confirmada o frontend é promovido na Vercel.
 
 Para publicar uma versão, faça um pull request de `master` para `prod`.
 
