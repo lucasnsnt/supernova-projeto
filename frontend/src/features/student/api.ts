@@ -4,7 +4,7 @@ import type { Address } from './profile-api'
 export type Direction = 'IDA' | 'VOLTA'
 export type ConfirmationStatus = 'PENDING' | 'YES' | 'NO' | 'NO_RESPONSE'
 export type DailyConfirmation = {
-  id: number; studentName?: string; serviceDate: string; direction: Direction; scheduledTime: string
+  id: number; studentName?: string; institutionName?: string | null; serviceDate: string; direction: Direction; scheduledTime: string
   preliminaryDepartureAt: string; responseDeadline: string; status: ConfirmationStatus
 }
 export type Schedule = { id: number; dayOfWeek: string; time: string; direction: Direction }
@@ -32,4 +32,12 @@ export const removeSchedule = (day: string) => apiFetch<void>(`/api/students/me/
 export function time(value: string | null) {
   if (!value) return '—'
   return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(new Date(value))
+}
+
+export const directionLabel = (direction: Direction) => direction === 'IDA' ? 'Ida' : 'Volta'
+export const confirmationLabel: Record<ConfirmationStatus, string> = {
+  PENDING: 'Aguardando resposta',
+  YES: 'Confirmado',
+  NO: 'Não vai',
+  NO_RESPONSE: 'Prazo encerrado',
 }

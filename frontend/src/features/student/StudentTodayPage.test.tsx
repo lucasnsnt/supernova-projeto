@@ -16,3 +16,13 @@ it('mostra e responde confirmação de amanhã liberada na noite anterior', asyn
   await waitFor(() => expect(answerConfirmation).toHaveBeenCalledWith(7, 'YES'))
   expect(await screen.findByRole('alert')).toHaveTextContent('O prazo terminou')
 })
+
+it('mantém a ida confirmada visível antes de a rota ser calculada', async () => {
+  vi.mocked(studentTrips).mockResolvedValue([])
+  vi.mocked(studentConfirmations).mockImplementation(async date => date === tomorrow() ? [] : [{ id: 8, serviceDate: date!, direction: 'IDA', status: 'YES', scheduledTime: '18:30:00', preliminaryDepartureAt: `${date}T17:30:00`, responseDeadline: `${date}T16:30:00`, institutionName: 'Universidade Federal' }])
+  render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><StudentTodayPage /></QueryClientProvider>)
+  expect(await screen.findByText('Confirmado')).toBeInTheDocument()
+  expect(screen.getByText('Universidade Federal')).toBeInTheDocument()
+  expect(screen.getByText(/Sua presença está confirmada/)).toBeInTheDocument()
+  expect(screen.getByText(/Sua programação acima continua válida/)).toBeInTheDocument()
+})

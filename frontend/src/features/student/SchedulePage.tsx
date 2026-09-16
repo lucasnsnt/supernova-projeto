@@ -9,7 +9,7 @@ const days = [
 
 export function SchedulePage() {
   const schedules = useQuery({ queryKey: ['student-schedules'], queryFn: studentSchedules })
-  return <div className="page-stack"><header className="page-heading"><p className="eyebrow">Sua rotina</p><h1>Agenda semanal</h1><p className="muted">Informe quando sua aula começa e termina em cada dia.</p></header><div className="schedule-list">{days.map(([value, label]) => {
+  return <div className="page-stack"><header className="page-heading"><p className="eyebrow">Sua rotina</p><h1>Agenda semanal</h1><p className="muted">Escolha os dias de aula e informe o início e o fim. Usaremos esses horários para preparar ida e volta.</p></header><div className="schedule-legend"><span><b>Entrada</b> gera a ida</span><span><b>Saída</b> gera a volta</span></div>{schedules.isLoading && <div className="status-card">Carregando sua agenda…</div>}{schedules.isError && <div className="alert-card">Não foi possível carregar sua agenda.</div>}<div className="schedule-list">{days.map(([value, label]) => {
     const current = (schedules.data ?? []).filter((item) => item.dayOfWeek === value)
     const version = current.map((item) => `${item.direction}-${item.time}`).join('|')
     return <ScheduleRow key={`${value}-${version}`} day={value} label={label} schedules={current} />
@@ -24,9 +24,11 @@ function ScheduleRow({ day, label, schedules }: { day: string; label: string; sc
   const [returnTime, setReturnTime] = useState(
     schedules.find((item) => item.direction === 'VOLTA')?.time.slice(0, 5) ?? '',
   )
+  const [message, setMessage] = useState('')
   const refresh = () => { void queryClient.invalidateQueries({ queryKey: ['student-schedules'] }); void queryClient.invalidateQueries({ queryKey: ['student-registration'] }) }
-  const save = useMutation({ mutationFn: () => saveSchedule(day, outbound || null, returnTime || null), onSuccess: refresh })
-  const remove = useMutation({ mutationFn: () => removeSchedule(day), onSuccess: refresh })
+  const save = useMutation({ mutationFn: () => saveSchedule(day, outbound || null, returnTime || null), onSuccess: () => { setMessage('Horários salvos'); refresh() } })
+  const remove = useMutation({ mutationFn: () => removeSchedule(day), onSuccess: () => { setOutbound(''); setReturnTime(''); setMessage('Dia removido da agenda'); refresh() } })
   function submit(event: FormEvent) { event.preventDefault(); save.mutate() }
-  return <form className="schedule-row" onSubmit={submit}><strong>{label}</strong><label>Entrada<input type="time" value={outbound} onChange={(event) => setOutbound(event.target.value)} /></label><label>Saída<input type="time" value={returnTime} onChange={(event) => setReturnTime(event.target.value)} /></label><div className="button-row"><button className="secondary-button" type="button" disabled={!schedules.length || remove.isPending} onClick={() => remove.mutate()}>Limpar</button><button className="primary-button compact" disabled={(!outbound && !returnTime) || save.isPending}>Salvar</button></div></form>
+  const active = Boolean(outbound || returnTime || schedules.length)
+  return <form className={`schedule-row ${active ? 'active' : ''}`} onSubmit={submit}><div className="schedule-day"><span className="schedule-check">{active ? '✓' : ''}</span><strong>{label}</strong><small>{active ? 'Dia de aula' : 'Sem aula'}</small></div><label>Início da aula<input type="time" value={outbound} onChange={(event) => { setMessage(''); setOutbound(event.target.value) }} /></label><label>Fim da aula<input type="time" value={returnTime} onChange={(event) => { setMessage(''); setReturnTime(event.target.value) }} /></label><div className="button-row"><button className="secondary-button" type="button" disabled={!schedules.length || remove.isPending} onClick={() => remove.mutate()}>{remove.isPending ? 'Limpando…' : 'Limpar'}</button><button className="primary-button compact" disabled={(!outbound && !returnTime) || save.isPending}>{save.isPending ? 'Salvando…' : 'Salvar'}</button></div>{message && <p className="save-feedback" role="status">✓ {message}</p>}{(save.error || remove.error) && <p className="form-error" role="alert">{save.error?.message || remove.error?.message}</p>}</form>
 }
