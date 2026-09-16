@@ -16,7 +16,19 @@ const emptyAddress: Address = { street: '', number: '', complement: '', neighbor
 export function profilePayload(form: ProfilePayload, original: Address | null): ProfilePayload {
   const locationFields = ['street', 'number', 'neighborhood', 'city', 'state', 'zipCode'] as const
   const changed = locationFields.some(field => form.address[field].trim() !== (original?.[field] ?? '').trim())
-  return { ...form, address: { ...form.address, state: form.address.state.toUpperCase(), latitude: changed ? null : original?.latitude ?? null, longitude: changed ? null : original?.longitude ?? null } }
+  // Typing a new address clears its old point in the form.  Once the person
+  // confirms a new pin, however, those freshly selected coordinates must win.
+  const hasConfirmedPoint = form.address.latitude != null && form.address.longitude != null
+    && (form.address.latitude !== original?.latitude || form.address.longitude !== original?.longitude)
+  return {
+    ...form,
+    address: {
+      ...form.address,
+      state: form.address.state.toUpperCase(),
+      latitude: hasConfirmedPoint ? form.address.latitude : changed ? null : original?.latitude ?? null,
+      longitude: hasConfirmedPoint ? form.address.longitude : changed ? null : original?.longitude ?? null,
+    },
+  }
 }
 
 export function StudentProfilePage() {

@@ -48,6 +48,13 @@ describe('cadastro do aluno', () => {
     const form = { name: 'Aluno', phone: '123', dateOfBirth: '2000-01-01', address: { ...address, street: 'Rua Nova' } }
     expect(profilePayload(form, address).address).toEqual({ ...form.address, latitude: null, longitude: null })
   })
+  it('preserva o novo ponto confirmado ao salvar um endereço alterado', () => {
+    const form = {
+      name: 'Aluno', phone: '123', dateOfBirth: '2000-01-01',
+      address: { ...address, street: 'Rua Nova', latitude: -10.911, longitude: -37.071 },
+    }
+    expect(profilePayload(form, address).address).toEqual(form.address)
+  })
   it('confere um convite, impede confirmação obsoleta e aceita o novo', async () => {
     vi.mocked(api.previewInvite).mockResolvedValue({ driverId: 2, driverName: 'Motorista Ana', expiresAt: '2026-12-01T20:00:00' })
     vi.mocked(api.acceptInvite).mockResolvedValue(active)
