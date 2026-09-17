@@ -12,7 +12,7 @@ vi.mock('../driver/api', async importOriginal => ({
 afterEach(cleanup)
 
 describe('RouteForm', () => {
-  it('limita cada rota a uma ida e uma volta por dia', async () => {
+  it('limita cada criação a um dia, uma ida e uma volta', async () => {
     const user = userEvent.setup()
     render(<QueryClientProvider client={new QueryClient()}><RouteForm
       routeVehicles={[]}
@@ -21,13 +21,14 @@ describe('RouteForm', () => {
       onCreated={vi.fn()}
     /></QueryClientProvider>)
 
-    const addOutbound = screen.getAllByRole('button', { name: '+ Ida' })[0]
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Dia da rota' }), 'MONDAY')
+    const addOutbound = screen.getByRole('button', { name: '+ Ida' })
     await user.click(addOutbound)
 
     expect(screen.getByText('Ida')).toBeVisible()
     expect(screen.getAllByRole('button', { name: /Horário de saída/ })).toHaveLength(1)
-    expect(screen.queryAllByRole('button', { name: '+ Ida' })).toHaveLength(6)
-    expect(screen.getAllByRole('button', { name: '+ Volta' })[0]).toBeEnabled()
+    expect(screen.queryByRole('button', { name: '+ Ida' })).toBeNull()
+    expect(screen.getByRole('button', { name: '+ Volta' })).toBeEnabled()
   })
 
   it('abre o seletor simplificado em vez do campo de hora nativo', async () => {
@@ -39,7 +40,8 @@ describe('RouteForm', () => {
       onCreated={vi.fn()}
     /></QueryClientProvider>)
 
-    await user.click(screen.getAllByRole('button', { name: '+ Volta' })[0])
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Dia da rota' }), 'MONDAY')
+    await user.click(screen.getByRole('button', { name: '+ Volta' }))
     await user.click(screen.getByRole('button', { name: /Horário de saída/ }))
 
     expect(screen.getByRole('dialog', { name: /Seg · Volta/ })).toBeVisible()

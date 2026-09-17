@@ -147,6 +147,9 @@ public class RecurringRouteService {
             }
             daysWithSchedules.add(day);
         }
+        if (daysWithSchedules.size() != 1) {
+            throw new BusinessRuleException("Crie uma rota separada para cada dia");
+        }
         for (String day : daysWithSchedules) {
             if (!keys.contains(day + ":IDA") || !keys.contains(day + ":VOLTA")) {
                 throw new BusinessRuleException("Cada dia configurado precisa ter uma ida e uma volta");
