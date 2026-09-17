@@ -13,12 +13,16 @@ import ink.lucasnsnt.supernovaprojeto.dtos.student.StudentDetailsResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.DailyConfirmationAnswerRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.DailyConfirmationResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.route.RecurringRouteResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.route.RouteEnrollmentRequest;
+import ink.lucasnsnt.supernovaprojeto.dtos.route.RouteEnrollmentResponse;
 import ink.lucasnsnt.supernovaprojeto.services.AccountService;
 import ink.lucasnsnt.supernovaprojeto.services.DriverStudentLinkService;
 import ink.lucasnsnt.supernovaprojeto.services.StudentScheduleService;
 import ink.lucasnsnt.supernovaprojeto.services.StudentService;
 import ink.lucasnsnt.supernovaprojeto.services.DailyConfirmationService;
 import ink.lucasnsnt.supernovaprojeto.services.TripService;
+import ink.lucasnsnt.supernovaprojeto.services.RecurringRouteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -44,6 +48,7 @@ public class StudentController {
     private final DriverStudentLinkService linkService;
     private final DailyConfirmationService confirmationService;
     private final TripService tripService;
+    private final RecurringRouteService recurringRouteService;
 
     @GetMapping
     public StudentDetailsResponse getDetails(@AuthenticationPrincipal Jwt jwt) {
@@ -115,6 +120,23 @@ public class StudentController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long linkId) {
         return linkService.endByStudentResponse(userId(jwt), linkId);
+    }
+
+    @GetMapping("/available-routes")
+    public List<RecurringRouteResponse> findAvailableRoutes(@AuthenticationPrincipal Jwt jwt) {
+        return recurringRouteService.findAvailableForStudent(userId(jwt));
+    }
+
+    @GetMapping("/route-enrollments")
+    public List<RouteEnrollmentResponse> findRouteEnrollments(@AuthenticationPrincipal Jwt jwt) {
+        return recurringRouteService.findEnrollmentsForStudent(userId(jwt));
+    }
+
+    @PostMapping("/route-enrollments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public RouteEnrollmentResponse requestRouteEnrollment(
+            @AuthenticationPrincipal Jwt jwt, @Valid @RequestBody RouteEnrollmentRequest request) {
+        return recurringRouteService.requestEnrollment(userId(jwt), request);
     }
 
     @GetMapping("/daily-confirmations")

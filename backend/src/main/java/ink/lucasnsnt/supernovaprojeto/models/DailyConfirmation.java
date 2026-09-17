@@ -36,6 +36,10 @@ public class DailyConfirmation {
     @JoinColumn(name = "driver_id", nullable = false)
     private Driver driver;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recurring_route_id")
+    private RecurringRoute recurringRoute;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
