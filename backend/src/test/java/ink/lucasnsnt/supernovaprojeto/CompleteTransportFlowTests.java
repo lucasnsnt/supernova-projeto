@@ -25,6 +25,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -42,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CompleteTransportFlowTests {
     private static final AtomicInteger geocodes = new AtomicInteger();
     private static final AtomicInteger routes = new AtomicInteger();
+    private static final AtomicReference<String> lastOptimization = new AtomicReference<>();
     private static final HttpServer google = googleFixture();
     @Autowired private MockMvc mvc;
     @Autowired private UserRepository users;
@@ -64,7 +66,7 @@ class CompleteTransportFlowTests {
     @AfterAll static void stopGoogle() { google.stop(0); }
 
     @Test
-    void shouldRegisterApproveConfirmPlanStartAndCompleteTrip() throws Exception {
+    void shouldRegisterJoinConfirmPreviewStartEarlyAndCompleteWithoutDriverApproval() throws Exception {
         now("2026-09-15T10:00:00");
         when(tokenProvider.accessToken()).thenReturn("fixture-access-token");
         String driver = register("motorista@complete.test", "DRIVER", "11122233344");
@@ -105,6 +107,25 @@ class CompleteTransportFlowTests {
             assertThat(address.getLongitude()).isNotNull();
         });
 
+        // A class schedule and an active driver link alone must not create transport.
+        scheduler.processConfirmations();
+        assertThat((java.util.List<?>) read(get("/api/students/me/daily-confirmations?date=2026-09-15"),
+                student, "$" )).isEmpty();
+        Number vehicleId = JsonPath.read(savedVehicle, "$.id");
+        String route = send(post("/api/drivers/me/routes"), driver, """
+                {"name":"Terça universidades","vehicleId":%s,
+                 "schedules":[
+                   {"dayOfWeek":"TUESDAY","direction":"IDA","departureTime":"07:00","responseDeadlineTime":"06:00"},
+                   {"dayOfWeek":"TUESDAY","direction":"VOLTA","departureTime":"12:00","responseDeadlineTime":"11:00"}],
+                 "institutions":[{"institutionId":%s,"stopOrder":1}]}
+                """.formatted(vehicleId, institutionId));
+        Number routeId = JsonPath.read(route, "$.id");
+        String enrollment = send(post("/api/students/me/route-enrollments"), student,
+                "{\"routeId\":%s,\"outboundEnabled\":false,\"returnEnabled\":true}".formatted(routeId));
+        assertThat(JsonPath.<String>read(enrollment, "$.status")).isEqualTo("APPROVED");
+        assertThat((java.util.List<?>) read(get("/api/students/me/routes/{id}/enrollments", routeId),
+                student, "$" )).hasSize(1);
+
         // An old registration without coordinates must recover during planning.
         var oldAddress = addresses.findAll().getFirst();
         oldAddress.setLatitude(null); oldAddress.setLongitude(null); addresses.save(oldAddress);
@@ -113,23 +134,42 @@ class CompleteTransportFlowTests {
         send(put("/api/students/me/daily-confirmations/{id}/answer", confirmationId), student, "{\"answer\":\"YES\"}");
         scheduler.processConfirmations();
         assertThat(trips.count()).isZero(); // Before the response deadline.
-        now("2026-09-15T11:01:00");
-        scheduler.processConfirmations();
-        scheduler.processConfirmations(); // Must not duplicate the trip.
-        assertThat(trips.count()).isOne();
-        assertThat(geocodes.get()).isEqualTo(4);
-        assertThat(routes.get()).isOne();
 
-        // Obtain fresh access tokens after advancing the clock past token expiry.
-        driver = login("motorista@complete.test"); student = login("aluno@complete.test");
-        Number tripId = (Number) read(get("/api/drivers/me/trips?date=2026-09-15"), driver, "$[0].id");
-        assertThat(read(get("/api/students/me/trips?date=2026-09-15"), student, "$[0].status").toString()).isEqualTo("PLANNED");
+        String preview = send(get("/api/drivers/me/routes/{id}/trip-preview", routeId)
+                .param("date", "2026-09-15").param("direction", "VOLTA"), driver, null);
+        assertThat(JsonPath.<Boolean>read(preview, "$.canStart")).isTrue();
+        assertThat(JsonPath.<Boolean>read(preview, "$.withinStartWindow")).isFalse();
+        assertThat(JsonPath.<String>read(preview, "$.scheduledDepartureAt")).isEqualTo("2026-09-15T12:00:00");
+        assertThat(JsonPath.<java.util.List<?>>read(preview, "$.participants")).hasSize(1);
+        assertThat(trips.count()).isZero(); // Opening the preview never starts or persists a trip.
+        assertThat(geocodes.get()).isEqualTo(4);
+
+        String startBody = "{\"serviceDate\":\"2026-09-15\",\"direction\":\"VOLTA\",\"acknowledgeOutsideWindow\":false}";
+        mvc.perform(post("/api/drivers/me/routes/{id}/start", routeId)
+                .header("Authorization", "Bearer " + driver).with(csrf())
+                .contentType(MediaType.APPLICATION_JSON).content(startBody))
+                .andExpect(status().isUnprocessableContent());
+        assertThat(trips.count()).isZero();
+        String started = send(post("/api/drivers/me/routes/{id}/start", routeId), driver,
+                startBody.replace("false", "true"));
+        Number tripId = JsonPath.read(started, "$.id");
+        assertThat(JsonPath.<String>read(started, "$.status")).isEqualTo("IN_PROGRESS");
+        assertThat(JsonPath.<String>read(started, "$.startedAt")).isEqualTo("2026-09-15T10:00:00");
+        assertThat(JsonPath.<String>read(started, "$.plannedDepartureAt")).isEqualTo("2026-09-15T12:00:00");
+        assertThat(JsonPath.<String>read(lastOptimization.get(),
+                "$.model.vehicles[0].startTimeWindows[0].startTime")).isEqualTo("2026-09-15T13:00:00Z");
+        assertThat(JsonPath.<String>read(lastOptimization.get(),
+                "$.model.shipments[0].pickups[0].timeWindows[0].startTime")).isEqualTo("2026-09-15T15:00:00Z");
         assertThat(read(get("/api/drivers/me/trips?date=2026-09-15"), driver,
                 "$[0].participants[0].pickupAddress.street").toString()).isEqualTo("Rua MVP");
         assertThat(read(get("/api/drivers/me/trips?date=2026-09-15"), driver,
                 "$[0].participants[0].dropoffAddress.number").toString()).isEqualTo("10");
-        send(post("/api/drivers/me/trips/{id}/start", tripId), driver, null);
         assertThat(read(get("/api/students/me/trips?date=2026-09-15"), student, "$[0].status").toString()).isEqualTo("IN_PROGRESS");
+        now("2026-09-15T11:01:00");
+        scheduler.processConfirmations();
+        scheduler.processConfirmations();
+        assertThat(trips.count()).isOne(); // Deadline processing cannot duplicate the early-started occurrence.
+        driver = login("motorista@complete.test"); student = login("aluno@complete.test");
         send(post("/api/drivers/me/trips/{id}/completion", tripId), driver, null);
         assertThat(read(get("/api/students/me/trips?date=2026-09-15"), student, "$[0].status").toString()).isEqualTo("COMPLETED");
         assertThat(read(get("/api/students/me/trips?date=2026-09-15"), student, "$[0].completedAt")).isNotNull();
@@ -184,12 +224,14 @@ class CompleteTransportFlowTests {
             });
             server.createContext("/v1/projects/test-project:optimizeTours", exchange -> {
                 routes.incrementAndGet();
-                exchange.getRequestBody().readAllBytes();
+                String request = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                lastOptimization.set(request);
+                String departure = JsonPath.read(request, "$.model.vehicles[0].startTimeWindows[0].startTime");
                 respond(exchange, """
-                        {"routes":[{"vehicleStartTime":"2026-09-15T14:45:00Z","visits":[
+                        {"routes":[{"vehicleStartTime":"%s","visits":[
                         {"shipmentIndex":0,"isPickup":true,"startTime":"2026-09-15T15:00:00Z"},
                         {"shipmentIndex":0,"isPickup":false,"startTime":"2026-09-15T15:30:00Z"}]}]}
-                        """);
+                        """.formatted(departure));
             });
             server.start(); return server;
         } catch (java.io.IOException exception) { throw new IllegalStateException(exception); }
