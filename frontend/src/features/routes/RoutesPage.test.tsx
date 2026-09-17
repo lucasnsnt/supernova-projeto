@@ -48,4 +48,19 @@ describe('RouteForm', () => {
     expect(screen.getByLabelText('Minuto')).toBeVisible()
     expect(document.querySelector('.route-time-card input[type="time"]')).toBeNull()
   })
+
+  it('mostra a lista de instituições ao adicionar uma parada', async () => {
+    const user = userEvent.setup()
+    render(<QueryClientProvider client={new QueryClient()}><RouteForm
+      routeVehicles={[]}
+      routeInstitutions={[{ id: 1, name: 'Faculdade Central', type: 'UNIVERSITY', address: {} as never }]}
+      onClose={vi.fn()}
+      onCreated={vi.fn()}
+    /></QueryClientProvider>)
+
+    await user.click(screen.getByRole('button', { name: 'Adicionar instituição' }))
+
+    expect(screen.getByRole('combobox', { name: 'Instituição atendida 1' })).toHaveValue('1')
+    expect(screen.getByRole('option', { name: 'Faculdade Central' })).toBeVisible()
+  })
 })

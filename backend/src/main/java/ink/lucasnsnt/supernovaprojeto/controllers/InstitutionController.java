@@ -21,7 +21,7 @@ public class InstitutionController {
     private final InstitutionService institutionService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'DRIVER', 'ADMIN')")
     public List<InstitutionResponse> findAll(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) InstitutionType type) {
