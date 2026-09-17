@@ -1,4 +1,4 @@
-# Supernova
+# transmoovi
 
 Monorepo da aplicação web de transporte estudantil.
 

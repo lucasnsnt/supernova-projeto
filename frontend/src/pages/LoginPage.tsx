@@ -32,8 +32,8 @@ export function LoginPage() {
   return (
     <main className="auth-page">
       <section className="auth-card" aria-labelledby="login-title">
-        <div className="brand-mark" aria-hidden="true">S</div>
-        <p className="eyebrow">Supernova</p>
+        <img className="brand-mark" src="/transmoovi-app-icon-512.png" alt="" />
+        <p className="eyebrow">transmoovi</p>
         <h1 id="login-title">Entre na sua conta</h1>
         <p className="muted">Acompanhe sua rotina de transporte em um só lugar.</p>
         <form onSubmit={submit} className="form-stack">
