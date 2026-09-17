@@ -1,79 +1,65 @@
 # Planejamento da operação diária
 
-## Confirmação do aluno
+## Rota fixa do motorista
 
-Cada ocorrência da agenda gera uma confirmação diária independente da viagem.
-O aluno responde uma única vez com `YES` ou `NO`. A ausência de resposta até o
-prazo fica registrada como `NO_RESPONSE`; somente `YES` participa da viagem.
+O motorista cria uma rota recorrente para um dia da semana, com os horários
+pareados de ida/volta, instituições atendidas e o veículo configurado. As
+saídas publicadas são fixas; cada ocorrência nasce dessa rota, nunca de uma
+agenda escolar isolada.
+O aluno só entra com convite ativo daquele motorista e instituição atendida.
+Entrada é imediata, sem aprovação; o aluno pode sair e o motorista pode removê-lo.
+A agenda acadêmica permanece para validar horários, mas sozinha não cria viagens.
 
-O sistema calcula uma saída preliminar considerando todos os alunos esperados.
-O prazo termina uma hora antes dessa saída e não é prorrogado quando recusas
-tornam a rota mais curta.
+## Confirmação diária
 
-- Saída anterior às 09:00: confirmação disponível às 20:00 do dia anterior.
-- Saída a partir das 09:00: confirmação disponível às 06:00 do próprio dia.
-- Fuso operacional: `America/Bahia`.
+Somente alunos matriculados em uma rota geram confirmação diária. O aluno responde
+`YES` ou `NO`; ausência até o prazo vira `NO_RESPONSE`, e apenas `YES` entra no
+manifesto. A confirmação pode ser liberada antes do prazo e o motorista pode
+iniciar antes dele. A rota define `responseDeadlineTime` próprio; esse valor
+configurado é a fonte de verdade da ocorrência (incluindo a janela de liberação,
+com os horários padrão de 20:00 no dia anterior/06:00 no dia de serviço quando
+assim configurados).
+Fuso operacional: `America/Bahia`.
 
 ## Planejamento das viagens
 
-No encerramento do prazo, o sistema cria viagens somente com os alunos que
-responderam `YES`. A quantidade de viagens é resultado da viabilidade de
-capacidade, trajeto e horários, e não um número fixo.
+Após o prazo, calcula-se a ocorrência somente com `YES` matriculados naquela rota.
+A ocorrência é uma única viagem; capacidade, trajeto e horários determinam sua
+viabilidade. Na ida, casa é coleta e instituição é entrega até o início da aula.
+Na volta, instituição é coleta a partir do fim da aula e casa é entrega; espera
+máxima: 30 minutos.
 
-Na ida, a casa é a coleta e a instituição é a entrega, cujo limite é o horário
-da agenda. Na volta, a instituição é a coleta, disponível no horário da agenda,
-e a casa é a entrega. A espera máxima depois da aula é de 30 minutos.
-
-Se uma solução não for possível, nenhum aluno confirmado é removido
-silenciosamente. O planejamento fica em `NEEDS_ATTENTION` e informa as
-restrições que não puderam ser atendidas.
+Solução impossível não remove confirmados silenciosamente: fica `NEEDS_ATTENTION`
+com as restrições não atendidas.
 
 ## Atuação do motorista
 
-A viagem é criada pelo sistema e não depende de aceite. O motorista confirma ou
-ajusta o horário de saída. Até 30 minutos antes, ele pode adiantar ou atrasar em
-até 30 minutos quando a rota continuar viável. Depois desse limite, somente um
-atraso com motivo pode ser informado. O cancelamento é permitido até o início e
-sempre exige motivo.
+Cartões de rota abrem modal com o elenco. Cartões de ocorrência abrem prévia de
+otimização real usando só passageiros `YES`, endereços de casa/instituição e o
+veículo da rota. O otimizador pode reordenar instituições por tempo/geografia,
+sem alterar a saída fixa.
 
-O motorista possui um veículo padrão, aplicado automaticamente às novas
-viagens. Ele pode substituir o veículo de uma viagem antes de iniciá-la, sem
-alterar o padrão, desde que a capacidade seja suficiente. Mudanças de horário,
-veículo e cancelamento geram notificações internas aos participantes.
+Início dentro de ±30 minutos (inclusive limites) é direto. Fora exige confirmação
+explícita: **Iniciar antecipadamente** antes ou **Iniciar agora** depois. Pode
+iniciar cedo antes do prazo. Ao iniciar, congela os `YES` atuais: sem entradas
+tardias, e viagens vazias ou inviáveis não podem iniciar.
 
-O endereço operacional do motorista é a origem da ida e o destino da volta. Ele
-pode coincidir com o endereço cadastrado ou ser configurado separadamente.
-
-## Rotas e notificações
-
-O MVP usará a Google Route Optimization API. A integração fica isolada do
-domínio para permitir troca de fornecedor. Respostas são exibidas em tempo real,
-mas a rota externa não é recalculada a cada resposta. A otimização definitiva
-ocorre no encerramento do prazo e é repetida apenas para mudanças operacionais
-relevantes.
-
-As notificações são persistentes e internas à aplicação web. Não haverá SMS,
-email operacional ou push do dispositivo no MVP.
+O veículo da rota é aplicado à ocorrência. Alterações e remoções notificam
+internamente os participantes. O MVP usa Google Route Optimization API isolada
+do domínio; prévia recalcula ao abrir e a rota definitiva congela no início.
 
 ## Estados
 
 ```text
-PENDING -> YES
-        -> NO
-        -> NO_RESPONSE
-```
-
-```text
+PENDING -> YES | NO | NO_RESPONSE
 PLANNING -> PLANNED -> IN_PROGRESS -> COMPLETED
-       |         |
-       |         +-----------------> CANCELLED
-       +---------------------------> NEEDS_ATTENTION
+                    +--------------> CANCELLED
+       +----------------------------> NEEDS_ATTENTION
 ```
 
 ## Fora do primeiro MVP
 
 - calendário escolar, feriados e exceções planejadas;
-- rastreamento GPS ao vivo;
 - push, SMS ou email operacional;
 - agenda completa de turnos do motorista;
 - gestão documental avançada da aprovação do motorista.
