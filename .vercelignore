@@ -1,0 +1,9 @@
+# The Vercel project builds only the frontend/ root directory.
+backend/
+frontend/node_modules/
+frontend/dist/
+frontend/.vercel/
+.git/
+.github/
+docs/
+infra/
