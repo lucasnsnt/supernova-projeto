@@ -8,12 +8,18 @@ import ink.lucasnsnt.supernovaprojeto.dtos.invite.InviteResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.link.LinkedStudentResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.vehicle.VehicleRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.vehicle.VehicleResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.route.RecurringRouteCreateRequest;
+import ink.lucasnsnt.supernovaprojeto.dtos.route.RecurringRouteResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.route.RouteEnrollmentResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.route.RouteEnrollmentReviewRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.common.AddressRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.DailyConfirmationResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.DepartureUpdateRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripCancellationRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripVehicleUpdateRequest;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripLocationUpdateRequest;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripTrackingResponse;
 import ink.lucasnsnt.supernovaprojeto.models.DriverInvite;
 import ink.lucasnsnt.supernovaprojeto.models.Vehicle;
 import ink.lucasnsnt.supernovaprojeto.services.AccountService;
@@ -24,6 +30,8 @@ import ink.lucasnsnt.supernovaprojeto.services.VehicleService;
 import ink.lucasnsnt.supernovaprojeto.services.DailyConfirmationService;
 import ink.lucasnsnt.supernovaprojeto.services.TripService;
 import ink.lucasnsnt.supernovaprojeto.services.TripPlanningService;
+import ink.lucasnsnt.supernovaprojeto.services.TripTrackingService;
+import ink.lucasnsnt.supernovaprojeto.services.RecurringRouteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,6 +58,8 @@ public class DriverController {
     private final DailyConfirmationService confirmationService;
     private final TripService tripService;
     private final TripPlanningService tripPlanningService;
+    private final RecurringRouteService recurringRouteService;
+    private final TripTrackingService tripTrackingService;
 
     @GetMapping
     public DriverResponse getProfile(@AuthenticationPrincipal Jwt jwt) {
@@ -117,6 +127,38 @@ public class DriverController {
         return linkService.endByDriverResponse(userId(jwt), linkId);
     }
 
+    @GetMapping("/routes")
+    public List<RecurringRouteResponse> findRecurringRoutes(@AuthenticationPrincipal Jwt jwt) {
+        return recurringRouteService.findByDriver(userId(jwt));
+    }
+
+    @GetMapping("/route-previews")
+    public List<ink.lucasnsnt.supernovaprojeto.dtos.route.RecurringRoutePreviewResponse> findRoutePreviews(
+            @AuthenticationPrincipal Jwt jwt, @RequestParam LocalDate date) {
+        return recurringRouteService.findPreviewsForDriver(userId(jwt), date);
+    }
+
+    @PostMapping("/routes")
+    @ResponseStatus(HttpStatus.CREATED)
+    public RecurringRouteResponse createRecurringRoute(
+            @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody RecurringRouteCreateRequest request) {
+        return recurringRouteService.create(userId(jwt), request);
+    }
+
+    @GetMapping("/routes/{routeId}/enrollments")
+    public List<RouteEnrollmentResponse> findRouteEnrollments(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable Long routeId) {
+        return recurringRouteService.findEnrollmentsForDriver(userId(jwt), routeId);
+    }
+
+    @PutMapping("/route-enrollments/{enrollmentId}")
+    public RouteEnrollmentResponse reviewRouteEnrollment(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable Long enrollmentId,
+            @Valid @RequestBody RouteEnrollmentReviewRequest request) {
+        return recurringRouteService.reviewEnrollment(userId(jwt), enrollmentId, request);
+    }
+
     @GetMapping("/daily-confirmations")
     public List<DailyConfirmationResponse> findDailyConfirmations(
             @AuthenticationPrincipal Jwt jwt,
@@ -167,6 +209,22 @@ public class DriverController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long tripId) {
         return tripService.complete(userId(jwt), tripId);
+    }
+
+    @PostMapping("/trips/{tripId}/stops/completion")
+    public TripResponse completeTripStop(@AuthenticationPrincipal Jwt jwt, @PathVariable Long tripId) {
+        return tripService.completeNextStop(userId(jwt), tripId);
+    }
+
+    @PutMapping("/trips/{tripId}/location")
+    public TripTrackingResponse updateTripLocation(@AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long tripId, @Valid @RequestBody TripLocationUpdateRequest request) {
+        return tripTrackingService.updateLocation(userId(jwt), tripId, request);
+    }
+
+    @GetMapping("/trips/{tripId}/tracking")
+    public TripTrackingResponse trackTrip(@AuthenticationPrincipal Jwt jwt, @PathVariable Long tripId) {
+        return tripTrackingService.findForDriver(userId(jwt), tripId);
     }
 
     @PostMapping("/trips/{tripId}/cancellation")

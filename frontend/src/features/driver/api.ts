@@ -1,4 +1,4 @@
-import type { DailyConfirmation, Trip } from '../student/api'
+import type { DailyConfirmation, Trip, TripTracking } from '../student/api'
 import { apiFetch } from '../../lib/api'
 import { today } from '../student/api'
 
@@ -8,9 +8,23 @@ export type Vehicle = { id: number; brand: string; model: string; year: number |
 export type Address = { street: string; number: string; complement: string | null; neighborhood: string; city: string; state: string; zipCode: string; latitude: number | null; longitude: number | null }
 export type DriverProfile = { id: number; name: string; email: string; phone: string; dateOfBirth: string; address: Address; operationalAddress: Address; cnh: string; status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED'; statusReason: string | null; reviewedAt: string | null }
 export type DriverProfilePayload = { name: string; phone: string; dateOfBirth: string; cnh: string; address: Address }
+export type RouteDirection = 'IDA' | 'VOLTA'
+export type RecurringRoute = {
+  id: number; name: string; active: boolean; vehicleId: number; vehicleLabel: string
+  schedules: Array<{ dayOfWeek: string; direction: RouteDirection; departureTime: string; responseDeadlineTime: string }>
+  institutions: Array<{ institutionId: number; institutionName: string; stopOrder: number; outboundArrivalBy: string | null; returnDepartureAt: string | null }>
+}
+export type RouteEnrollment = { id: number; routeId: number; routeName: string; studentId: number; studentName: string; outboundEnabled: boolean; returnEnabled: boolean; status: 'PENDING' | 'APPROVED' | 'REJECTED'; createdAt: string }
+export type RecurringRoutePayload = { name: string; vehicleId: number; schedules: Array<{ dayOfWeek: string; direction: RouteDirection; departureTime: string; responseDeadlineTime: string }>; institutions: Array<{ institutionId: number; stopOrder: number; outboundArrivalBy: string | null; returnDepartureAt: string | null }> }
+export type RoutePreview = { routeId: number; routeName: string; serviceDate: string; direction: RouteDirection; departureTime: string; stops: Array<{ institutionName: string; order: number; expectedAt: string | null }>; passengers: Array<{ studentId: number; studentName: string; institutionName: string | null }> }
 
 export const driverConfirmations = () => apiFetch<DailyConfirmation[]>(`/api/drivers/me/daily-confirmations?date=${today()}`)
 export const driverTrips = (date = today()) => apiFetch<Trip[]>(`/api/drivers/me/trips?date=${date}`)
+export const driverRoutes = () => apiFetch<RecurringRoute[]>('/api/drivers/me/routes')
+export const driverRoutePreviews = (date = today()) => apiFetch<RoutePreview[]>(`/api/drivers/me/route-previews?date=${date}`)
+export const createDriverRoute = (body: RecurringRoutePayload) => apiFetch<RecurringRoute>('/api/drivers/me/routes', { method: 'POST', body: JSON.stringify(body) })
+export const driverRouteEnrollments = (routeId: number) => apiFetch<RouteEnrollment[]>(`/api/drivers/me/routes/${routeId}/enrollments`)
+export const reviewRouteEnrollment = (id: number, status: 'APPROVED' | 'REJECTED') => apiFetch<RouteEnrollment>(`/api/drivers/me/route-enrollments/${id}`, { method: 'PUT', body: JSON.stringify({ status }) })
 export const linkedStudents = () => apiFetch<LinkedStudent[]>('/api/drivers/me/students')
 export const invites = () => apiFetch<Invite[]>('/api/drivers/me/invites')
 export const createInvite = () => apiFetch<Invite>('/api/drivers/me/invites', { method: 'POST', body: JSON.stringify({ validityDays: 7, replaceCurrent: true }) })
@@ -24,6 +38,9 @@ export const createVehicle = (body: Omit<Vehicle, 'id' | 'defaultVehicle'>) => a
 export const updateVehicle = (id: number, body: Omit<Vehicle, 'id' | 'defaultVehicle'>) => apiFetch<Vehicle>(`/api/drivers/me/vehicles/${id}`, { method: 'PUT', body: JSON.stringify(body) })
 export const deleteVehicle = (id: number) => apiFetch<void>(`/api/drivers/me/vehicles/${id}`, { method: 'DELETE' })
 export const tripAction = (id: number, action: 'start' | 'completion' | 'replanning', body?: unknown) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/${action}`, { method: 'POST', body: body ? JSON.stringify(body) : undefined })
+export const completeTripStop = (id: number) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/stops/completion`, { method: 'POST' })
+export const driverTripTracking = (id: number) => apiFetch<TripTracking>(`/api/drivers/me/trips/${id}/tracking`)
+export const updateTripLocation = (id: number, body: { latitude: number; longitude: number; accuracy: number | null; heading: number | null; recordedAt: string }) => apiFetch<TripTracking>(`/api/drivers/me/trips/${id}/location`, { method: 'PUT', body: JSON.stringify(body) })
 export const cancelTrip = (id: number, reason: string) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/cancellation`, { method: 'POST', body: JSON.stringify({ reason }) })
 
 export const setDefaultVehicle = (id: number) => apiFetch<Vehicle>(`/api/drivers/me/vehicles/${id}/default`, { method: 'PUT' })

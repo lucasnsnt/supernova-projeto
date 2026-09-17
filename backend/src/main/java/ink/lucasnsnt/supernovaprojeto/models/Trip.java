@@ -61,6 +61,10 @@ public class Trip {
 
     private LocalDateTime cancelledAt;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer completedStopCount = 0;
+
     @Column(length = 500)
     private String cancellationReason;
 

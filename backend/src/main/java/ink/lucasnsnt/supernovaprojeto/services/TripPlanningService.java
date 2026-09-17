@@ -48,7 +48,7 @@ public class TripPlanningService {
                 .collect(Collectors.groupingBy(
                         confirmation -> new PlanningKey(
                                 confirmation.getDriver().getId(), confirmation.getServiceDate(),
-                                confirmation.getDirection()),
+                                confirmation.getDirection(), confirmation.getRecurringRoute() == null ? null : confirmation.getRecurringRoute().getId()),
                         LinkedHashMap::new,
                         Collectors.toList()));
 
@@ -258,6 +258,6 @@ public class TripPlanningService {
                 participant.getConfirmation()));
     }
 
-    private record PlanningKey(Long driverId, LocalDate date, Direction direction) {
+    private record PlanningKey(Long driverId, LocalDate date, Direction direction, Long recurringRouteId) {
     }
 }

@@ -16,6 +16,8 @@ import { StudentProfilePage } from './features/student/StudentProfilePage'
 import { DriverProfilePage } from './features/driver/DriverProfilePage'
 import { AdminStudentsPage } from './features/admin/AdminStudentsPage'
 import { AccountSettingsPage } from './features/account/AccountSettingsPage'
+import { RoutesPage } from './features/routes/RoutesPage'
+import { ActiveTripPage } from './pages/ActiveTripPage'
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } })
 
@@ -28,6 +30,8 @@ export default function App() {
       <Route path="agenda" element={<SchedulePage />} />
       <Route path="meu-cadastro" element={<RoleProfilePage />} />
       <Route path="viagens" element={<TripsPage />} />
+      <Route path="viagens/:tripId/ativa" element={<ActiveTripPage />} />
+      <Route path="rotas" element={<RoutesPage />} />
       <Route path="alunos" element={<StudentsPage />} />
       <Route path="motoristas" element={<DriversPage />} />
       <Route path="alunos-admin" element={<AdminStudentsPage />} />

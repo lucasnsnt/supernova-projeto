@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { studentTrips, time, today, type Trip } from '../features/student/api'
 import { cancelTrip, tripAction, driverTrips, vehicles, changeTripVehicle, updateDeparture } from '../features/driver/api'
@@ -51,7 +52,8 @@ function DateNavigator({ value, onChange }: { value: string; onChange: (date: st
 function parseDate(value: string) { return new Date(`${value}T12:00:00Z`) }
 
 function TripCard({ trip, driver, onChanged }: { trip: Trip; driver: boolean; onChanged: () => void }) {
-  const action = useMutation({ mutationFn: (value: 'start' | 'completion' | 'replanning') => tripAction(trip.id, value), onSuccess: onChanged })
+  const navigate = useNavigate()
+  const action = useMutation({ mutationFn: (value: 'start' | 'completion' | 'replanning') => tripAction(trip.id, value), onSuccess: (_, value) => { onChanged(); if (value === 'start') navigate(`/viagens/${trip.id}/ativa`) } })
   const cancel = useMutation({ mutationFn: (reason: string) => cancelTrip(trip.id, reason), onSuccess: onChanged })
   const busy = action.isPending || cancel.isPending
   const beforeStart = ['PLANNED', 'NEEDS_ATTENTION'].includes(trip.status)
@@ -74,8 +76,8 @@ function TripCard({ trip, driver, onChanged }: { trip: Trip; driver: boolean; on
       {(action.error || cancel.error) && <p role="alert" className="form-error">{(action.error ?? cancel.error)?.message}</p>}
     </div>
     <div className="trip-actions"><strong className="trip-status">{statuses[trip.status] ?? trip.status}</strong>
-      {driver && trip.status === 'PLANNED' && <button disabled={busy} className="primary-button compact" onClick={() => action.mutate('start')}>Iniciar</button>}
-      {driver && trip.status === 'IN_PROGRESS' && <button disabled={busy} className="primary-button compact" onClick={() => action.mutate('completion')}>Concluir</button>}
+      {driver && trip.status === 'PLANNED' && <button disabled={busy} className="primary-button compact" onClick={() => action.mutate('start')}>Iniciar viagem</button>}
+      {trip.status === 'IN_PROGRESS' && <button disabled={busy} className="primary-button compact" onClick={() => navigate(`/viagens/${trip.id}/ativa`)}>{driver ? 'Abrir viagem' : 'Acompanhar'}</button>}
       {driver && trip.status === 'NEEDS_ATTENTION' && <button disabled={busy} className="primary-button compact" onClick={() => action.mutate('replanning')}>Recalcular</button>}
       {driver && beforeStart && <button disabled={busy} className="secondary-button" onClick={requestCancellation}>Cancelar</button>}
     </div>

@@ -109,6 +109,17 @@ class TripServiceTests {
                 eq("Hora da viagem"), contains("06:00"), same(due), isNull());
     }
 
+    @Test
+    void shouldStartAdvanceStopsAndFinishTrip() {
+        Trip trip = trip();
+        stubOwnedTrip(trip);
+
+        assertThat(service.start(10L, 40L).status()).isEqualTo(TripStatus.IN_PROGRESS);
+        assertThat(service.completeNextStop(10L, 40L).completedStopCount()).isOne();
+        assertThat(service.complete(10L, 40L).status()).isEqualTo(TripStatus.COMPLETED);
+        assertThat(trip.getCompletedAt()).isEqualTo(LocalDateTime.of(2026, 9, 15, 5, 0));
+    }
+
     private TripService serviceAt(LocalDateTime localDateTime) {
         ZoneId zone = ZoneId.of("America/Bahia");
         Clock clock = Clock.fixed(localDateTime.atZone(zone).toInstant(), zone);

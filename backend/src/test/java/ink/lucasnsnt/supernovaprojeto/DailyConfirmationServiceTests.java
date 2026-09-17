@@ -6,6 +6,7 @@ import ink.lucasnsnt.supernovaprojeto.models.*;
 import ink.lucasnsnt.supernovaprojeto.models.enums.*;
 import ink.lucasnsnt.supernovaprojeto.repositories.DailyConfirmationRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.DriverStudentLinkRepository;
+import ink.lucasnsnt.supernovaprojeto.repositories.RecurringRouteEnrollmentRepository;
 import ink.lucasnsnt.supernovaprojeto.services.DailyConfirmationService;
 import ink.lucasnsnt.supernovaprojeto.services.InAppNotificationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,7 @@ class DailyConfirmationServiceTests {
 
     private DailyConfirmationRepository confirmationRepository;
     private DriverStudentLinkRepository linkRepository;
+    private RecurringRouteEnrollmentRepository routeEnrollmentRepository;
     private InAppNotificationService notificationService;
     private DailyConfirmationService service;
 
@@ -31,12 +33,13 @@ class DailyConfirmationServiceTests {
     void setUp() {
         confirmationRepository = mock(DailyConfirmationRepository.class);
         linkRepository = mock(DriverStudentLinkRepository.class);
+        routeEnrollmentRepository = mock(RecurringRouteEnrollmentRepository.class);
         notificationService = mock(InAppNotificationService.class);
         DailyTransportProperties properties = new DailyTransportProperties();
         Clock clock = Clock.fixed(
                 Instant.parse("2026-09-14T23:00:00Z"), ZoneId.of("America/Bahia"));
         service = new DailyConfirmationService(
-                confirmationRepository, linkRepository, notificationService, properties, clock);
+                confirmationRepository, linkRepository, routeEnrollmentRepository, notificationService, properties, clock);
     }
 
     @Test
@@ -64,6 +67,33 @@ class DailyConfirmationServiceTests {
         assertThat(confirmation.getStatus()).isEqualTo(DailyConfirmationStatus.PENDING);
         verify(notificationService).create(eq(20L), eq(NotificationType.DAILY_CONFIRMATION_REQUESTED),
                 anyString(), anyString(), isNull(), same(confirmation));
+    }
+
+    @Test
+    void shouldUseDriverRouteTimesForAnApprovedEnrollment() {
+        LocalDate serviceDate = LocalDate.of(2026, 9, 15);
+        DriverStudentLink link = eligibleLink(serviceDate.getDayOfWeek(), LocalTime.of(18, 30));
+        Vehicle vehicle = Vehicle.builder().model("Van").licensePlate("ABC1D23").passengerCapacity(15).driver(link.getDriver()).build();
+        RecurringRoute route = RecurringRoute.builder().id(80L).driver(link.getDriver()).vehicle(vehicle).name("Noturna").createdAt(LocalDateTime.now()).build();
+        route.addSchedule(RecurringRouteSchedule.builder().dayOfWeek(serviceDate.getDayOfWeek()).direction(Direction.IDA)
+                .departureTime(LocalTime.of(17, 10)).responseDeadlineTime(LocalTime.of(16, 10)).build());
+        RecurringRouteEnrollment enrollment = RecurringRouteEnrollment.builder().route(route).student(link.getStudent())
+                .outboundEnabled(true).returnEnabled(false).status(RouteEnrollmentStatus.APPROVED).requestedAt(LocalDateTime.now()).build();
+        when(routeEnrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED)).thenReturn(List.of(enrollment));
+        when(linkRepository.findAllByStatus(DriverStudentLinkStatus.ACTIVE)).thenReturn(List.of(link));
+        when(confirmationRepository.existsByStudentIdAndServiceDateAndDirection(20L, serviceDate, Direction.IDA)).thenReturn(false, true);
+        when(confirmationRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        DailyConfirmationService routeService = new DailyConfirmationService(
+                confirmationRepository, linkRepository, routeEnrollmentRepository, notificationService,
+                new DailyTransportProperties(), Clock.fixed(Instant.parse("2026-09-15T15:00:00Z"), ZoneId.of("America/Bahia")));
+        routeService.releaseAvailableForDate(serviceDate);
+
+        var captor = org.mockito.ArgumentCaptor.forClass(DailyConfirmation.class);
+        verify(confirmationRepository).save(captor.capture());
+        assertThat(captor.getValue().getRecurringRoute().getId()).isEqualTo(80L);
+        assertThat(captor.getValue().getPreliminaryDepartureAt()).isEqualTo("2026-09-15T17:10:00");
+        assertThat(captor.getValue().getResponseDeadline()).isEqualTo("2026-09-15T16:10:00");
     }
 
     @Test

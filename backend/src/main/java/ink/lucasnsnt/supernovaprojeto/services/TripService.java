@@ -129,10 +129,28 @@ public class TripService {
     }
 
     @Transactional
+    public TripResponse completeNextStop(@NotNull Long driverId, @NotNull Long tripId) {
+        Trip trip = findOwnedTrip(driverId, tripId);
+        if (trip.getStatus() != TripStatus.IN_PROGRESS) {
+            throw new BusinessRuleException("Somente uma viagem em andamento pode avançar paradas");
+        }
+        int totalStops = trip.getParticipants().size() * 2;
+        if (trip.getCompletedStopCount() >= totalStops) {
+            throw new BusinessRuleException("Todas as paradas desta viagem já foram concluídas");
+        }
+        trip.setCompletedStopCount(trip.getCompletedStopCount() + 1);
+        return TripResponse.from(trip);
+    }
+
+    @Transactional
     public TripResponse cancel(
             @NotNull Long driverId, @NotNull Long tripId, @NotBlank String reason) {
         Trip trip = findOwnedTrip(driverId, tripId);
-        requireBeforeStart(trip);
+        if (trip.getStatus() != TripStatus.PLANNED
+                && trip.getStatus() != TripStatus.NEEDS_ATTENTION
+                && trip.getStatus() != TripStatus.IN_PROGRESS) {
+            throw new BusinessRuleException("Esta viagem não pode mais ser cancelada");
+        }
         trip.setStatus(TripStatus.CANCELLED);
         trip.setCancellationReason(reason.trim());
         trip.setCancelledAt(LocalDateTime.now(clock));

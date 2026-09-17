@@ -1,5 +1,6 @@
 import { apiFetch } from '../../lib/api'
 import type { Address } from './profile-api'
+import type { RecurringRoute, RouteEnrollment, RoutePreview } from '../driver/api'
 
 export type Direction = 'IDA' | 'VOLTA'
 export type ConfirmationStatus = 'PENDING' | 'YES' | 'NO' | 'NO_RESPONSE'
@@ -12,9 +13,12 @@ export type Trip = {
   id: number; serviceDate: string; direction: Direction; status: string
   departureAt: string | null; planningIssue: string | null
   startedAt: string | null; completedAt: string | null; cancellationReason: string | null
+  encodedPolyline: string | null; completedStopCount: number
   vehicle: { id: number; model: string; licensePlate: string } | null
   participants: Array<{ studentId: number; studentName: string; institutionName: string | null; pickupOrder: number; dropoffOrder: number; estimatedPickupAt: string | null; estimatedDropoffAt: string | null; pickupAddress: Address | null; dropoffAddress: Address | null }>
 }
+export type TripLocation = { latitude: number; longitude: number; accuracy: number | null; heading: number | null; recordedAt: string; updatedAt: string }
+export type TripTracking = { trip: Trip; location: TripLocation | null }
 
 export const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bahia' })
 export const tomorrow = () => {
@@ -25,6 +29,11 @@ export const tomorrow = () => {
 export const studentConfirmations = (date = today()) => apiFetch<DailyConfirmation[]>(`/api/students/me/daily-confirmations?date=${date}`)
 export const answerConfirmation = (id: number, answer: 'YES' | 'NO') => apiFetch<DailyConfirmation>(`/api/students/me/daily-confirmations/${id}/answer`, { method: 'PUT', body: JSON.stringify({ answer }) })
 export const studentTrips = (date = today()) => apiFetch<Trip[]>(`/api/students/me/trips?date=${date}`)
+export const studentTripTracking = (id: number) => apiFetch<TripTracking>(`/api/students/me/trips/${id}/tracking`)
+export const availableRoutes = () => apiFetch<RecurringRoute[]>('/api/students/me/available-routes')
+export const studentRoutePreviews = (date = today()) => apiFetch<RoutePreview[]>(`/api/students/me/route-previews?date=${date}`)
+export const studentRouteEnrollments = () => apiFetch<RouteEnrollment[]>('/api/students/me/route-enrollments')
+export const requestRouteEnrollment = (routeId: number, outboundEnabled: boolean, returnEnabled: boolean) => apiFetch<RouteEnrollment>('/api/students/me/route-enrollments', { method: 'POST', body: JSON.stringify({ routeId, outboundEnabled, returnEnabled }) })
 export const studentSchedules = () => apiFetch<Schedule[]>('/api/students/me/schedules')
 export const saveSchedule = (day: string, outboundTime: string | null, returnTime: string | null) => apiFetch<Schedule[]>(`/api/students/me/schedules/${day}`, { method: 'PUT', body: JSON.stringify({ outboundTime, returnTime }) })
 export const removeSchedule = (day: string) => apiFetch<void>(`/api/students/me/schedules/${day}`, { method: 'DELETE' })
