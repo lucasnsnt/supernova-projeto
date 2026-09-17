@@ -68,6 +68,11 @@ button, input { font: inherit; } a { color: inherit; } button, a { -webkit-tap-h
 .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; } .icon-button { color: var(--primary); text-decoration: none; font-size: .8rem; } .text-button { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-weight: 700; }
 .app-content { width: min(100% - 40px, 1120px); margin: 0 auto; padding: 52px 0 100px; }
 .page-stack { display: grid; gap: 32px; } .page-heading { max-width: 640px; } .page-heading .eyebrow { margin-top: 0; }
+.profile-page-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; max-width: 720px; }
+.profile-page-heading > div { min-width: 0; }
+.logout-button { flex: 0 0 auto; min-height: 42px; padding: 0 17px; border: 1px solid #c8d5cd; border-radius: 999px; background: white; color: #34453b; cursor: pointer; font-weight: 800; box-shadow: 0 4px 12px rgba(23, 72, 50, .08); transition: border-color .2s, background .2s, color .2s, transform .2s; }
+.logout-button:hover { border-color: var(--primary); background: #edf6f0; color: var(--primary); transform: translateY(-1px); }
+.logout-button:focus-visible { outline: 3px solid rgba(8, 120, 236, .2); outline-offset: 2px; }
 .status-card { display: flex; align-items: center; gap: 18px; max-width: 720px; padding: 22px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .status-card h2 { margin: 0 0 5px; font-size: 1.05rem; } .status-icon { display: grid; place-items: center; flex: 0 0 44px; height: 44px; border-radius: 50%; background: #e5f4eb; color: var(--primary); font-weight: 900; }
 .action-card, .trip-card, .schedule-row { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
@@ -160,3 +165,4 @@ button, input { font: inherit; } a { color: inherit; } button, a { -webkit-tap-h
 @media (max-width: 700px) { .route-modal-backdrop { padding: 0; }.route-form { width: 100%; min-height: 100dvh; margin: 0; padding: 22px 16px max(28px, env(safe-area-inset-bottom)); border-radius: 0; box-shadow: none; }.route-fieldset { padding: 14px 10px; }.route-day { grid-template-columns: 38px minmax(0, 1fr); }.route-day-schedules { grid-template-columns: 1fr; }.route-time-card { padding: 11px; }.route-stop { grid-template-columns: 24px minmax(0, 1fr); padding-bottom: 10px; border-bottom: 1px solid #edf0ee; }.route-stop input, .route-stop button { grid-column: 2; }.route-stop select { grid-column: 2; }.time-picker-backdrop { align-items: end; padding: 0; }.time-picker { width: 100%; padding: 24px 20px max(24px, env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0; }.time-picker .modal-actions { grid-template-columns: 1fr 1.3fr; } }
 .route-stop { grid-template-columns: 24px minmax(0, 1fr) auto; }
 @media (max-width: 700px) { .route-stop { grid-template-columns: 24px minmax(0, 1fr); } }
+@media (max-width: 700px) { .profile-page-heading { flex-direction: column; gap: 14px; } .logout-button { align-self: flex-start; } }
