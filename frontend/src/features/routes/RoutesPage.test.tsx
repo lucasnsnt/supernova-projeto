@@ -62,5 +62,6 @@ describe('RouteForm', () => {
 
     expect(screen.getByRole('combobox', { name: 'Instituição atendida 1' })).toHaveValue('1')
     expect(screen.getByRole('option', { name: 'Faculdade Central' })).toBeVisible()
+    expect(document.querySelector('.route-stop input[type="time"]')).toBeNull()
   })
 })

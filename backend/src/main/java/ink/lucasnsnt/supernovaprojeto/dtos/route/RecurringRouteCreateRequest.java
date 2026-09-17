@@ -14,6 +14,5 @@ public record RecurringRouteCreateRequest(
         @NotEmpty List<@Valid InstitutionStop> institutions) {
     public record Schedule(@NotNull DayOfWeek dayOfWeek, @NotNull Direction direction,
                            @NotNull LocalTime departureTime, @NotNull LocalTime responseDeadlineTime) { }
-    public record InstitutionStop(@NotNull Long institutionId, @NotNull @Positive Integer stopOrder,
-                                  LocalTime outboundArrivalBy, LocalTime returnDepartureAt) { }
+    public record InstitutionStop(@NotNull Long institutionId, @NotNull @Positive Integer stopOrder) { }
 }

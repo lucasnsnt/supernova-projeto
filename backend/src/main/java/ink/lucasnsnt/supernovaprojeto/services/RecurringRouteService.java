@@ -47,7 +47,7 @@ public class RecurringRouteService {
                 .responseDeadlineTime(item.responseDeadlineTime()).build()));
         request.institutions().forEach(item -> route.addInstitution(RecurringRouteInstitution.builder()
                 .institution(institutionRepository.findById(item.institutionId()).orElseThrow(() -> new ResourceNotFoundException("Instituição", item.institutionId())))
-                .stopOrder(item.stopOrder()).outboundArrivalBy(item.outboundArrivalBy()).returnDepartureAt(item.returnDepartureAt()).build()));
+                .stopOrder(item.stopOrder()).build()));
         return RecurringRouteResponse.from(routeRepository.save(route));
     }
 
