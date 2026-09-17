@@ -13,6 +13,7 @@ import ink.lucasnsnt.supernovaprojeto.dtos.student.StudentDetailsResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.DailyConfirmationAnswerRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.DailyConfirmationResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripResponse;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripTrackingResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.route.RecurringRouteResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.route.RouteEnrollmentRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.route.RouteEnrollmentResponse;
@@ -22,6 +23,7 @@ import ink.lucasnsnt.supernovaprojeto.services.StudentScheduleService;
 import ink.lucasnsnt.supernovaprojeto.services.StudentService;
 import ink.lucasnsnt.supernovaprojeto.services.DailyConfirmationService;
 import ink.lucasnsnt.supernovaprojeto.services.TripService;
+import ink.lucasnsnt.supernovaprojeto.services.TripTrackingService;
 import ink.lucasnsnt.supernovaprojeto.services.RecurringRouteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +51,7 @@ public class StudentController {
     private final DailyConfirmationService confirmationService;
     private final TripService tripService;
     private final RecurringRouteService recurringRouteService;
+    private final TripTrackingService tripTrackingService;
 
     @GetMapping
     public StudentDetailsResponse getDetails(@AuthenticationPrincipal Jwt jwt) {
@@ -165,6 +168,11 @@ public class StudentController {
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam LocalDate date) {
         return tripService.findByStudent(userId(jwt), date);
+    }
+
+    @GetMapping("/trips/{tripId}/tracking")
+    public TripTrackingResponse trackTrip(@AuthenticationPrincipal Jwt jwt, @PathVariable Long tripId) {
+        return tripTrackingService.findForStudent(userId(jwt), tripId);
     }
 
     private Long userId(Jwt jwt) {

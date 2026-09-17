@@ -1,4 +1,4 @@
-import type { DailyConfirmation, Trip } from '../student/api'
+import type { DailyConfirmation, Trip, TripTracking } from '../student/api'
 import { apiFetch } from '../../lib/api'
 import { today } from '../student/api'
 
@@ -38,6 +38,9 @@ export const createVehicle = (body: Omit<Vehicle, 'id' | 'defaultVehicle'>) => a
 export const updateVehicle = (id: number, body: Omit<Vehicle, 'id' | 'defaultVehicle'>) => apiFetch<Vehicle>(`/api/drivers/me/vehicles/${id}`, { method: 'PUT', body: JSON.stringify(body) })
 export const deleteVehicle = (id: number) => apiFetch<void>(`/api/drivers/me/vehicles/${id}`, { method: 'DELETE' })
 export const tripAction = (id: number, action: 'start' | 'completion' | 'replanning', body?: unknown) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/${action}`, { method: 'POST', body: body ? JSON.stringify(body) : undefined })
+export const completeTripStop = (id: number) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/stops/completion`, { method: 'POST' })
+export const driverTripTracking = (id: number) => apiFetch<TripTracking>(`/api/drivers/me/trips/${id}/tracking`)
+export const updateTripLocation = (id: number, body: { latitude: number; longitude: number; accuracy: number | null; heading: number | null; recordedAt: string }) => apiFetch<TripTracking>(`/api/drivers/me/trips/${id}/location`, { method: 'PUT', body: JSON.stringify(body) })
 export const cancelTrip = (id: number, reason: string) => apiFetch<Trip>(`/api/drivers/me/trips/${id}/cancellation`, { method: 'POST', body: JSON.stringify({ reason }) })
 
 export const setDefaultVehicle = (id: number) => apiFetch<Vehicle>(`/api/drivers/me/vehicles/${id}/default`, { method: 'PUT' })

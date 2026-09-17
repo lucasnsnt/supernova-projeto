@@ -18,6 +18,8 @@ import ink.lucasnsnt.supernovaprojeto.dtos.trip.DepartureUpdateRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripCancellationRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripVehicleUpdateRequest;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripLocationUpdateRequest;
+import ink.lucasnsnt.supernovaprojeto.dtos.trip.TripTrackingResponse;
 import ink.lucasnsnt.supernovaprojeto.models.DriverInvite;
 import ink.lucasnsnt.supernovaprojeto.models.Vehicle;
 import ink.lucasnsnt.supernovaprojeto.services.AccountService;
@@ -28,6 +30,7 @@ import ink.lucasnsnt.supernovaprojeto.services.VehicleService;
 import ink.lucasnsnt.supernovaprojeto.services.DailyConfirmationService;
 import ink.lucasnsnt.supernovaprojeto.services.TripService;
 import ink.lucasnsnt.supernovaprojeto.services.TripPlanningService;
+import ink.lucasnsnt.supernovaprojeto.services.TripTrackingService;
 import ink.lucasnsnt.supernovaprojeto.services.RecurringRouteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +59,7 @@ public class DriverController {
     private final TripService tripService;
     private final TripPlanningService tripPlanningService;
     private final RecurringRouteService recurringRouteService;
+    private final TripTrackingService tripTrackingService;
 
     @GetMapping
     public DriverResponse getProfile(@AuthenticationPrincipal Jwt jwt) {
@@ -205,6 +209,22 @@ public class DriverController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long tripId) {
         return tripService.complete(userId(jwt), tripId);
+    }
+
+    @PostMapping("/trips/{tripId}/stops/completion")
+    public TripResponse completeTripStop(@AuthenticationPrincipal Jwt jwt, @PathVariable Long tripId) {
+        return tripService.completeNextStop(userId(jwt), tripId);
+    }
+
+    @PutMapping("/trips/{tripId}/location")
+    public TripTrackingResponse updateTripLocation(@AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long tripId, @Valid @RequestBody TripLocationUpdateRequest request) {
+        return tripTrackingService.updateLocation(userId(jwt), tripId, request);
+    }
+
+    @GetMapping("/trips/{tripId}/tracking")
+    public TripTrackingResponse trackTrip(@AuthenticationPrincipal Jwt jwt, @PathVariable Long tripId) {
+        return tripTrackingService.findForDriver(userId(jwt), tripId);
     }
 
     @PostMapping("/trips/{tripId}/cancellation")
