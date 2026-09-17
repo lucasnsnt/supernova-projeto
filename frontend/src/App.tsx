@@ -18,6 +18,7 @@ import { AdminStudentsPage } from './features/admin/AdminStudentsPage'
 import { AccountSettingsPage } from './features/account/AccountSettingsPage'
 import { RoutesPage } from './features/routes/RoutesPage'
 import { ActiveTripPage } from './pages/ActiveTripPage'
+import { useAuth } from './auth/AuthContext'
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } })
 
@@ -44,5 +45,9 @@ export default function App() {
 }
 
 function RoleProfilePage() {
-  return <><StudentProfilePage /><DriverProfilePage /></>
+  const { session } = useAuth()
+
+  if (session?.role === 'STUDENT') return <StudentProfilePage />
+  if (session?.role === 'DRIVER') return <DriverProfilePage />
+  return <Navigate to="/conta" replace />
 }

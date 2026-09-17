@@ -10,6 +10,7 @@ import { BirthDateInput } from '../../components/BirthDateInput'
 import { displayBirthDate, isoBirthDate } from '../../lib/birthDate'
 import { PostalCodeInput } from '../../components/PostalCodeInput'
 import { AddressMap } from '../location/AddressMap'
+import { LogoutButton } from '../../components/LogoutButton'
 
 const emptyAddress: Address = { street: '', number: '', complement: '', neighborhood: '', city: '', state: '', zipCode: '', latitude: null, longitude: null }
 // oxlint-disable-next-line react/only-export-components
@@ -35,7 +36,7 @@ export function StudentProfilePage() {
   const { session } = useAuth()
   const { details } = useStudentRegistration()
   if (session?.role !== 'STUDENT') return <Navigate to="/" replace />
-  return <div className="page-stack"><header className="page-heading"><p className="eyebrow">Seu transporte</p><h1>Meu cadastro</h1><p className="muted">Mantenha seus dados, instituição e motorista atualizados.</p></header>
+  return <div className="page-stack"><header className="page-heading profile-page-heading"><div><p className="eyebrow">Seu transporte</p><h1>Meu cadastro</h1><p className="muted">Mantenha seus dados, instituição e motorista atualizados.</p></div><LogoutButton /></header>
     <StudentReadiness />
     {details.isPending && <p role="status">Carregando dados…</p>}
     {details.isError && <p role="alert">Não foi possível carregar seus dados.</p>}

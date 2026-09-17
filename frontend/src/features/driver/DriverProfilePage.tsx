@@ -6,12 +6,13 @@ import { displayBirthDate, isoBirthDate } from '../../lib/birthDate'
 import { driverProfile, resubmitProfile, setOperationalAddress, updateRejectedProfile, type Address, type DriverProfile } from './api'
 import { PostalCodeInput } from '../../components/PostalCodeInput'
 import { AddressMap } from '../location/AddressMap'
+import { LogoutButton } from '../../components/LogoutButton'
 
 export function DriverProfilePage() {
   const { session } = useAuth()
   const profile = useQuery({ queryKey: ['driver-profile'], queryFn: driverProfile, enabled: session?.role === 'DRIVER' })
   if (session?.role !== 'DRIVER') return null
-  return <div className="page-stack"><header className="page-heading"><p className="eyebrow">Cadastro do motorista</p><h1>Meu cadastro</h1><p className="muted">Confira os dados enviados para análise administrativa.</p></header>
+  return <div className="page-stack"><header className="page-heading profile-page-heading"><div><p className="eyebrow">Cadastro do motorista</p><h1>Meu cadastro</h1><p className="muted">Confira os dados enviados para análise administrativa.</p></div><LogoutButton /></header>
     {profile.isPending && <p role="status">Carregando dados…</p>}
     {profile.isError && <p role="alert" className="form-error">{profile.error.message}</p>}
     {profile.data && <Profile key={JSON.stringify(profile.data)} profile={profile.data} />}
