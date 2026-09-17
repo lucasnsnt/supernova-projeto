@@ -22,7 +22,7 @@ export function AppShell() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <NavLink to="/" className="brand"><span>S</span> Supernova</NavLink>
+        <NavLink to="/" className="brand"><img src="/transmoovi-logo.png" alt="" /><span>transmoovi</span></NavLink>
         <nav className="desktop-nav" aria-label="Navegação principal">{items.map((item) => <NavigationLink key={item.to} item={item} />)}</nav>
         <div className="topbar-actions">
           <NavLink to="/notificacoes" className="icon-button notification-link" aria-label={`${unread.data?.count ?? 0} notificações não lidas`}><Suspense fallback={<span className="notification-placeholder" />}><NotificationBell unread={Boolean(unread.data?.count)} /></Suspense>{Boolean(unread.data?.count) && <b>{unread.data?.count}</b>}</NavLink>

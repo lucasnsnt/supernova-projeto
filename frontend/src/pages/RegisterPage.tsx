@@ -92,7 +92,7 @@ export function RegisterPage() {
   return (
     <main className="auth-page registration-page">
       <section className="auth-card registration-card" aria-labelledby="register-title">
-        <div className="brand-mark" aria-hidden="true">S</div>
+        <img className="brand-mark" src="/transmoovi-app-icon-512.png" alt="" />
         <p className="eyebrow">Etapa {step === 'email' ? '1' : step === 'code' ? '2' : '3'} de 3</p>
         <h1 id="register-title">{step === 'email' ? 'Vamos começar' : step === 'code' ? 'Confira seu e-mail' : 'Complete seu cadastro'}</h1>
         {step === 'email' && <form className="form-stack" onSubmit={requestCode}>
