@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { TripsPage } from './TripsPage'
 import * as api from '../features/driver/api'
-import { studentTrips, type Trip } from '../features/student/api'
+import { studentTrips, today, type Trip } from '../features/student/api'
 import { MemoryRouter } from 'react-router-dom'
 let role = 'DRIVER'
 vi.mock('../auth/AuthContext', () => ({ useAuth: () => ({ session: { role, driverStatus: 'APPROVED' } }) }))
@@ -35,7 +35,9 @@ it('consulta a data escolhida para acompanhar o histórico', async () => {
   mount()
   await screen.findByText('Ana')
   await userEvent.click(screen.getByRole('button', { name: 'Dia anterior' }))
-  await waitFor(() => expect(api.driverTrips).toHaveBeenCalledWith('2026-09-15'))
+  const previous = new Date(`${today()}T12:00:00`)
+  previous.setDate(previous.getDate() - 1)
+  await waitFor(() => expect(api.driverTrips).toHaveBeenCalledWith(previous.toISOString().slice(0, 10)))
 })
 it('aluno acompanha suas paradas sem comandos do motorista', async () => {
   role = 'STUDENT'; vi.mocked(studentTrips).mockResolvedValue([trip]); mount()

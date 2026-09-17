@@ -33,7 +33,7 @@ public class RecurringRoute {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("dayOfWeek ASC, direction ASC")
+    @OrderBy("dayOfWeek ASC, direction ASC, departureTime ASC")
     @Builder.Default
     private List<RecurringRouteSchedule> schedules = new ArrayList<>();
 

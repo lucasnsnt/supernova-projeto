@@ -176,8 +176,8 @@ public class DailyConfirmationService {
     private boolean release(
             RecurringRouteEnrollment enrollment, RecurringRouteSchedule schedule,
             LocalDate serviceDate, LocalDateTime now) {
-        if (confirmationRepository.existsByStudentIdAndServiceDateAndDirection(
-                enrollment.getStudent().getId(), serviceDate, schedule.getDirection())) return false;
+        if (confirmationRepository.existsByStudentIdAndServiceDateAndDirectionAndScheduledTime(
+                enrollment.getStudent().getId(), serviceDate, schedule.getDirection(), schedule.getDepartureTime())) return false;
         LocalDateTime departure = serviceDate.atTime(schedule.getDepartureTime());
         LocalDateTime deadline = routeDeadline(schedule, serviceDate);
         LocalDateTime availableAt = availability(departure, serviceDate);

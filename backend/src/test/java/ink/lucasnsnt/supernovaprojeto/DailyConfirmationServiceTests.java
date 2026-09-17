@@ -81,7 +81,10 @@ class DailyConfirmationServiceTests {
                 .outboundEnabled(true).returnEnabled(false).status(RouteEnrollmentStatus.APPROVED).requestedAt(LocalDateTime.now()).build();
         when(routeEnrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED)).thenReturn(List.of(enrollment));
         when(linkRepository.findAllByStatus(DriverStudentLinkStatus.ACTIVE)).thenReturn(List.of(link));
-        when(confirmationRepository.existsByStudentIdAndServiceDateAndDirection(20L, serviceDate, Direction.IDA)).thenReturn(false, true);
+        when(confirmationRepository.existsByStudentIdAndServiceDateAndDirectionAndScheduledTime(
+                20L, serviceDate, Direction.IDA, LocalTime.of(17, 10))).thenReturn(false);
+        when(confirmationRepository.existsByStudentIdAndServiceDateAndDirection(
+                20L, serviceDate, Direction.IDA)).thenReturn(true);
         when(confirmationRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         DailyConfirmationService routeService = new DailyConfirmationService(
@@ -94,6 +97,32 @@ class DailyConfirmationServiceTests {
         assertThat(captor.getValue().getRecurringRoute().getId()).isEqualTo(80L);
         assertThat(captor.getValue().getPreliminaryDepartureAt()).isEqualTo("2026-09-15T17:10:00");
         assertThat(captor.getValue().getResponseDeadline()).isEqualTo("2026-09-15T16:10:00");
+    }
+
+    @Test
+    void shouldReleaseMoreThanOneRouteTimeInTheSameDirection() {
+        LocalDate serviceDate = LocalDate.of(2026, 9, 15);
+        DriverStudentLink link = eligibleLink(serviceDate.getDayOfWeek(), LocalTime.of(18, 30));
+        Vehicle vehicle = Vehicle.builder().model("Van").licensePlate("ABC1D23").passengerCapacity(15).driver(link.getDriver()).build();
+        RecurringRoute route = RecurringRoute.builder().id(80L).driver(link.getDriver()).vehicle(vehicle).name("Noturna").createdAt(LocalDateTime.now()).build();
+        route.addSchedule(RecurringRouteSchedule.builder().dayOfWeek(serviceDate.getDayOfWeek()).direction(Direction.IDA)
+                .departureTime(LocalTime.of(17, 10)).responseDeadlineTime(LocalTime.of(16, 10)).build());
+        route.addSchedule(RecurringRouteSchedule.builder().dayOfWeek(serviceDate.getDayOfWeek()).direction(Direction.IDA)
+                .departureTime(LocalTime.of(19, 10)).responseDeadlineTime(LocalTime.of(18, 10)).build());
+        RecurringRouteEnrollment enrollment = RecurringRouteEnrollment.builder().route(route).student(link.getStudent())
+                .outboundEnabled(true).returnEnabled(false).status(RouteEnrollmentStatus.APPROVED).requestedAt(LocalDateTime.now()).build();
+        when(routeEnrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED)).thenReturn(List.of(enrollment));
+        when(confirmationRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        DailyConfirmationService routeService = new DailyConfirmationService(
+                confirmationRepository, linkRepository, routeEnrollmentRepository, notificationService,
+                new DailyTransportProperties(), Clock.fixed(Instant.parse("2026-09-15T15:00:00Z"), ZoneId.of("America/Bahia")));
+
+        assertThat(routeService.releaseAvailableForDate(serviceDate)).isEqualTo(2);
+        var captor = org.mockito.ArgumentCaptor.forClass(DailyConfirmation.class);
+        verify(confirmationRepository, times(2)).save(captor.capture());
+        assertThat(captor.getAllValues()).extracting(DailyConfirmation::getScheduledTime)
+                .containsExactly(LocalTime.of(17, 10), LocalTime.of(19, 10));
     }
 
     @Test

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useId, useState, type FormEvent } from 'react'
 import { useAuth } from '../../auth/AuthContext'
 import { institutions, type Institution } from '../admin/api'
 import { createDriverRoute, driverRouteEnrollments, driverRoutePreviews, driverRoutes, reviewRouteEnrollment, vehicles, type RecurringRoute, type RouteDirection, type RoutePreview } from '../driver/api'
@@ -8,8 +8,9 @@ import { availableRoutes, requestRouteEnrollment, studentRouteEnrollments, stude
 const days = [
   ['MONDAY', 'Seg'], ['TUESDAY', 'Ter'], ['WEDNESDAY', 'Qua'], ['THURSDAY', 'Qui'], ['FRIDAY', 'Sex'], ['SATURDAY', 'Sáb'], ['SUNDAY', 'Dom'],
 ] as const
-type DraftSchedule = { dayOfWeek: string; direction: RouteDirection; departureTime: string; responseDeadlineTime: string }
+type DraftSchedule = { id: number; dayOfWeek: string; direction: RouteDirection; departureTime: string; responseDeadlineTime: string }
 type DraftStop = { institutionId: number; outboundArrivalBy: string; returnDepartureAt: string }
+type TimePickerTarget = { scheduleId: number; label: string }
 
 export function RoutesPage() {
   const { session } = useAuth()
@@ -44,22 +45,58 @@ function DriverRoutes() {
   </div>
 }
 
-function RouteForm({ routeVehicles, routeInstitutions, onClose, onCreated }: { routeVehicles: Array<{ id: number; brand: string; model: string; licensePlate: string }>; routeInstitutions: Institution[]; onClose: () => void; onCreated: () => void }) {
+export function RouteForm({ routeVehicles, routeInstitutions, onClose, onCreated }: { routeVehicles: Array<{ id: number; brand: string; model: string; licensePlate: string }>; routeInstitutions: Institution[]; onClose: () => void; onCreated: () => void }) {
   const [name, setName] = useState('')
   const [vehicleId, setVehicleId] = useState('')
   const [schedules, setSchedules] = useState<DraftSchedule[]>([])
   const [stops, setStops] = useState<DraftStop[]>([])
-  const save = useMutation({ mutationFn: () => createDriverRoute({ name, vehicleId: Number(vehicleId), schedules, institutions: stops.map((stop, index) => ({ ...stop, stopOrder: index + 1, outboundArrivalBy: stop.outboundArrivalBy || null, returnDepartureAt: stop.returnDepartureAt || null })) }), onSuccess: onCreated })
-  const addSchedule = (dayOfWeek: string, direction: RouteDirection) => setSchedules(current => current.some(item => item.dayOfWeek === dayOfWeek && item.direction === direction) ? current : [...current, { dayOfWeek, direction, departureTime: '', responseDeadlineTime: '' }])
-  const updateSchedule = (dayOfWeek: string, direction: RouteDirection, field: 'departureTime' | 'responseDeadlineTime', value: string) => setSchedules(current => current.map(item => item.dayOfWeek === dayOfWeek && item.direction === direction ? { ...item, [field]: value } : item))
-  function submit(event: FormEvent) { event.preventDefault(); save.mutate() }
+  const [timePicker, setTimePicker] = useState<TimePickerTarget | null>(null)
+  const [validationError, setValidationError] = useState('')
+  const save = useMutation({ mutationFn: () => createDriverRoute({ name, vehicleId: Number(vehicleId), schedules: schedules.map(({ dayOfWeek, direction, departureTime, responseDeadlineTime }) => ({ dayOfWeek, direction, departureTime, responseDeadlineTime })), institutions: stops.map((stop, index) => ({ ...stop, stopOrder: index + 1, outboundArrivalBy: stop.outboundArrivalBy || null, returnDepartureAt: stop.returnDepartureAt || null })) }), onSuccess: onCreated })
+  const addSchedule = (dayOfWeek: string, direction: RouteDirection) => { setValidationError(''); setSchedules(current => [...current, { id: (current.at(-1)?.id ?? 0) + 1, dayOfWeek, direction, departureTime: '', responseDeadlineTime: '' }]) }
+  const updateScheduleTime = (scheduleId: number, departureTime: string) => {
+    setValidationError('')
+    setSchedules(current => current.map(item => item.id === scheduleId ? { ...item, departureTime, responseDeadlineTime: subtractHour(departureTime) } : item))
+  }
+  function submit(event: FormEvent) {
+    event.preventDefault()
+    if (!name.trim()) return setValidationError('Informe um nome para a rota.')
+    if (!vehicleId) return setValidationError('Selecione o veículo da rota.')
+    if (!schedules.length) return setValidationError('Adicione pelo menos um horário de ida ou volta.')
+    if (schedules.some(item => !item.departureTime)) return setValidationError('Defina todos os horários de ida e volta adicionados.')
+    if (!stops.length) return setValidationError('Adicione pelo menos uma instituição atendida.')
+    setValidationError('')
+    save.mutate()
+  }
   return <div className="modal-backdrop route-modal-backdrop"><form className="route-form" onSubmit={submit}><div className="section-heading"><div><p className="section-kicker">Nova rota</p><h2>Monte sua rotina</h2></div><button type="button" className="text-button" onClick={onClose}>Fechar</button></div><p className="muted">Comece pelo seu horário de saída. A prévia e as confirmações serão geradas a partir daqui.</p>
     <label className="compact-field">Nome da rota<input required maxLength={120} placeholder="Ex.: Noite - Zona Sul" value={name} onChange={e => setName(e.target.value)} /></label>
     <label className="compact-field">Veículo<select required value={vehicleId} onChange={e => setVehicleId(e.target.value)}><option value="">Selecione</option>{routeVehicles.map(vehicle => <option key={vehicle.id} value={vehicle.id}>{vehicle.brand} {vehicle.model} · {vehicle.licensePlate}</option>)}</select></label>
-    <fieldset className="route-fieldset"><legend>Saídas recorrentes</legend><p className="muted">Adicione ida, volta ou as duas em cada dia.</p>{days.map(([day, label]) => <div className="route-day" key={day}><strong>{label}</strong>{(['IDA', 'VOLTA'] as const).map(direction => { const item = schedules.find(value => value.dayOfWeek === day && value.direction === direction); return item ? <div className="route-time-fields" key={direction}><span>{direction === 'IDA' ? 'Ida' : 'Volta'}</span><input aria-label={`${label} ${direction} saída`} type="time" required value={item.departureTime} onChange={e => updateSchedule(day, direction, 'departureTime', e.target.value)} /><input aria-label={`${label} ${direction} prazo`} type="time" required value={item.responseDeadlineTime} onChange={e => updateSchedule(day, direction, 'responseDeadlineTime', e.target.value)} /><button type="button" className="text-button" onClick={() => setSchedules(current => current.filter(value => value !== item))}>×</button></div> : <button type="button" className="add-slot" key={direction} onClick={() => addSchedule(day, direction)}>+ {direction === 'IDA' ? 'Ida' : 'Volta'}</button> })}</div>)}</fieldset>
+    <fieldset className="route-fieldset"><legend>Saídas recorrentes</legend><p className="muted">Adicione quantos horários de ida e volta precisar em cada dia.</p>{days.map(([day, label]) => { const daySchedules = schedules.filter(item => item.dayOfWeek === day); return <div className="route-day" key={day}><strong>{label}</strong><div className="route-day-content"><div className="route-day-schedules">{daySchedules.map(item => { const sameDirection = daySchedules.filter(value => value.direction === item.direction); const number = sameDirection.indexOf(item) + 1; return <div className="route-time-card" key={item.id}><div className="route-time-card-heading"><strong>{item.direction === 'IDA' ? 'Ida' : 'Volta'} {sameDirection.length > 1 ? number : ''}</strong><button type="button" className="remove-slot" aria-label={`Remover ${item.direction === 'IDA' ? 'ida' : 'volta'} de ${label}`} onClick={() => setSchedules(current => current.filter(value => value.id !== item.id))}>Remover</button></div><TimeButton label="Horário de saída" value={item.departureTime} onClick={() => setTimePicker({ scheduleId: item.id, label: `${label} · ${item.direction === 'IDA' ? 'Ida' : 'Volta'} ${sameDirection.length > 1 ? number : ''}` })} /></div> })}</div><div className="route-add-actions"><button type="button" className="add-slot" onClick={() => addSchedule(day, 'IDA')}>+ Ida</button><button type="button" className="add-slot" onClick={() => addSchedule(day, 'VOLTA')}>+ Volta</button></div></div></div> })}</fieldset>
     <fieldset className="route-fieldset"><legend>Instituições atendidas</legend><p className="muted">A ordem serve como referência; não há cálculo de rota nesta etapa.</p>{stops.map((stop, index) => <div className="route-stop" key={`${stop.institutionId}-${index}`}><strong>{index + 1}</strong><select value={stop.institutionId} onChange={e => setStops(current => current.map((item, i) => i === index ? { ...item, institutionId: Number(e.target.value) } : item))}>{routeInstitutions.filter(institution => institution.id === stop.institutionId || !stops.some(item => item.institutionId === institution.id)).map(institution => <option key={institution.id} value={institution.id}>{institution.name}</option>)}</select><input aria-label="Chegar até" type="time" value={stop.outboundArrivalBy} onChange={e => setStops(current => current.map((item, i) => i === index ? { ...item, outboundArrivalBy: e.target.value } : item))} /><input aria-label="Buscar às" type="time" value={stop.returnDepartureAt} onChange={e => setStops(current => current.map((item, i) => i === index ? { ...item, returnDepartureAt: e.target.value } : item))} /><button type="button" className="text-button" onClick={() => setStops(current => current.filter((_, i) => i !== index))}>Remover</button></div>)}{stops.length < routeInstitutions.length && <button type="button" className="secondary-button" onClick={() => { const next = routeInstitutions.find(institution => !stops.some(stop => stop.institutionId === institution.id)); if (next) setStops(current => [...current, { institutionId: next.id, outboundArrivalBy: '', returnDepartureAt: '' }]) }}>Adicionar instituição</button>}</fieldset>
-    {save.error && <p className="form-error">{save.error.message}</p>}<button className="primary-button" disabled={save.isPending || !schedules.length || !stops.length}>{save.isPending ? 'Criando rota…' : 'Criar rota'}</button>
+    {(validationError || save.error) && <p className="form-error route-form-error" role="alert">{validationError || save.error?.message}</p>}<button className="primary-button" disabled={save.isPending}>{save.isPending ? 'Criando rota…' : 'Criar rota'}</button>
+    {timePicker && <SimpleTimePicker title={timePicker.label} value={schedules.find(item => item.id === timePicker.scheduleId)?.departureTime ?? ''} onCancel={() => setTimePicker(null)} onConfirm={value => { updateScheduleTime(timePicker.scheduleId, value); setTimePicker(null) }} />}
   </form></div>
+}
+
+function TimeButton({ label, value, onClick }: { label: string; value: string; onClick: () => void }) {
+  return <button type="button" className={`time-field-button ${value ? 'selected' : ''}`} onClick={onClick}><span>{label}</span><strong>{value || '--:--'}</strong></button>
+}
+
+function SimpleTimePicker({ title, value, onCancel, onConfirm }: { title: string; value: string; onCancel: () => void; onConfirm: (value: string) => void }) {
+  const titleId = useId()
+  const [hour, setHour] = useState(value.slice(0, 2) || '07')
+  const [minute, setMinute] = useState(value.slice(3, 5) || '00')
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') onCancel() }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [onCancel])
+  return <div className="time-picker-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) onCancel() }}><section className="time-picker" role="dialog" aria-modal="true" aria-labelledby={titleId}><p className="section-kicker">Selecionar horário</p><h3 id={titleId}>{title}</h3><div className="time-picker-controls"><label>Hora<select autoFocus value={hour} onChange={event => setHour(event.target.value)}>{Array.from({ length: 24 }, (_, index) => String(index).padStart(2, '0')).map(option => <option key={option}>{option}</option>)}</select></label><span aria-hidden="true">:</span><label>Minuto<select value={minute} onChange={event => setMinute(event.target.value)}>{['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'].map(option => <option key={option}>{option}</option>)}</select></label></div><div className="time-picker-preview">{hour}:{minute}</div><div className="modal-actions"><button type="button" className="secondary-button" onClick={onCancel}>Cancelar</button><button type="button" className="primary-button compact" onClick={() => onConfirm(`${hour}:${minute}`)}>Definir horário</button></div></section></div>
+}
+
+function subtractHour(value: string) {
+  const [hour, minute] = value.split(':').map(Number)
+  return `${String((hour + 23) % 24).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
 }
 
 function StudentRoutes() {
@@ -79,7 +116,7 @@ function StudentRoutes() {
 }
 
 function RouteSummary({ route }: { route: RecurringRoute }) { return <div className="route-summary"><p className="section-kicker">{route.vehicleLabel}</p><h3>{route.name}</h3><p className="muted">{route.institutions.map(stop => stop.institutionName).join(' · ')}</p><div className="route-schedule-chips">{route.schedules.slice(0, 4).map((item, index) => <span key={`${item.dayOfWeek}-${item.direction}-${index}`}>{shortDay(item.dayOfWeek)} {item.direction === 'IDA' ? '↑' : '↓'} {shortTime(item.departureTime)}</span>)}{route.schedules.length > 4 && <span>+{route.schedules.length - 4}</span>}</div></div> }
-function PreviewSection({ previews, loading, student = false }: { previews: RoutePreview[] | undefined; loading: boolean; student?: boolean }) { return <section><div className="section-heading"><div><p className="section-kicker">Hoje</p><h2>Sua programação</h2></div></div>{loading ? <p className="muted">Montando prévia…</p> : <div className="preview-list">{previews?.map(item => <article className="preview-card" key={`${item.routeId}-${item.direction}`}><header><div><p className="section-kicker">{item.routeName}</p><h3>{shortTime(item.departureTime)}</h3></div><span className="direction-pill">{item.direction === 'IDA' ? 'Ida' : 'Volta'}</span></header><p className="preview-destination">{item.stops.map(stop => stop.institutionName).join(' · ')}</p><div className="student-preview-list">{(student ? item.passengers.slice(0, 1) : item.passengers).map(person => <div className="student-preview" key={person.studentId}><span className="status-dot yes" /><div><strong>{student ? 'Sua vaga aprovada' : person.studentName}</strong><small>{person.institutionName ?? 'Instituição'}</small></div></div>)}</div><footer>Prévia sem rota calculada · {item.passengers.length} {item.passengers.length === 1 ? 'aluno' : 'alunos'}</footer></article>)}{!previews?.length && <p className="empty-copy">Nenhuma saída recorrente aprovada para hoje.</p>}</div>}</section> }
+function PreviewSection({ previews, loading, student = false }: { previews: RoutePreview[] | undefined; loading: boolean; student?: boolean }) { return <section><div className="section-heading"><div><p className="section-kicker">Hoje</p><h2>Sua programação</h2></div></div>{loading ? <p className="muted">Montando prévia…</p> : <div className="preview-list">{previews?.map(item => <article className="preview-card" key={`${item.routeId}-${item.direction}-${item.departureTime}`}><header><div><p className="section-kicker">{item.routeName}</p><h3>{shortTime(item.departureTime)}</h3></div><span className="direction-pill">{item.direction === 'IDA' ? 'Ida' : 'Volta'}</span></header><p className="preview-destination">{item.stops.map(stop => stop.institutionName).join(' · ')}</p><div className="student-preview-list">{(student ? item.passengers.slice(0, 1) : item.passengers).map(person => <div className="student-preview" key={person.studentId}><span className="status-dot yes" /><div><strong>{student ? 'Sua vaga aprovada' : person.studentName}</strong><small>{person.institutionName ?? 'Instituição'}</small></div></div>)}</div><footer>Prévia sem rota calculada · {item.passengers.length} {item.passengers.length === 1 ? 'aluno' : 'alunos'}</footer></article>)}{!previews?.length && <p className="empty-copy">Nenhuma saída recorrente aprovada para hoje.</p>}</div>}</section> }
 function shortDay(day: string) { return days.find(([value]) => value === day)?.[1] ?? day }
 function shortTime(value: string) { return value.slice(0, 5) }
 function legLabel(outbound: boolean, returning: boolean) { return outbound && returning ? 'Ida e volta' : outbound ? 'Somente ida' : 'Somente volta' }

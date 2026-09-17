@@ -35,6 +35,11 @@ public interface DailyConfirmationRepository extends JpaRepository<DailyConfirma
     List<DailyConfirmation> findAllByStatusAndResponseDeadlineLessThanEqualOrderByResponseDeadline(
             DailyConfirmationStatus status, LocalDateTime deadline);
 
+    boolean existsByStudentIdAndServiceDateAndDirectionAndScheduledTime(
+            Long studentId, LocalDate serviceDate,
+            ink.lucasnsnt.supernovaprojeto.models.enums.Direction direction,
+            java.time.LocalTime scheduledTime);
+
     boolean existsByStudentIdAndServiceDateAndDirection(
             Long studentId, LocalDate serviceDate,
             ink.lucasnsnt.supernovaprojeto.models.enums.Direction direction);
