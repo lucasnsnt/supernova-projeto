@@ -1,6 +1,6 @@
 import { apiFetch } from '../../lib/api'
 import type { Address } from './profile-api'
-import type { RecurringRoute, RouteEnrollment } from '../driver/api'
+import type { RecurringRoute, RouteEnrollment, RoutePreview } from '../driver/api'
 
 export type Direction = 'IDA' | 'VOLTA'
 export type ConfirmationStatus = 'PENDING' | 'YES' | 'NO' | 'NO_RESPONSE'
@@ -27,6 +27,7 @@ export const studentConfirmations = (date = today()) => apiFetch<DailyConfirmati
 export const answerConfirmation = (id: number, answer: 'YES' | 'NO') => apiFetch<DailyConfirmation>(`/api/students/me/daily-confirmations/${id}/answer`, { method: 'PUT', body: JSON.stringify({ answer }) })
 export const studentTrips = (date = today()) => apiFetch<Trip[]>(`/api/students/me/trips?date=${date}`)
 export const availableRoutes = () => apiFetch<RecurringRoute[]>('/api/students/me/available-routes')
+export const studentRoutePreviews = (date = today()) => apiFetch<RoutePreview[]>(`/api/students/me/route-previews?date=${date}`)
 export const studentRouteEnrollments = () => apiFetch<RouteEnrollment[]>('/api/students/me/route-enrollments')
 export const requestRouteEnrollment = (routeId: number, outboundEnabled: boolean, returnEnabled: boolean) => apiFetch<RouteEnrollment>('/api/students/me/route-enrollments', { method: 'POST', body: JSON.stringify({ routeId, outboundEnabled, returnEnabled }) })
 export const studentSchedules = () => apiFetch<Schedule[]>('/api/students/me/schedules')

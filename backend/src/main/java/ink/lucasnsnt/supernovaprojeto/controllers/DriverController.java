@@ -128,6 +128,12 @@ public class DriverController {
         return recurringRouteService.findByDriver(userId(jwt));
     }
 
+    @GetMapping("/route-previews")
+    public List<ink.lucasnsnt.supernovaprojeto.dtos.route.RecurringRoutePreviewResponse> findRoutePreviews(
+            @AuthenticationPrincipal Jwt jwt, @RequestParam LocalDate date) {
+        return recurringRouteService.findPreviewsForDriver(userId(jwt), date);
+    }
+
     @PostMapping("/routes")
     @ResponseStatus(HttpStatus.CREATED)
     public RecurringRouteResponse createRecurringRoute(

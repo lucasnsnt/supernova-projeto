@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -102,6 +103,29 @@ public class RecurringRouteService {
     @Transactional(readOnly = true)
     public List<RouteEnrollmentResponse> findEnrollmentsForStudent(@NotNull Long studentId) {
         return enrollmentRepository.findAllByStudentIdOrderByRequestedAtDesc(studentId).stream().map(RouteEnrollmentResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecurringRoutePreviewResponse> findPreviewsForDriver(@NotNull Long driverId, LocalDate date) {
+        driverService.requireOperationalView(driverId);
+        return previewsFor(date, enrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED).stream()
+                .filter(item -> item.getRoute().getDriver().getId().equals(driverId)).toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecurringRoutePreviewResponse> findPreviewsForStudent(@NotNull Long studentId, LocalDate date) {
+        return previewsFor(date, enrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED).stream()
+                .filter(item -> item.getStudent().getId().equals(studentId)).toList());
+    }
+
+    private List<RecurringRoutePreviewResponse> previewsFor(LocalDate date, List<RecurringRouteEnrollment> enrollments) {
+        return List.of(ink.lucasnsnt.supernovaprojeto.models.enums.Direction.IDA, ink.lucasnsnt.supernovaprojeto.models.enums.Direction.VOLTA).stream()
+                .flatMap(direction -> enrollments.stream().filter(item -> direction == ink.lucasnsnt.supernovaprojeto.models.enums.Direction.IDA ? item.isOutboundEnabled() : item.isReturnEnabled())
+                        .collect(java.util.stream.Collectors.groupingBy(item -> item.getRoute().getId())).values().stream()
+                        .flatMap(group -> group.getFirst().getRoute().getSchedules().stream()
+                                .filter(schedule -> schedule.getDayOfWeek().equals(date.getDayOfWeek()) && schedule.getDirection() == direction)
+                                .map(schedule -> RecurringRoutePreviewResponse.from(date, direction, schedule.getDepartureTime(), group))))
+                .toList();
     }
 
     private void ensureStudentCanUseRoute(Student student, RecurringRoute route) {

@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { useAuth } from '../../auth/AuthContext'
 import { institutions, type Institution } from '../admin/api'
-import { createDriverRoute, driverRouteEnrollments, driverRoutes, reviewRouteEnrollment, vehicles, type RecurringRoute, type RouteDirection } from '../driver/api'
-import { availableRoutes, requestRouteEnrollment, studentRouteEnrollments } from '../student/api'
+import { createDriverRoute, driverRouteEnrollments, driverRoutePreviews, driverRoutes, reviewRouteEnrollment, vehicles, type RecurringRoute, type RouteDirection, type RoutePreview } from '../driver/api'
+import { availableRoutes, requestRouteEnrollment, studentRouteEnrollments, studentRoutePreviews } from '../student/api'
 
 const days = [
   ['MONDAY', 'Seg'], ['TUESDAY', 'Ter'], ['WEDNESDAY', 'Qua'], ['THURSDAY', 'Qui'], ['FRIDAY', 'Sex'], ['SATURDAY', 'Sáb'], ['SUNDAY', 'Dom'],
@@ -21,6 +21,7 @@ export function RoutesPage() {
 function DriverRoutes() {
   const client = useQueryClient()
   const routes = useQuery({ queryKey: ['driver-routes'], queryFn: driverRoutes })
+  const previews = useQuery({ queryKey: ['driver-route-previews'], queryFn: () => driverRoutePreviews() })
   const routeVehicles = useQuery({ queryKey: ['driver-vehicles'], queryFn: vehicles })
   const routeInstitutions = useQuery({ queryKey: ['institutions'], queryFn: institutions })
   const [showForm, setShowForm] = useState(false)
@@ -31,6 +32,7 @@ function DriverRoutes() {
     <header className="page-heading"><p className="eyebrow">Sua operação</p><h1>Rotas e horários</h1><p className="muted">Defina sua saída fixa, as instituições por onde passa e aprove os alunos uma única vez.</p></header>
     {routes.error && <p role="alert" className="form-error">{routes.error.message}</p>}
     <section className="route-intro"><span>1</span><div><strong>O horário é seu</strong><p>Os alunos entram na rota; a saída não é calculada a partir da aula deles.</p></div></section>
+    <PreviewSection previews={previews.data} loading={previews.isLoading} />
     <section><div className="section-heading"><h2>Suas rotas</h2><button className="primary-button compact" onClick={() => setShowForm(true)}>Criar rota</button></div>
       <div className="route-list">{routes.data?.map(route => <button key={route.id} className={`route-card ${selectedRoute?.id === route.id ? 'selected' : ''}`} onClick={() => setSelectedRoute(route)}><RouteSummary route={route} /><span aria-hidden="true">›</span></button>)}{!routes.isLoading && !routes.data?.length && <p className="empty-copy">Ainda não há rota. Crie a primeira com sua saída e as instituições atendidas.</p>}</div>
     </section>
@@ -63,11 +65,13 @@ function RouteForm({ routeVehicles, routeInstitutions, onClose, onCreated }: { r
 function StudentRoutes() {
   const client = useQueryClient()
   const routes = useQuery({ queryKey: ['available-routes'], queryFn: availableRoutes })
+  const previews = useQuery({ queryKey: ['student-route-previews'], queryFn: () => studentRoutePreviews() })
   const enrollments = useQuery({ queryKey: ['student-route-enrollments'], queryFn: studentRouteEnrollments })
   const [choice, setChoice] = useState<{ routeId: number; outbound: boolean; returning: boolean } | null>(null)
   const request = useMutation({ mutationFn: () => requestRouteEnrollment(choice!.routeId, choice!.outbound, choice!.returning), onSuccess: () => { setChoice(null); void client.invalidateQueries({ queryKey: ['student-route-enrollments'] }) } })
   return <div className="page-stack"><header className="page-heading"><p className="eyebrow">Seu transporte</p><h1>Escolha sua rota</h1><p className="muted">Veja as rotas do seu motorista que passam pela sua instituição e peça sua vaga.</p></header>
     {routes.error && <p className="form-error">{routes.error.message}</p>}
+    <PreviewSection previews={previews.data} loading={previews.isLoading} student />
     <section><div className="section-heading"><h2>Disponíveis para você</h2></div><div className="route-list">{routes.data?.map(route => { const enrollment = enrollments.data?.find(item => item.routeId === route.id); return <article className="student-route-card" key={route.id}><RouteSummary route={route} />{enrollment ? <span className={`tag ${enrollment.status === 'APPROVED' ? 'neutral' : ''}`}>{enrollment.status === 'PENDING' ? 'Pedido enviado' : enrollment.status === 'APPROVED' ? 'Na sua rota' : 'Recusado'}</span> : <button className="primary-button compact" onClick={() => setChoice({ routeId: route.id, outbound: true, returning: true })}>Pedir vaga</button>}</article> })}{!routes.isLoading && !routes.data?.length && <p className="empty-copy">Quando seu motorista criar uma rota que passe pela sua instituição, ela aparecerá aqui.</p>}</div></section>
     <section><div className="section-heading"><h2>Seus pedidos</h2></div><div className="card-list">{enrollments.data?.map(item => <article className="trip-card" key={item.id}><div><strong>{item.routeName}</strong><p className="muted">{legLabel(item.outboundEnabled, item.returnEnabled)}</p></div><span className={`tag ${item.status === 'APPROVED' ? 'neutral' : ''}`}>{item.status === 'PENDING' ? 'Aguardando' : item.status === 'APPROVED' ? 'Aprovado' : 'Recusado'}</span></article>)}</div></section>
     {choice && <div className="modal-backdrop"><section className="modal-card"><p className="section-kicker">Solicitar vaga</p><h2>Quais trechos você usa?</h2><p className="muted">Você poderá responder às confirmações do dia depois que o motorista aprovar.</p><label className="route-check"><input type="checkbox" checked={choice.outbound} onChange={e => setChoice({ ...choice, outbound: e.target.checked })} /> Ida</label><label className="route-check"><input type="checkbox" checked={choice.returning} onChange={e => setChoice({ ...choice, returning: e.target.checked })} /> Volta</label>{request.error && <p className="form-error">{request.error.message}</p>}<div className="modal-actions"><button className="secondary-button" onClick={() => setChoice(null)}>Cancelar</button><button className="primary-button compact" disabled={request.isPending || (!choice.outbound && !choice.returning)} onClick={() => request.mutate()}>{request.isPending ? 'Enviando…' : 'Enviar pedido'}</button></div></section></div>}
@@ -75,6 +79,7 @@ function StudentRoutes() {
 }
 
 function RouteSummary({ route }: { route: RecurringRoute }) { return <div className="route-summary"><p className="section-kicker">{route.vehicleLabel}</p><h3>{route.name}</h3><p className="muted">{route.institutions.map(stop => stop.institutionName).join(' · ')}</p><div className="route-schedule-chips">{route.schedules.slice(0, 4).map((item, index) => <span key={`${item.dayOfWeek}-${item.direction}-${index}`}>{shortDay(item.dayOfWeek)} {item.direction === 'IDA' ? '↑' : '↓'} {shortTime(item.departureTime)}</span>)}{route.schedules.length > 4 && <span>+{route.schedules.length - 4}</span>}</div></div> }
+function PreviewSection({ previews, loading, student = false }: { previews: RoutePreview[] | undefined; loading: boolean; student?: boolean }) { return <section><div className="section-heading"><div><p className="section-kicker">Hoje</p><h2>Sua programação</h2></div></div>{loading ? <p className="muted">Montando prévia…</p> : <div className="preview-list">{previews?.map(item => <article className="preview-card" key={`${item.routeId}-${item.direction}`}><header><div><p className="section-kicker">{item.routeName}</p><h3>{shortTime(item.departureTime)}</h3></div><span className="direction-pill">{item.direction === 'IDA' ? 'Ida' : 'Volta'}</span></header><p className="preview-destination">{item.stops.map(stop => stop.institutionName).join(' · ')}</p><div className="student-preview-list">{(student ? item.passengers.slice(0, 1) : item.passengers).map(person => <div className="student-preview" key={person.studentId}><span className="status-dot yes" /><div><strong>{student ? 'Sua vaga aprovada' : person.studentName}</strong><small>{person.institutionName ?? 'Instituição'}</small></div></div>)}</div><footer>Prévia sem rota calculada · {item.passengers.length} {item.passengers.length === 1 ? 'aluno' : 'alunos'}</footer></article>)}{!previews?.length && <p className="empty-copy">Nenhuma saída recorrente aprovada para hoje.</p>}</div>}</section> }
 function shortDay(day: string) { return days.find(([value]) => value === day)?.[1] ?? day }
 function shortTime(value: string) { return value.slice(0, 5) }
 function legLabel(outbound: boolean, returning: boolean) { return outbound && returning ? 'Ida e volta' : outbound ? 'Somente ida' : 'Somente volta' }

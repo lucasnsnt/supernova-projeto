@@ -132,6 +132,12 @@ public class StudentController {
         return recurringRouteService.findEnrollmentsForStudent(userId(jwt));
     }
 
+    @GetMapping("/route-previews")
+    public List<ink.lucasnsnt.supernovaprojeto.dtos.route.RecurringRoutePreviewResponse> findRoutePreviews(
+            @AuthenticationPrincipal Jwt jwt, @RequestParam LocalDate date) {
+        return recurringRouteService.findPreviewsForStudent(userId(jwt), date);
+    }
+
     @PostMapping("/route-enrollments")
     @ResponseStatus(HttpStatus.CREATED)
     public RouteEnrollmentResponse requestRouteEnrollment(

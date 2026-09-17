@@ -16,10 +16,12 @@ export type RecurringRoute = {
 }
 export type RouteEnrollment = { id: number; routeId: number; routeName: string; studentId: number; studentName: string; outboundEnabled: boolean; returnEnabled: boolean; status: 'PENDING' | 'APPROVED' | 'REJECTED'; createdAt: string }
 export type RecurringRoutePayload = { name: string; vehicleId: number; schedules: Array<{ dayOfWeek: string; direction: RouteDirection; departureTime: string; responseDeadlineTime: string }>; institutions: Array<{ institutionId: number; stopOrder: number; outboundArrivalBy: string | null; returnDepartureAt: string | null }> }
+export type RoutePreview = { routeId: number; routeName: string; serviceDate: string; direction: RouteDirection; departureTime: string; stops: Array<{ institutionName: string; order: number; expectedAt: string | null }>; passengers: Array<{ studentId: number; studentName: string; institutionName: string | null }> }
 
 export const driverConfirmations = () => apiFetch<DailyConfirmation[]>(`/api/drivers/me/daily-confirmations?date=${today()}`)
 export const driverTrips = (date = today()) => apiFetch<Trip[]>(`/api/drivers/me/trips?date=${date}`)
 export const driverRoutes = () => apiFetch<RecurringRoute[]>('/api/drivers/me/routes')
+export const driverRoutePreviews = (date = today()) => apiFetch<RoutePreview[]>(`/api/drivers/me/route-previews?date=${date}`)
 export const createDriverRoute = (body: RecurringRoutePayload) => apiFetch<RecurringRoute>('/api/drivers/me/routes', { method: 'POST', body: JSON.stringify(body) })
 export const driverRouteEnrollments = (routeId: number) => apiFetch<RouteEnrollment[]>(`/api/drivers/me/routes/${routeId}/enrollments`)
 export const reviewRouteEnrollment = (id: number, status: 'APPROVED' | 'REJECTED') => apiFetch<RouteEnrollment>(`/api/drivers/me/route-enrollments/${id}`, { method: 'PUT', body: JSON.stringify({ status }) })
