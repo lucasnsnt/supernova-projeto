@@ -12,7 +12,7 @@ vi.mock('../driver/api', async importOriginal => ({
 afterEach(cleanup)
 
 describe('RouteForm', () => {
-  it('permite adicionar mais de uma ida no mesmo dia com um campo por horário', async () => {
+  it('limita cada rota a uma ida e uma volta por dia', async () => {
     const user = userEvent.setup()
     render(<QueryClientProvider client={new QueryClient()}><RouteForm
       routeVehicles={[]}
@@ -23,12 +23,11 @@ describe('RouteForm', () => {
 
     const addOutbound = screen.getAllByRole('button', { name: '+ Ida' })[0]
     await user.click(addOutbound)
-    await user.click(addOutbound)
 
-    expect(screen.getByText('Ida 1')).toBeVisible()
-    expect(screen.getByText('Ida 2')).toBeVisible()
-    expect(screen.getAllByRole('button', { name: /Horário de saída/ })).toHaveLength(2)
-    expect(screen.getAllByRole('button', { name: '+ Ida' })[0]).toBeEnabled()
+    expect(screen.getByText('Ida')).toBeVisible()
+    expect(screen.getAllByRole('button', { name: /Horário de saída/ })).toHaveLength(1)
+    expect(screen.queryAllByRole('button', { name: '+ Ida' })).toHaveLength(6)
+    expect(screen.getAllByRole('button', { name: '+ Volta' })[0]).toBeEnabled()
   })
 
   it('abre o seletor simplificado em vez do campo de hora nativo', async () => {

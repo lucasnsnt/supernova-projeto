@@ -139,9 +139,17 @@ public class RecurringRouteService {
 
     private void ensureUniqueSchedules(RecurringRouteCreateRequest request) {
         Set<String> keys = new HashSet<>();
+        Set<String> daysWithSchedules = new HashSet<>();
         for (var schedule : request.schedules()) {
-            if (!keys.add(schedule.dayOfWeek() + ":" + schedule.direction() + ":" + schedule.departureTime())) {
-                throw new BusinessRuleException("Não repita o mesmo horário de ida ou volta no mesmo dia");
+            String day = schedule.dayOfWeek().toString();
+            if (!keys.add(day + ":" + schedule.direction())) {
+                throw new BusinessRuleException("Cada rota pode ter somente uma ida e uma volta por dia");
+            }
+            daysWithSchedules.add(day);
+        }
+        for (String day : daysWithSchedules) {
+            if (!keys.contains(day + ":IDA") || !keys.contains(day + ":VOLTA")) {
+                throw new BusinessRuleException("Cada dia configurado precisa ter uma ida e uma volta");
             }
         }
     }
