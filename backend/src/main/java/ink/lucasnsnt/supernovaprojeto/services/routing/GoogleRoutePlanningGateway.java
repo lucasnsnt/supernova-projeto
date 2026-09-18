@@ -83,6 +83,10 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
         // Relative optimization weights: minimize distance and total route duration.
         vehicle.put("costPerKilometer", 1.0);
         vehicle.put("costPerHour", 1.0);
+        if (request.departureAt() != null) {
+            String fixedStart = instant(request.departureAt());
+            vehicle.put("startTimeWindows", List.of(Map.of("startTime", fixedStart, "endTime", fixedStart)));
+        }
         vehicle.put("loadLimits", Map.of(
                 "passengers", Map.of("maxLoad", Integer.toString(request.vehicleCapacity()))));
         if (request.start() != null) {

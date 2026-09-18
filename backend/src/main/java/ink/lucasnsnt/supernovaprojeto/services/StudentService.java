@@ -29,6 +29,7 @@ public class StudentService {
     private final UserRepository userRepository;
     private final InstitutionRepository institutionRepository;
     private final AccountService accountService;
+    private final TransportMembershipLock transportLock;
 
     @Transactional
     public Student register(@NotNull Long userId) {
@@ -54,6 +55,7 @@ public class StudentService {
 
     @Transactional
     public Student selectInstitution(@NotNull Long studentId, @NotNull Long institutionId) {
+        transportLock.student(studentId);
         Student student = findById(studentId);
         Institution institution = institutionRepository.findById(institutionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Instituição", institutionId));

@@ -14,7 +14,7 @@ import java.time.LocalTime;
         name = "daily_confirmations",
         uniqueConstraints = @UniqueConstraint(
                 name = "uk_daily_confirmation",
-                columnNames = {"student_id", "service_date", "direction", "scheduled_time"}
+                columnNames = {"student_id", "service_date", "direction", "recurring_route_id", "scheduled_time"}
         )
 )
 @Getter
@@ -53,6 +53,8 @@ public class DailyConfirmation {
 
     @Column(nullable = false)
     private LocalTime scheduledTime;
+
+    private LocalTime academicTime;
 
     @Column(nullable = false)
     private LocalDateTime preliminaryDepartureAt;

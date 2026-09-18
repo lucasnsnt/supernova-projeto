@@ -14,6 +14,12 @@ import java.util.Optional;
 @Repository
 public interface DailyConfirmationRepository extends JpaRepository<DailyConfirmation, Long> {
 
+    boolean existsByStudentIdAndServiceDateAndDirectionAndRecurringRouteId(Long studentId, LocalDate date,
+            ink.lucasnsnt.supernovaprojeto.models.enums.Direction direction, Long routeId);
+
+    List<DailyConfirmation> findAllByRecurringRouteIdAndServiceDateAndDirection(Long routeId, LocalDate date,
+            ink.lucasnsnt.supernovaprojeto.models.enums.Direction direction);
+
     @EntityGraph(attributePaths = {"driver", "driver.user", "student", "student.user", "student.institution"})
     List<DailyConfirmation> findAllByStudentIdAndServiceDateOrderByScheduledTime(
             Long studentId, LocalDate serviceDate);

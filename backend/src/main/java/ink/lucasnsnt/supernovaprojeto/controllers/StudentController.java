@@ -131,8 +131,19 @@ public class StudentController {
     }
 
     @GetMapping("/route-enrollments")
-    public List<RouteEnrollmentResponse> findRouteEnrollments(@AuthenticationPrincipal Jwt jwt) {
+    public List<ink.lucasnsnt.supernovaprojeto.dtos.route.RouteEnrollmentResponse> enrollments(@AuthenticationPrincipal Jwt jwt) {
         return recurringRouteService.findEnrollmentsForStudent(userId(jwt));
+    }
+
+    @DeleteMapping("/route-enrollments/{enrollmentId}")
+    @ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
+    public void leaveRoute(@AuthenticationPrincipal Jwt jwt, @PathVariable Long enrollmentId) {
+        recurringRouteService.leave(userId(jwt), enrollmentId);
+    }
+
+    @GetMapping("/routes/{routeId}/enrollments")
+    public List<ink.lucasnsnt.supernovaprojeto.dtos.route.RouteEnrollmentResponse> roster(@AuthenticationPrincipal Jwt jwt, @PathVariable Long routeId) {
+        return recurringRouteService.findRouteRosterForStudent(userId(jwt), routeId);
     }
 
     @GetMapping("/route-previews")

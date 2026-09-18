@@ -12,6 +12,10 @@ import java.util.Optional;
 @Repository
 public interface DriverRepository extends JpaRepository<Driver, Long> {
 
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select d from Driver d where d.id = :id")
+    Optional<Driver> lockById(@org.springframework.data.repository.query.Param("id") Long id);
+
     Optional<Driver> findByCnh(String cnh);
 
     boolean existsByCnh(String cnh);

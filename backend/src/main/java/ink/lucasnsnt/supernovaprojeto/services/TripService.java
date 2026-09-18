@@ -27,6 +27,7 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 public class TripService {
+    private final RouteOperationService routeOperationService;
 
     private final TripRepository tripRepository;
     private final VehicleRepository vehicleRepository;
@@ -108,13 +109,7 @@ public class TripService {
 
     @Transactional
     public TripResponse start(@NotNull Long driverId, @NotNull Long tripId) {
-        Trip trip = findOwnedTrip(driverId, tripId);
-        if (trip.getStatus() != TripStatus.PLANNED) {
-            throw new BusinessRuleException("Somente uma viagem planejada pode ser iniciada");
-        }
-        trip.setStatus(TripStatus.IN_PROGRESS);
-        trip.setStartedAt(LocalDateTime.now(clock));
-        return TripResponse.from(trip);
+        return routeOperationService.startTrip(driverId, tripId, false);
     }
 
     @Transactional

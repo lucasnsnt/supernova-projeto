@@ -28,9 +28,14 @@ class DailyConfirmationServiceTests {
     private RecurringRouteEnrollmentRepository routeEnrollmentRepository;
     private InAppNotificationService notificationService;
     private DailyConfirmationService service;
+    private final ink.lucasnsnt.supernovaprojeto.services.RouteEligibilityService eligibility = mock(ink.lucasnsnt.supernovaprojeto.services.RouteEligibilityService.class);
+    private final ink.lucasnsnt.supernovaprojeto.repositories.DriverRepository drivers = mock(ink.lucasnsnt.supernovaprojeto.repositories.DriverRepository.class);
+    private final ink.lucasnsnt.supernovaprojeto.repositories.TripRepository trips = mock(ink.lucasnsnt.supernovaprojeto.repositories.TripRepository.class);
 
     @BeforeEach
     void setUp() {
+        when(eligibility.eligible(any(Student.class), any(RecurringRoute.class))).thenReturn(true);
+        when(eligibility.eligible(any(DailyConfirmation.class))).thenReturn(true);
         confirmationRepository = mock(DailyConfirmationRepository.class);
         linkRepository = mock(DriverStudentLinkRepository.class);
         routeEnrollmentRepository = mock(RecurringRouteEnrollmentRepository.class);
@@ -39,34 +44,16 @@ class DailyConfirmationServiceTests {
         Clock clock = Clock.fixed(
                 Instant.parse("2026-09-14T23:00:00Z"), ZoneId.of("America/Bahia"));
         service = new DailyConfirmationService(
-                confirmationRepository, linkRepository, routeEnrollmentRepository, notificationService, properties, clock);
+                confirmationRepository, linkRepository, routeEnrollmentRepository, notificationService, properties, clock, drivers, trips, eligibility);
     }
 
     @Test
-    void shouldReleaseEarlyConfirmationOnPreviousEvening() {
+    void shouldNotReleaseTransportFromAcademicScheduleAlone() {
         LocalDate serviceDate = LocalDate.of(2026, 9, 15);
-        DriverStudentLink link = eligibleLink(serviceDate.getDayOfWeek(), LocalTime.of(7, 0));
-        when(linkRepository.findAllByStatus(DriverStudentLinkStatus.ACTIVE)).thenReturn(List.of(link));
-        when(confirmationRepository.existsByStudentIdAndServiceDateAndDirection(
-                20L, serviceDate, Direction.IDA)).thenReturn(false);
-        when(confirmationRepository.save(any())).thenAnswer(invocation -> {
-            DailyConfirmation confirmation = invocation.getArgument(0);
-            confirmation.setId(30L);
-            return confirmation;
-        });
-
-        int created = service.releaseAvailableForDate(serviceDate);
-
-        assertThat(created).isOne();
-        var confirmationCaptor = org.mockito.ArgumentCaptor.forClass(DailyConfirmation.class);
-        verify(confirmationRepository).save(confirmationCaptor.capture());
-        DailyConfirmation confirmation = confirmationCaptor.getValue();
-        assertThat(confirmation.getAvailableAt()).isEqualTo("2026-09-14T20:00:00");
-        assertThat(confirmation.getPreliminaryDepartureAt()).isEqualTo("2026-09-15T06:00:00");
-        assertThat(confirmation.getResponseDeadline()).isEqualTo("2026-09-15T05:00:00");
-        assertThat(confirmation.getStatus()).isEqualTo(DailyConfirmationStatus.PENDING);
-        verify(notificationService).create(eq(20L), eq(NotificationType.DAILY_CONFIRMATION_REQUESTED),
-                anyString(), anyString(), isNull(), same(confirmation));
+        when(linkRepository.findAllByStatus(DriverStudentLinkStatus.ACTIVE))
+                .thenReturn(List.of(eligibleLink(serviceDate.getDayOfWeek(), LocalTime.of(7, 0))));
+        assertThat(service.releaseAvailableForDate(serviceDate)).isZero();
+        verify(confirmationRepository, never()).save(any());
     }
 
     @Test
@@ -89,7 +76,7 @@ class DailyConfirmationServiceTests {
 
         DailyConfirmationService routeService = new DailyConfirmationService(
                 confirmationRepository, linkRepository, routeEnrollmentRepository, notificationService,
-                new DailyTransportProperties(), Clock.fixed(Instant.parse("2026-09-15T15:00:00Z"), ZoneId.of("America/Bahia")));
+                new DailyTransportProperties(), Clock.fixed(Instant.parse("2026-09-15T15:00:00Z"), ZoneId.of("America/Bahia")), drivers, trips, eligibility);
         routeService.releaseAvailableForDate(serviceDate);
 
         var captor = org.mockito.ArgumentCaptor.forClass(DailyConfirmation.class);
@@ -97,6 +84,7 @@ class DailyConfirmationServiceTests {
         assertThat(captor.getValue().getRecurringRoute().getId()).isEqualTo(80L);
         assertThat(captor.getValue().getPreliminaryDepartureAt()).isEqualTo("2026-09-15T17:10:00");
         assertThat(captor.getValue().getResponseDeadline()).isEqualTo("2026-09-15T16:10:00");
+        assertThat(captor.getValue().getAcademicTime()).isEqualTo(LocalTime.of(18, 30));
     }
 
     @Test
@@ -116,7 +104,7 @@ class DailyConfirmationServiceTests {
 
         DailyConfirmationService routeService = new DailyConfirmationService(
                 confirmationRepository, linkRepository, routeEnrollmentRepository, notificationService,
-                new DailyTransportProperties(), Clock.fixed(Instant.parse("2026-09-15T15:00:00Z"), ZoneId.of("America/Bahia")));
+                new DailyTransportProperties(), Clock.fixed(Instant.parse("2026-09-15T15:00:00Z"), ZoneId.of("America/Bahia")), drivers, trips, eligibility);
 
         assertThat(routeService.releaseAvailableForDate(serviceDate)).isEqualTo(2);
         var captor = org.mockito.ArgumentCaptor.forClass(DailyConfirmation.class);
@@ -162,6 +150,7 @@ class DailyConfirmationServiceTests {
         return DailyConfirmation.builder()
                 .id(30L)
                 .driver(link.getDriver())
+                .recurringRoute(RecurringRoute.builder().id(80L).driver(link.getDriver()).build())
                 .student(link.getStudent())
                 .serviceDate(LocalDate.of(2026, 9, 15))
                 .direction(Direction.IDA)

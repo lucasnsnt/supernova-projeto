@@ -5,8 +5,6 @@ import ink.lucasnsnt.supernovaprojeto.dtos.trip.DailyConfirmationResponse;
 import ink.lucasnsnt.supernovaprojeto.exceptions.BusinessRuleException;
 import ink.lucasnsnt.supernovaprojeto.exceptions.ResourceNotFoundException;
 import ink.lucasnsnt.supernovaprojeto.models.DailyConfirmation;
-import ink.lucasnsnt.supernovaprojeto.models.DriverStudentLink;
-import ink.lucasnsnt.supernovaprojeto.models.StudentSchedule;
 import ink.lucasnsnt.supernovaprojeto.models.RecurringRouteEnrollment;
 import ink.lucasnsnt.supernovaprojeto.models.RecurringRouteSchedule;
 import ink.lucasnsnt.supernovaprojeto.models.enums.RouteEnrollmentStatus;
@@ -37,33 +35,24 @@ public class DailyConfirmationService {
     private final InAppNotificationService notificationService;
     private final DailyTransportProperties properties;
     private final Clock clock;
+    private final ink.lucasnsnt.supernovaprojeto.repositories.DriverRepository driverRepository;
+    private final ink.lucasnsnt.supernovaprojeto.repositories.TripRepository tripRepository;
+    private final RouteEligibilityService eligibility;
 
     @Transactional
     public int releaseAvailableForDate(@NotNull LocalDate serviceDate) {
         LocalDateTime now = LocalDateTime.now(clock);
         int created = 0;
-        for (RecurringRouteEnrollment enrollment : routeEnrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED)) {
-            if (!enrollment.getRoute().isActive()
-                    || enrollment.getRoute().getDriver().getStatus() != DriverStatus.APPROVED
+        for (RecurringRouteEnrollment enrollment : routeEnrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED).stream()
+                .sorted(java.util.Comparator.comparing(item -> item.getRoute().getDriver().getId())).toList()) {
+            driverRepository.lockById(enrollment.getRoute().getDriver().getId());
+            if (!eligibility.eligible(enrollment.getStudent(), enrollment.getRoute())
                     || !enrollment.getStudent().isProfileComplete()) continue;
             for (RecurringRouteSchedule schedule : enrollment.getRoute().getSchedules()) {
                 if (schedule.getDayOfWeek() != serviceDate.getDayOfWeek()
                         || (schedule.getDirection() == Direction.IDA && !enrollment.isOutboundEnabled())
                         || (schedule.getDirection() == Direction.VOLTA && !enrollment.isReturnEnabled())) continue;
                 if (release(enrollment, schedule, serviceDate, now)) created++;
-            }
-        }
-        for (DriverStudentLink link : linkRepository.findAllByStatus(DriverStudentLinkStatus.ACTIVE)) {
-            if (link.getDriver().getStatus() != DriverStatus.APPROVED || !link.getStudent().isProfileComplete()) {
-                continue;
-            }
-            List<StudentSchedule> schedules = link.getStudent().getSchedules().stream()
-                    .filter(schedule -> schedule.getDayOfWeek() == serviceDate.getDayOfWeek())
-                    .toList();
-            for (StudentSchedule schedule : schedules) {
-                if (release(link, schedule, serviceDate, now)) {
-                    created++;
-                }
             }
         }
         return created;
@@ -88,6 +77,13 @@ public class DailyConfirmationService {
         }
         DailyConfirmation confirmation = confirmationRepository.findByIdAndStudentId(confirmationId, studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Confirmação", confirmationId));
+        driverRepository.lockById(confirmation.getDriver().getId());
+        if (!eligibility.eligible(confirmation)) throw new BusinessRuleException("A inscrição, instituição ou vínculo não permite participar desta rota");
+        var occurrence = tripRepository.findByRecurringRouteIdAndServiceDateAndDirection(
+                confirmation.getRecurringRoute().getId(), confirmation.getServiceDate(), confirmation.getDirection());
+        if (occurrence.filter(trip -> trip.getStartedAt() != null || trip.getStatus() == TripStatus.CANCELLED).isPresent()) {
+            throw new BusinessRuleException("A lista desta viagem já foi encerrada");
+        }
         LocalDateTime now = LocalDateTime.now(clock);
         if (now.isBefore(confirmation.getAvailableAt())) {
             throw new BusinessRuleException("A confirmação ainda não está disponível");
@@ -131,53 +127,16 @@ public class DailyConfirmationService {
     }
 
     private boolean release(
-            DriverStudentLink link,
-            StudentSchedule schedule,
-            LocalDate serviceDate,
-            LocalDateTime now) {
-        if (confirmationRepository.existsByStudentIdAndServiceDateAndDirection(
-                link.getStudent().getId(), serviceDate, schedule.getDirection())) {
-            return false;
-        }
-        LocalDateTime departure = preliminaryDeparture(schedule, serviceDate);
-        LocalDateTime availableAt = availability(departure, serviceDate);
-        if (now.isBefore(availableAt)) {
-            return false;
-        }
-        LocalDateTime deadline = departure.minus(properties.getResponseDeadlineLead());
-        DailyConfirmationStatus initialStatus = now.isBefore(deadline)
-                ? DailyConfirmationStatus.PENDING
-                : DailyConfirmationStatus.NO_RESPONSE;
-        DailyConfirmation confirmation = confirmationRepository.save(DailyConfirmation.builder()
-                .driver(link.getDriver())
-                .student(link.getStudent())
-                .serviceDate(serviceDate)
-                .direction(schedule.getDirection())
-                .scheduledTime(schedule.getTime())
-                .preliminaryDepartureAt(departure)
-                .availableAt(availableAt)
-                .responseDeadline(deadline)
-                .status(initialStatus)
-                .createdAt(now)
-                .build());
-        if (initialStatus == DailyConfirmationStatus.PENDING) {
-            notificationService.create(
-                    link.getStudent().getId(),
-                    NotificationType.DAILY_CONFIRMATION_REQUESTED,
-                    "Confirme sua viagem",
-                    "Você utilizará o transporte na " + schedule.getDirection().name().toLowerCase()
-                            + " de " + serviceDate + "?",
-                    null,
-                    confirmation);
-        }
-        return true;
-    }
-
-    private boolean release(
             RecurringRouteEnrollment enrollment, RecurringRouteSchedule schedule,
             LocalDate serviceDate, LocalDateTime now) {
-        if (confirmationRepository.existsByStudentIdAndServiceDateAndDirectionAndScheduledTime(
-                enrollment.getStudent().getId(), serviceDate, schedule.getDirection(), schedule.getDepartureTime())) return false;
+        if (confirmationRepository.existsByStudentIdAndServiceDateAndDirectionAndRecurringRouteId(
+                enrollment.getStudent().getId(), serviceDate, schedule.getDirection(), enrollment.getRoute().getId())) return false;
+        var academic = enrollment.getStudent().getSchedules().stream()
+                .filter(item -> item.getDayOfWeek() == serviceDate.getDayOfWeek() && item.getDirection() == schedule.getDirection())
+                .findFirst().orElse(null);
+        if (academic == null) return false;
+        if (tripRepository.findByRecurringRouteIdAndServiceDateAndDirection(enrollment.getRoute().getId(), serviceDate, schedule.getDirection())
+                .filter(trip -> trip.getStartedAt() != null || trip.getStatus() == TripStatus.CANCELLED).isPresent()) return false;
         LocalDateTime departure = serviceDate.atTime(schedule.getDepartureTime());
         LocalDateTime deadline = routeDeadline(schedule, serviceDate);
         LocalDateTime availableAt = availability(departure, serviceDate);
@@ -187,7 +146,7 @@ public class DailyConfirmationService {
         DailyConfirmation confirmation = confirmationRepository.save(DailyConfirmation.builder()
                 .driver(enrollment.getRoute().getDriver()).recurringRoute(enrollment.getRoute())
                 .student(enrollment.getStudent()).serviceDate(serviceDate).direction(schedule.getDirection())
-                .scheduledTime(schedule.getDepartureTime()).preliminaryDepartureAt(departure)
+                .scheduledTime(schedule.getDepartureTime()).academicTime(academic.getTime()).preliminaryDepartureAt(departure)
                 .availableAt(availableAt).responseDeadline(deadline).status(initialStatus).createdAt(now).build());
         if (initialStatus == DailyConfirmationStatus.PENDING) {
             notificationService.create(enrollment.getStudent().getId(), NotificationType.DAILY_CONFIRMATION_REQUESTED,
@@ -201,13 +160,6 @@ public class DailyConfirmationService {
         LocalDateTime departure = serviceDate.atTime(schedule.getDepartureTime());
         LocalDateTime deadline = serviceDate.atTime(schedule.getResponseDeadlineTime());
         return deadline.isBefore(departure) ? deadline : deadline.minusDays(1);
-    }
-
-    private LocalDateTime preliminaryDeparture(StudentSchedule schedule, LocalDate serviceDate) {
-        LocalDateTime scheduled = serviceDate.atTime(schedule.getTime());
-        return schedule.getDirection() == Direction.IDA
-                ? scheduled.minus(properties.getPreliminaryOutboundLead())
-                : scheduled;
     }
 
     private LocalDateTime availability(LocalDateTime departure, LocalDate serviceDate) {

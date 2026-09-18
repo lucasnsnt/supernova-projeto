@@ -14,6 +14,11 @@ import java.util.Optional;
 @Repository
 public interface TripRepository extends JpaRepository<Trip, Long> {
 
+    Optional<Trip> findByRecurringRouteIdAndServiceDateAndDirection(Long routeId, LocalDate date,
+            ink.lucasnsnt.supernovaprojeto.models.enums.Direction direction);
+
+    boolean existsByDriverIdAndStatus(Long driverId, TripStatus status);
+
     boolean existsByVehicleId(Long vehicleId);
 
     @EntityGraph(attributePaths = {

@@ -32,6 +32,7 @@ public class DriverStudentLinkService {
     private final DriverService driverService;
     private final StudentService studentService;
     private final Clock clock;
+    private final TransportMembershipLock transportLock;
 
     @Transactional
     public DriverStudentLink acceptInvite(@NotNull Long studentId, @NotBlank String token) {
@@ -68,6 +69,7 @@ public class DriverStudentLinkService {
 
     @Transactional
     public DriverStudentLink endByStudent(@NotNull Long studentId, @NotNull Long linkId) {
+        transportLock.student(studentId);
         DriverStudentLink link = findLink(linkId);
         if (!link.getStudent().getId().equals(studentId)) {
             throw new ResourceNotFoundException("Vínculo", linkId);
@@ -83,6 +85,7 @@ public class DriverStudentLinkService {
 
     @Transactional
     public DriverStudentLink endByDriver(@NotNull Long driverId, @NotNull Long linkId) {
+        transportLock.driver(driverId);
         driverService.requireApproved(driverId);
         DriverStudentLink link = findLink(linkId);
         if (!link.getDriver().getId().equals(driverId)) {

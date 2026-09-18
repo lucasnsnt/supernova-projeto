@@ -60,6 +60,26 @@ public class DriverController {
     private final TripPlanningService tripPlanningService;
     private final RecurringRouteService recurringRouteService;
     private final TripTrackingService tripTrackingService;
+    private final ink.lucasnsnt.supernovaprojeto.services.RouteOperationService routeOperationService;
+
+    @GetMapping("/routes/{routeId}/trip-preview")
+    public ink.lucasnsnt.supernovaprojeto.dtos.route.OperationalRoutePreview operationalPreview(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable Long routeId, @RequestParam LocalDate date,
+            @RequestParam ink.lucasnsnt.supernovaprojeto.models.enums.Direction direction) {
+        return routeOperationService.preview(userId(jwt), routeId, date, direction);
+    }
+
+    @PostMapping("/routes/{routeId}/start")
+    public TripResponse startRoute(@AuthenticationPrincipal Jwt jwt, @PathVariable Long routeId,
+            @Valid @RequestBody ink.lucasnsnt.supernovaprojeto.dtos.route.RouteStartRequest request) {
+        return routeOperationService.start(userId(jwt), routeId, request);
+    }
+
+    @DeleteMapping("/route-enrollments/{enrollmentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeRouteEnrollment(@AuthenticationPrincipal Jwt jwt, @PathVariable Long enrollmentId) {
+        recurringRouteService.remove(userId(jwt), enrollmentId);
+    }
 
     @GetMapping
     public DriverResponse getProfile(@AuthenticationPrincipal Jwt jwt) {
@@ -200,8 +220,9 @@ public class DriverController {
     @PostMapping("/trips/{tripId}/start")
     public TripResponse startTrip(
             @AuthenticationPrincipal Jwt jwt,
-            @PathVariable Long tripId) {
-        return tripService.start(userId(jwt), tripId);
+            @PathVariable Long tripId,
+            @RequestBody(required = false) ink.lucasnsnt.supernovaprojeto.dtos.trip.TripStartRequest request) {
+        return routeOperationService.startTrip(userId(jwt), tripId, request != null && request.acknowledgeOutsideWindow());
     }
 
     @PostMapping("/trips/{tripId}/completion")
