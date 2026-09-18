@@ -14,7 +14,11 @@ public record RecurringRoutePreviewResponse(Long routeId, String routeName, Loca
 
     public static RecurringRoutePreviewResponse from(LocalDate date, Direction direction, LocalTime departure,
                                                      List<RecurringRouteEnrollment> enrollments) {
-        var route = enrollments.getFirst().getRoute();
+        return from(enrollments.getFirst().getRoute(), date, direction, departure, enrollments);
+    }
+
+    public static RecurringRoutePreviewResponse from(ink.lucasnsnt.supernovaprojeto.models.RecurringRoute route,
+            LocalDate date, Direction direction, LocalTime departure, List<RecurringRouteEnrollment> enrollments) {
         var stops = route.getInstitutions().stream().map(stop -> new Stop(stop.getInstitution().getName(), stop.getStopOrder(),
                 direction == Direction.IDA ? stop.getOutboundArrivalBy() : stop.getReturnDepartureAt())).toList();
         var passengers = enrollments.stream().map(item -> new Passenger(item.getStudent().getId(), item.getStudent().getUser().getName(),

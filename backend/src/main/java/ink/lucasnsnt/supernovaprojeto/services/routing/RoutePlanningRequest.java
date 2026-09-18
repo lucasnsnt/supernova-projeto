@@ -12,5 +12,10 @@ public record RoutePlanningRequest(
         int vehicleCapacity,
         RoutePoint start,
         RoutePoint end,
-        List<RoutePassenger> passengers) {
+        List<RoutePassenger> passengers,
+        java.time.LocalDateTime departureAt) {
+    public RoutePlanningRequest(Long driverId, LocalDate serviceDate, Direction direction, int vehicleCapacity,
+            RoutePoint start, RoutePoint end, List<RoutePassenger> passengers) {
+        this(driverId, serviceDate, direction, vehicleCapacity, start, end, passengers, null);
+    }
 }

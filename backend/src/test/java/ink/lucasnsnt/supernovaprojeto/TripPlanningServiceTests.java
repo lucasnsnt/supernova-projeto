@@ -34,6 +34,7 @@ class TripPlanningServiceTests {
     private TripPlanningService service;
     private GeocodingService geocodingService;
     private DriverService driverService;
+    private final ink.lucasnsnt.supernovaprojeto.services.RouteEligibilityService eligibility = mock(ink.lucasnsnt.supernovaprojeto.services.RouteEligibilityService.class);
 
     @BeforeEach
     void setUp() {
@@ -45,17 +46,21 @@ class TripPlanningServiceTests {
         notificationService = mock(InAppNotificationService.class);
         geocodingService = mock(GeocodingService.class);
         driverService = mock(DriverService.class);
+        when(eligibility.eligible(any(DailyConfirmation.class))).thenAnswer(invocation ->
+                ((DailyConfirmation) invocation.getArgument(0)).getDriver().getStatus() == DriverStatus.APPROVED);
+        when(confirmationRepository.findAllByRecurringRouteIdAndServiceDateAndDirection(anyLong(), any(), any()))
+                .thenAnswer(invocation -> confirmationRepository.findAllByStatusAndResponseDeadlineLessThanEqualOrderByResponseDeadline(DailyConfirmationStatus.YES, LocalDateTime.now()));
         ZoneId zone = ZoneId.of("America/Bahia");
         Clock clock = Clock.fixed(
                 LocalDateTime.of(2026, 9, 15, 11, 30).atZone(zone).toInstant(), zone);
         service = new TripPlanningService(
                 confirmationRepository, participantRepository, tripRepository, vehicleRepository,
                 routeGateway, notificationService, new DailyTransportProperties(), clock,
-                geocodingService, driverService);
+                geocodingService, driverService, mock(DriverRepository.class), eligibility);
     }
 
     @Test
-    void shouldSplitReturnsThatExceedMaximumWait() {
+    void shouldKeepOneFixedDriverOccurrenceWithIndividualAcademicTimes() {
         DailyConfirmation first = confirmation(101L, 20L, LocalTime.of(12, 0), true);
         DailyConfirmation second = confirmation(102L, 21L, LocalTime.of(12, 20), true);
         DailyConfirmation third = confirmation(103L, 22L, LocalTime.of(13, 0), true);
@@ -75,13 +80,13 @@ class TripPlanningServiceTests {
 
         int created = service.planReadyConfirmations();
 
-        assertThat(created).isEqualTo(2);
+        assertThat(created).isOne();
         var requestCaptor = org.mockito.ArgumentCaptor.forClass(RoutePlanningRequest.class);
-        verify(routeGateway, times(2)).optimize(requestCaptor.capture());
+        verify(routeGateway).optimize(requestCaptor.capture());
         assertThat(requestCaptor.getAllValues())
                 .extracting(request -> request.passengers().size())
-                .containsExactly(2, 1);
-        verify(tripRepository, times(2)).save(any(Trip.class));
+                .containsExactly(3);
+        verify(tripRepository).save(any(Trip.class));
         verify(notificationService, times(3)).create(anyLong(), eq(NotificationType.TRIP_PLANNED),
                 anyString(), anyString(), any(Trip.class), any(DailyConfirmation.class));
     }
@@ -113,7 +118,7 @@ class TripPlanningServiceTests {
         Vehicle vehicle = vehicle(confirmation.getDriver(), 15);
         Trip trip = Trip.builder()
                 .id(40L)
-                .driver(confirmation.getDriver())
+                .driver(confirmation.getDriver()).recurringRoute(confirmation.getRecurringRoute())
                 .serviceDate(confirmation.getServiceDate())
                 .direction(Direction.IDA)
                 .status(TripStatus.NEEDS_ATTENTION)
@@ -132,6 +137,8 @@ class TripPlanningServiceTests {
                 .thenReturn(Optional.of(vehicle));
         when(routeGateway.optimize(any())).thenAnswer(invocation -> successful(invocation.getArgument(0)));
 
+        doReturn(List.of(confirmation)).when(confirmationRepository)
+                .findAllByRecurringRouteIdAndServiceDateAndDirection(anyLong(), any(), any());
         var response = service.replan(10L, 40L);
 
         assertThat(response.status()).isEqualTo(TripStatus.PLANNED);
@@ -207,8 +214,9 @@ class TripPlanningServiceTests {
         student.setId(studentId);
         return DailyConfirmation.builder()
                 .id(confirmationId).driver(driver).student(student)
+                .recurringRoute(RecurringRoute.builder().id(80L).driver(driver).vehicle(vehicle(driver, 15)).name("Rota").build())
                 .serviceDate(LocalDate.of(2026, 9, 15)).direction(Direction.VOLTA)
-                .scheduledTime(time).preliminaryDepartureAt(LocalDate.of(2026, 9, 15).atTime(time))
+                .scheduledTime(LocalTime.NOON).academicTime(time).preliminaryDepartureAt(LocalDate.of(2026, 9, 15).atTime(LocalTime.NOON))
                 .availableAt(LocalDateTime.of(2026, 9, 15, 6, 0))
                 .responseDeadline(LocalDateTime.of(2026, 9, 15, 11, 0))
                 .status(DailyConfirmationStatus.YES).createdAt(LocalDateTime.of(2026, 9, 15, 6, 0))

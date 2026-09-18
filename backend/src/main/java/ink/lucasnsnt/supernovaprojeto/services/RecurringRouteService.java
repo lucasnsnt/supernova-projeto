@@ -31,6 +31,8 @@ public class RecurringRouteService {
     private final DriverStudentLinkRepository linkRepository;
     private final DriverService driverService;
     private final Clock clock;
+    private final DriverRepository driverRepository;
+    private final RouteEligibilityService eligibility;
 
     @Transactional
     public RecurringRouteResponse create(@NotNull Long driverId, RecurringRouteCreateRequest request) {
@@ -72,22 +74,26 @@ public class RecurringRouteService {
     public RouteEnrollmentResponse requestEnrollment(@NotNull Long studentId, RouteEnrollmentRequest request) {
         Student student = studentRepository.findById(studentId).orElseThrow(() -> new ResourceNotFoundException("Aluno", studentId));
         RecurringRoute route = routeRepository.findById(request.routeId()).orElseThrow(() -> new ResourceNotFoundException("Rota", request.routeId()));
+        driverRepository.lockById(route.getDriver().getId());
         if (!route.isActive()) throw new BusinessRuleException("Esta rota não está aceitando inscrições");
         ensureStudentCanUseRoute(student, route);
-        if (enrollmentRepository.findByRouteIdAndStudentId(route.getId(), studentId).isPresent()) {
-            throw new ResourceConflictException("O aluno já possui uma solicitação para esta rota");
-        }
-        return RouteEnrollmentResponse.from(enrollmentRepository.save(RecurringRouteEnrollment.builder()
-                .route(route).student(student).outboundEnabled(request.outboundEnabled()).returnEnabled(request.returnEnabled())
-                .status(RouteEnrollmentStatus.PENDING).requestedAt(LocalDateTime.now(clock)).build()));
+        var enrollment = enrollmentRepository.findByRouteIdAndStudentId(route.getId(), studentId)
+                .orElseGet(() -> RecurringRouteEnrollment.builder().route(route).student(student).build());
+        enrollment.setOutboundEnabled(request.outboundEnabled());
+        enrollment.setReturnEnabled(request.returnEnabled());
+        enrollment.setStatus(RouteEnrollmentStatus.APPROVED);
+        enrollment.setRequestedAt(LocalDateTime.now(clock));
+        enrollment.setReviewedAt(null);
+        return RouteEnrollmentResponse.from(enrollmentRepository.save(enrollment));
     }
 
     @Transactional
     public RouteEnrollmentResponse reviewEnrollment(@NotNull Long driverId, @NotNull Long enrollmentId, RouteEnrollmentReviewRequest request) {
         driverService.requireApproved(driverId);
-        if (request.status() == RouteEnrollmentStatus.PENDING) throw new BusinessRuleException("Escolha aprovar ou rejeitar a solicitação");
+        if (request.status() != RouteEnrollmentStatus.REJECTED) throw new BusinessRuleException("A entrada é feita pelo aluno e não requer aprovação do motorista");
         RecurringRouteEnrollment enrollment = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException("Inscrição", enrollmentId));
         if (!enrollment.getRoute().getDriver().getId().equals(driverId)) throw new ResourceNotFoundException("Inscrição", enrollmentId);
+        driverRepository.lockById(driverId);
         enrollment.setStatus(request.status());
         enrollment.setReviewedAt(LocalDateTime.now(clock));
         return RouteEnrollmentResponse.from(enrollment);
@@ -97,7 +103,36 @@ public class RecurringRouteService {
     public List<RouteEnrollmentResponse> findEnrollmentsForDriver(@NotNull Long driverId, @NotNull Long routeId) {
         driverService.requireOperationalView(driverId);
         routeRepository.findByIdAndDriverId(routeId, driverId).orElseThrow(() -> new ResourceNotFoundException("Rota", routeId));
-        return enrollmentRepository.findAllByRouteIdOrderByRequestedAtDesc(routeId).stream().map(RouteEnrollmentResponse::from).toList();
+        return activeRoster(routeId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RouteEnrollmentResponse> findRouteRosterForStudent(Long studentId, Long routeId) {
+        var student = studentRepository.findById(studentId).orElseThrow(() -> new ResourceNotFoundException("Aluno", studentId));
+        var route = routeRepository.findById(routeId).orElseThrow(() -> new ResourceNotFoundException("Rota", routeId));
+        ensureStudentCanUseRoute(student, route);
+        return activeRoster(routeId);
+    }
+
+    private List<RouteEnrollmentResponse> activeRoster(Long routeId) {
+        return enrollmentRepository.findAllByRouteIdOrderByRequestedAtDesc(routeId).stream()
+                .filter(item -> item.getStatus() == RouteEnrollmentStatus.APPROVED)
+                .filter(item -> eligibility.eligible(item.getStudent(), item.getRoute()))
+                .map(RouteEnrollmentResponse::from).toList();
+    }
+
+    @Transactional
+    public void leave(Long studentId, Long enrollmentId) {
+        var item = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException("Inscrição", enrollmentId));
+        if (!item.getStudent().getId().equals(studentId)) throw new ResourceNotFoundException("Inscrição", enrollmentId);
+        driverRepository.lockById(item.getRoute().getDriver().getId());
+        item.setStatus(RouteEnrollmentStatus.REJECTED);
+        item.setReviewedAt(LocalDateTime.now(clock));
+    }
+
+    @Transactional
+    public void remove(Long driverId, Long enrollmentId) {
+        reviewEnrollment(driverId, enrollmentId, new RouteEnrollmentReviewRequest(RouteEnrollmentStatus.REJECTED));
     }
 
     @Transactional(readOnly = true)
@@ -108,14 +143,21 @@ public class RecurringRouteService {
     @Transactional(readOnly = true)
     public List<RecurringRoutePreviewResponse> findPreviewsForDriver(@NotNull Long driverId, LocalDate date) {
         driverService.requireOperationalView(driverId);
-        return previewsFor(date, enrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED).stream()
-                .filter(item -> item.getRoute().getDriver().getId().equals(driverId)).toList());
+        return routeRepository.findAllByDriverIdOrderByName(driverId).stream().filter(RecurringRoute::isActive)
+                .flatMap(route -> route.getSchedules().stream().filter(schedule -> schedule.getDayOfWeek() == date.getDayOfWeek())
+                        .map(schedule -> RecurringRoutePreviewResponse.from(route, date, schedule.getDirection(), schedule.getDepartureTime(),
+                                enrollmentRepository.findAllByRouteIdOrderByRequestedAtDesc(route.getId()).stream()
+                                        .filter(item -> item.getStatus() == RouteEnrollmentStatus.APPROVED)
+                                        .filter(item -> eligibility.eligible(item.getStudent(), route))
+                                        .filter(item -> schedule.getDirection() == ink.lucasnsnt.supernovaprojeto.models.enums.Direction.IDA ? item.isOutboundEnabled() : item.isReturnEnabled()).toList())))
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public List<RecurringRoutePreviewResponse> findPreviewsForStudent(@NotNull Long studentId, LocalDate date) {
         return previewsFor(date, enrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED).stream()
-                .filter(item -> item.getStudent().getId().equals(studentId)).toList());
+                .filter(item -> item.getStudent().getId().equals(studentId))
+                .filter(item -> eligibility.eligible(item.getStudent(), item.getRoute())).toList());
     }
 
     private List<RecurringRoutePreviewResponse> previewsFor(LocalDate date, List<RecurringRouteEnrollment> enrollments) {

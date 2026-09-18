@@ -10,6 +10,8 @@ import java.time.LocalTime;
 
 public record DailyConfirmationResponse(
         Long id,
+        Long routeId,
+        LocalTime academicTime,
         Long driverId,
         String driverName,
         Long studentId,
@@ -27,6 +29,8 @@ public record DailyConfirmationResponse(
     public static DailyConfirmationResponse from(DailyConfirmation confirmation) {
         return new DailyConfirmationResponse(
                 confirmation.getId(),
+                confirmation.getRecurringRoute() == null ? null : confirmation.getRecurringRoute().getId(),
+                confirmation.getAcademicTime(),
                 confirmation.getDriver().getId(),
                 confirmation.getDriver().getUser().getName(),
                 confirmation.getStudent().getId(),

@@ -28,6 +28,7 @@ class TripServiceTests {
     private DriverService driverService;
     private InAppNotificationService notificationService;
     private TripService service;
+    private final ink.lucasnsnt.supernovaprojeto.services.RouteOperationService operations = mock(ink.lucasnsnt.supernovaprojeto.services.RouteOperationService.class);
 
     @BeforeEach
     void setUp() {
@@ -114,7 +115,12 @@ class TripServiceTests {
         Trip trip = trip();
         stubOwnedTrip(trip);
 
+        when(operations.startTrip(10L, 40L, false)).thenAnswer(invocation -> {
+            trip.setStatus(TripStatus.IN_PROGRESS);
+            return ink.lucasnsnt.supernovaprojeto.dtos.trip.TripResponse.from(trip);
+        });
         assertThat(service.start(10L, 40L).status()).isEqualTo(TripStatus.IN_PROGRESS);
+        verify(operations).startTrip(10L, 40L, false);
         assertThat(service.completeNextStop(10L, 40L).completedStopCount()).isOne();
         assertThat(service.complete(10L, 40L).status()).isEqualTo(TripStatus.COMPLETED);
         assertThat(trip.getCompletedAt()).isEqualTo(LocalDateTime.of(2026, 9, 15, 5, 0));
@@ -123,7 +129,7 @@ class TripServiceTests {
     private TripService serviceAt(LocalDateTime localDateTime) {
         ZoneId zone = ZoneId.of("America/Bahia");
         Clock clock = Clock.fixed(localDateTime.atZone(zone).toInstant(), zone);
-        return new TripService(tripRepository, vehicleRepository, driverService,
+        return new TripService(operations, tripRepository, vehicleRepository, driverService,
                 notificationService, new DailyTransportProperties(), clock);
     }
 

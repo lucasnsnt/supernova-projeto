@@ -11,6 +11,7 @@ import java.util.List;
 
 public record TripResponse(
         Long id,
+        Long routeId,
         LocalDate serviceDate,
         Direction direction,
         TripStatus status,
@@ -38,6 +39,7 @@ public record TripResponse(
     private static TripResponse from(Trip trip, Long visibleStudentId) {
         return new TripResponse(
                 trip.getId(),
+                trip.getRecurringRoute() == null ? null : trip.getRecurringRoute().getId(),
                 trip.getServiceDate(),
                 trip.getDirection(),
                 trip.getStatus(),

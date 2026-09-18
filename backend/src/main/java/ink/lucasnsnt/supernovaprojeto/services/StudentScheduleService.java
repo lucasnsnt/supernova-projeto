@@ -22,6 +22,7 @@ public class StudentScheduleService {
 
     private final StudentScheduleRepository scheduleRepository;
     private final StudentService studentService;
+    private final TransportMembershipLock transportLock;
 
     @Transactional
     public List<StudentSchedule> setRoundTripForDay(
@@ -44,6 +45,7 @@ public class StudentScheduleService {
         if (outboundTime != null && returnTime != null && !returnTime.isAfter(outboundTime)) {
             throw new BusinessRuleException("O horário de volta precisa ser posterior ao horário de ida");
         }
+        transportLock.student(studentId);
         Student student = studentService.findById(studentId);
 
         student.getSchedules().removeIf(schedule -> schedule.getDayOfWeek() == dayOfWeek);
@@ -62,6 +64,7 @@ public class StudentScheduleService {
 
     @Transactional
     public void removeDay(@NotNull Long studentId, @NotNull DayOfWeek dayOfWeek) {
+        transportLock.student(studentId);
         Student student = studentService.findById(studentId);
         student.getSchedules().removeIf(schedule -> schedule.getDayOfWeek() == dayOfWeek);
     }

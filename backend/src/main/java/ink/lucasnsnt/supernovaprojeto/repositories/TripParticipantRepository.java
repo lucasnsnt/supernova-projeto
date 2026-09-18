@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface TripParticipantRepository extends JpaRepository<TripParticipant, Long> {
 
     boolean existsByConfirmationId(Long confirmationId);
+
 }

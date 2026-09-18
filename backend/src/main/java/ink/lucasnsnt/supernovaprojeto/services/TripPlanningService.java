@@ -35,6 +35,8 @@ public class TripPlanningService {
     private final Clock clock;
     private final GeocodingService geocodingService;
     private final DriverService driverService;
+    private final ink.lucasnsnt.supernovaprojeto.repositories.DriverRepository driverRepository;
+    private final RouteEligibilityService eligibility;
 
     @Transactional
     public int planReadyConfirmations() {
@@ -43,8 +45,10 @@ public class TripPlanningService {
                 .findAllByStatusAndResponseDeadlineLessThanEqualOrderByResponseDeadline(
                         DailyConfirmationStatus.YES, now)
                 .stream()
-                .filter(confirmation -> confirmation.getDriver().getStatus() == DriverStatus.APPROVED)
+                .filter(confirmation -> confirmation.getRecurringRoute() != null)
+                .filter(eligibility::eligible)
                 .filter(confirmation -> !participantRepository.existsByConfirmationId(confirmation.getId()))
+                .sorted(Comparator.comparing(c -> c.getDriver().getId()))
                 .collect(Collectors.groupingBy(
                         confirmation -> new PlanningKey(
                                 confirmation.getDriver().getId(), confirmation.getServiceDate(),
@@ -55,13 +59,19 @@ public class TripPlanningService {
 
         int tripsCreated = 0;
         for (List<DailyConfirmation> confirmations : groups.values()) {
-            Vehicle vehicle = vehicleRepository
-                    .findFirstByDriverIdAndDefaultVehicleTrue(confirmations.getFirst().getDriver().getId())
-                    .orElse(null);
-            for (List<DailyConfirmation> batch : partition(confirmations, vehicle)) {
-                createTrip(batch, vehicle, now);
-                tripsCreated++;
-            }
+            DailyConfirmation first = confirmations.getFirst();
+            driverRepository.lockById(first.getDriver().getId());
+            if (tripRepository.findByRecurringRouteIdAndServiceDateAndDirection(
+                    first.getRecurringRoute().getId(), first.getServiceDate(), first.getDirection()).isPresent()) continue;
+            List<DailyConfirmation> eligible = confirmed(first.getRecurringRoute().getId(), first.getServiceDate(), first.getDirection());
+            if (eligible.isEmpty()) continue;
+            Trip trip = build(first.getRecurringRoute(), first.getServiceDate(), first.getDirection(),
+                    first.getPreliminaryDepartureAt(), first.getPreliminaryDepartureAt(), eligible);
+            tripRepository.save(trip);
+            if (trip.getStatus() == TripStatus.PLANNED) notifyTripPlanned(trip);
+            else notificationService.create(first.getDriver().getId(), NotificationType.PLANNING_NEEDS_ATTENTION,
+                    "Planejamento precisa de atenção", trip.getPlanningIssue(), trip, null);
+            tripsCreated++;
         }
         return tripsCreated;
     }
@@ -75,101 +85,85 @@ public class TripPlanningService {
             throw new BusinessRuleException(
                     "Somente uma viagem que precisa de atenção pode ser recalculada");
         }
-        Vehicle vehicle = trip.getVehicle() == null
-                ? vehicleRepository.findFirstByDriverIdAndDefaultVehicleTrue(driverId).orElse(null)
-                : trip.getVehicle();
-        List<DailyConfirmation> confirmations = trip.getParticipants().stream()
-                .map(TripParticipant::getConfirmation)
-                .toList();
-        RoutePlanningResult route = vehicle == null
-                ? RoutePlanningResult.unavailable("O motorista não possui um veículo padrão")
-                : optimize(confirmations, vehicle);
-        applyReplanning(trip, vehicle, route, LocalDateTime.now(clock));
-        if (route.feasible()) {
-            notifyTripPlanned(trip);
-        }
+        driverRepository.lockById(driverId);
+        if (trip.getRecurringRoute() == null) throw new BusinessRuleException("Viagem antiga sem rota do motorista");
+        List<DailyConfirmation> confirmations = confirmed(trip.getRecurringRoute().getId(), trip.getServiceDate(), trip.getDirection());
+        Trip planned = build(trip.getRecurringRoute(), trip.getServiceDate(), trip.getDirection(),
+                trip.getPlannedDepartureAt(), trip.getPlannedDepartureAt(), confirmations);
+        merge(trip, planned);
+        if (trip.getStatus() == TripStatus.PLANNED) notifyTripPlanned(trip);
         return TripResponse.from(trip);
     }
 
-    private List<List<DailyConfirmation>> partition(
-            List<DailyConfirmation> confirmations, Vehicle vehicle) {
-        int capacity = vehicle == null ? Integer.MAX_VALUE : vehicle.getPassengerCapacity();
-        List<DailyConfirmation> sorted = confirmations.stream()
-                .sorted(Comparator.comparing(DailyConfirmation::getScheduledTime))
-                .toList();
-        List<List<DailyConfirmation>> batches = new ArrayList<>();
-        List<DailyConfirmation> current = new ArrayList<>();
-        LocalDateTime firstReturnPickup = null;
-        for (DailyConfirmation confirmation : sorted) {
-            LocalDateTime pickup = confirmation.getServiceDate().atTime(confirmation.getScheduledTime());
-            boolean exceedsReturnWait = confirmation.getDirection() == Direction.VOLTA
-                    && firstReturnPickup != null
-                    && pickup.isAfter(firstReturnPickup.plus(properties.getMaximumReturnWait()));
-            if (!current.isEmpty() && (current.size() >= capacity || exceedsReturnWait)) {
-                batches.add(List.copyOf(current));
-                current.clear();
-                firstReturnPickup = null;
-            }
-            if (firstReturnPickup == null && confirmation.getDirection() == Direction.VOLTA) {
-                firstReturnPickup = pickup;
-            }
-            current.add(confirmation);
-        }
-        if (!current.isEmpty()) {
-            batches.add(List.copyOf(current));
-        }
-        return batches;
+    List<DailyConfirmation> confirmed(Long routeId, LocalDate date, Direction direction) {
+        return confirmationRepository.findAllByRecurringRouteIdAndServiceDateAndDirection(routeId, date, direction)
+                .stream().filter(item -> item.getStatus() == DailyConfirmationStatus.YES)
+                .filter(eligibility::eligible)
+                .filter(item -> !participantRepository.existsByConfirmationId(item.getId())
+                        || tripRepository.findByRecurringRouteIdAndServiceDateAndDirection(routeId, date, direction)
+                        .map(trip -> trip.getParticipants().stream().anyMatch(p -> p.getConfirmation().getId().equals(item.getId()))).orElse(false))
+                .peek(item -> {
+                    // V8 did not invent historical deadlines. An unstarted occurrence
+                    // may now take an explicit snapshot of the student's current class.
+                    if (item.getAcademicTime() == null) item.getStudent().getSchedules().stream()
+                            .filter(schedule -> schedule.getDayOfWeek() == date.getDayOfWeek() && schedule.getDirection() == direction)
+                            .findFirst().ifPresent(schedule -> item.setAcademicTime(schedule.getTime()));
+                }).toList();
     }
 
-    private void createTrip(
-            List<DailyConfirmation> confirmations, Vehicle vehicle, LocalDateTime now) {
-        DailyConfirmation first = confirmations.getFirst();
-        RoutePlanningResult route = vehicle == null
-                ? RoutePlanningResult.unavailable("O motorista não possui um veículo padrão")
-                : optimize(confirmations, vehicle);
-        Trip trip = Trip.builder()
-                .driver(first.getDriver())
-                .vehicle(vehicle)
-                .serviceDate(first.getServiceDate())
-                .direction(first.getDirection())
+    Trip build(RecurringRoute recurring, LocalDate date, Direction direction, LocalDateTime scheduled,
+            LocalDateTime departure, List<DailyConfirmation> confirmations) {
+        RoutePlanningResult route = confirmations.isEmpty()
+                ? RoutePlanningResult.unavailable("Nenhum aluno confirmou presença nesta saída")
+                : optimize(confirmations, recurring.getVehicle(), departure);
+        Trip trip = Trip.builder().driver(recurring.getDriver()).recurringRoute(recurring)
+                .vehicle(recurring.getVehicle()).serviceDate(date).direction(direction)
                 .status(route.feasible() ? TripStatus.PLANNED : TripStatus.NEEDS_ATTENTION)
-                .plannedDepartureAt(route.feasible()
-                        ? route.departureAt() : first.getPreliminaryDepartureAt())
-                .planningIssue(route.issue())
-                .routeProvider(route.provider())
-                .routeReference(route.reference())
-                .encodedPolyline(route.encodedPolyline())
-                .routeCalculatedAt(route.feasible() ? now : null)
-                .createdAt(now)
-                .build();
-
+                .plannedDepartureAt(scheduled).driverDepartureAt(departure).planningIssue(route.issue())
+                .routeProvider(route.provider()).routeReference(route.reference()).encodedPolyline(route.encodedPolyline())
+                .routeCalculatedAt(route.feasible() ? LocalDateTime.now(clock) : null)
+                .createdAt(LocalDateTime.now(clock)).build();
         Map<Long, RouteStopPlan> stops = route.stops().stream()
                 .collect(Collectors.toMap(RouteStopPlan::confirmationId, stop -> stop));
-        int fallbackOrder = 1;
+        int order = 1;
         for (DailyConfirmation confirmation : confirmations) {
             RouteStopPlan stop = stops.get(confirmation.getId());
-            trip.addParticipant(TripParticipant.builder()
-                    .student(confirmation.getStudent())
-                    .confirmation(confirmation)
-                    .pickupOrder(stop == null ? fallbackOrder : stop.pickupOrder())
-                    .dropoffOrder(stop == null ? fallbackOrder : stop.dropoffOrder())
+            trip.addParticipant(TripParticipant.builder().student(confirmation.getStudent()).confirmation(confirmation)
+                    .pickupOrder(stop == null ? order : stop.pickupOrder())
+                    .dropoffOrder(stop == null ? order + confirmations.size() : stop.dropoffOrder())
                     .estimatedPickupAt(stop == null ? null : stop.estimatedPickupAt())
-                    .estimatedDropoffAt(stop == null ? null : stop.estimatedDropoffAt())
-                    .build());
-            fallbackOrder++;
+                    .estimatedDropoffAt(stop == null ? null : stop.estimatedDropoffAt()).build());
+            order++;
         }
-        tripRepository.save(trip);
-        if (route.feasible()) {
-            notifyTripPlanned(trip);
-        } else {
-            notificationService.create(first.getDriver().getId(),
-                    NotificationType.PLANNING_NEEDS_ATTENTION,
-                    "Planejamento precisa de atenção",
-                    route.issue(), trip, null);
+        return trip;
+    }
+
+    void merge(Trip existing, Trip planned) {
+        existing.setVehicle(planned.getVehicle());
+        existing.setPlannedDepartureAt(planned.getPlannedDepartureAt());
+        existing.setStatus(planned.getStatus());
+        existing.setDriverDepartureAt(planned.getDriverDepartureAt());
+        existing.setPlanningIssue(planned.getPlanningIssue());
+        existing.setRouteProvider(planned.getRouteProvider());
+        existing.setRouteReference(planned.getRouteReference());
+        existing.setEncodedPolyline(planned.getEncodedPolyline());
+        existing.setRouteCalculatedAt(planned.getRouteCalculatedAt());
+        Set<Long> ids = planned.getParticipants().stream().map(p -> p.getConfirmation().getId()).collect(Collectors.toSet());
+        existing.getParticipants().removeIf(p -> !ids.contains(p.getConfirmation().getId()));
+        for (TripParticipant next : planned.getParticipants()) {
+            TripParticipant current = existing.getParticipants().stream()
+                    .filter(p -> p.getConfirmation().getId().equals(next.getConfirmation().getId())).findFirst().orElse(null);
+            if (current == null) existing.addParticipant(next);
+            else {
+                current.setPickupOrder(next.getPickupOrder()); current.setDropoffOrder(next.getDropoffOrder());
+                current.setEstimatedPickupAt(next.getEstimatedPickupAt()); current.setEstimatedDropoffAt(next.getEstimatedDropoffAt());
+            }
         }
     }
 
-    private RoutePlanningResult optimize(List<DailyConfirmation> confirmations, Vehicle vehicle) {
+    private RoutePlanningResult optimize(List<DailyConfirmation> confirmations, Vehicle vehicle, LocalDateTime departure) {
+        if (vehicle == null || confirmations.size() > vehicle.getPassengerCapacity()) return RoutePlanningResult.unavailable("O veículo da rota não possui capacidade para todos os confirmados");
+        if (confirmations.stream().anyMatch(c -> c.getAcademicTime() == null)) return RoutePlanningResult.unavailable("Há confirmações antigas sem horário de aula; atualize os horários antes de iniciar");
         DailyConfirmation first = confirmations.getFirst();
         Address base = first.getDriver().getOperationalAddress() == null
                 ? first.getDriver().getUser().getAddress()
@@ -192,15 +186,15 @@ public class TripPlanningService {
                 first.getServiceDate(),
                 first.getDirection(),
                 vehicle.getPassengerCapacity(),
-                first.getDirection() == Direction.IDA ? point(base) : null,
+                point(base),
                 first.getDirection() == Direction.VOLTA ? point(base) : null,
-                passengers));
+                passengers, departure));
     }
 
     private RoutePassenger passenger(DailyConfirmation confirmation) {
         Address home = confirmation.getStudent().getUser().getAddress();
         Address institution = confirmation.getStudent().getInstitution().getAddress();
-        LocalDateTime scheduled = confirmation.getServiceDate().atTime(confirmation.getScheduledTime());
+        LocalDateTime scheduled = confirmation.getServiceDate().atTime(confirmation.getAcademicTime());
         if (confirmation.getDirection() == Direction.IDA) {
             return new RoutePassenger(confirmation.getId(), confirmation.getStudent().getId(),
                     point(home), point(institution), null, null, scheduled);
@@ -208,33 +202,6 @@ public class TripPlanningService {
         return new RoutePassenger(confirmation.getId(), confirmation.getStudent().getId(),
                 point(institution), point(home), scheduled,
                 scheduled.plus(properties.getMaximumReturnWait()), null);
-    }
-
-    private void applyReplanning(
-            Trip trip, Vehicle vehicle, RoutePlanningResult route, LocalDateTime calculatedAt) {
-        trip.setVehicle(vehicle);
-        trip.setStatus(route.feasible() ? TripStatus.PLANNED : TripStatus.NEEDS_ATTENTION);
-        trip.setPlanningIssue(route.issue());
-        trip.setRouteProvider(route.provider());
-        trip.setRouteReference(route.reference());
-        trip.setEncodedPolyline(route.encodedPolyline());
-        trip.setRouteCalculatedAt(route.feasible() ? calculatedAt : null);
-        if (!route.feasible()) {
-            return;
-        }
-        trip.setPlannedDepartureAt(route.departureAt());
-        Map<Long, RouteStopPlan> stops = route.stops().stream()
-                .collect(Collectors.toMap(RouteStopPlan::confirmationId, stop -> stop));
-        for (TripParticipant participant : trip.getParticipants()) {
-            RouteStopPlan stop = stops.get(participant.getConfirmation().getId());
-            if (stop == null) {
-                throw new BusinessRuleException("A rota recalculada não contém todos os alunos");
-            }
-            participant.setPickupOrder(stop.pickupOrder());
-            participant.setDropoffOrder(stop.dropoffOrder());
-            participant.setEstimatedPickupAt(stop.estimatedPickupAt());
-            participant.setEstimatedDropoffAt(stop.estimatedDropoffAt());
-        }
     }
 
     private RoutePoint point(Address address) {

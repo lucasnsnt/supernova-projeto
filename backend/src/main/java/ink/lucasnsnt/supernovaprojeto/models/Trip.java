@@ -32,6 +32,10 @@ public class Trip {
     private Driver driver;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recurring_route_id")
+    private RecurringRoute recurringRoute;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
