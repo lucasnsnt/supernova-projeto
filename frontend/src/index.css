@@ -166,3 +166,52 @@ button, input { font: inherit; } a { color: inherit; } button, a { -webkit-tap-h
 .route-stop { grid-template-columns: 24px minmax(0, 1fr) auto; }
 @media (max-width: 700px) { .route-stop { grid-template-columns: 24px minmax(0, 1fr); } }
 @media (max-width: 700px) { .profile-page-heading { flex-direction: column; gap: 14px; } .logout-button { align-self: flex-start; } }
+.preview-card-button { width: 100%; padding: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.preview-card-button:hover, .preview-card-button:focus-visible { border-color: #83b29a; box-shadow: 0 10px 28px rgba(8,120,236,.12); outline: none; }
+.preview-card-button > footer { display: flex; justify-content: space-between; gap: 12px; }
+.preview-card-button > footer strong { color: var(--primary); white-space: nowrap; }
+.preview-empty { margin: 0; padding: 14px 20px; background: white; color: var(--muted); font-size: .82rem; }
+.trip-card-button { width: 100%; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.trip-card-button:disabled { cursor: default; opacity: 1; }
+.route-card-side { display: grid; justify-items: end; gap: 8px; color: var(--primary); }
+.route-card-side b { font-size: 2rem; }
+.route-detail-backdrop, .route-operation-backdrop { align-items: start; overflow-y: auto; overscroll-behavior: contain; }
+.route-detail-modal, .route-operation-modal { width: min(100%, 760px); display: grid; gap: 22px; margin: 24px auto; padding: 26px; border-radius: 22px; background: white; box-shadow: 0 24px 70px rgba(0,0,0,.2); }
+.route-detail-modal h2, .route-operation-modal h2 { margin: 3px 0 0; }
+.route-information { display: grid; gap: 12px; padding: 17px; border: 1px solid var(--border); border-radius: 15px; background: #f8faf9; }
+.route-information > div { display: grid; gap: 5px; }
+.route-information > div > span { color: var(--muted); font-size: .74rem; font-weight: 750; text-transform: uppercase; }
+.route-roster { display: grid; gap: 10px; }
+.route-roster h3, .route-membership h3, .operation-stops h3 { margin: 0; }
+.route-roster-list { display: grid; gap: 8px; }
+.route-student-button, .route-student-row { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 15px; border: 1px solid var(--border); border-radius: 12px; background: white; color: inherit; text-align: left; }
+.route-student-button { cursor: pointer; }
+.route-student-button:hover, .route-student-button:focus-visible { border-color: #e3a4a0; background: #fff8f7; outline: none; }
+.route-student-button > span:first-child, .route-student-row > span { display: grid; gap: 3px; }
+.route-student-button small, .route-student-row small { color: var(--muted); }
+.remove-hint { color: var(--danger); font-size: .78rem; font-weight: 800; }
+.route-membership { display: grid; gap: 12px; padding: 17px; border-radius: 15px; background: #f1f7f3; }
+.route-membership .primary-button, .route-membership .secondary-button { width: 100%; }
+.operation-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.operation-heading > div { display: flex; align-items: center; gap: 10px; }
+.operation-heading strong { font-size: 1.08rem; }
+.preview-failure, .map-unavailable { padding: 15px; border: 1px solid #f0b8b3; border-radius: 12px; background: #fff4f3; color: var(--danger); }
+.preview-failure p, .map-unavailable p { margin: 0 0 12px; }
+.route-map-shell { position: relative; min-height: 320px; overflow: hidden; border: 1px solid var(--border); border-radius: 16px; background: #e5ece8; }
+.route-map-shell .live-map { min-height: 320px; }
+.route-map-shell .map-unavailable { position: absolute; z-index: 2; top: 16px; left: 16px; right: 16px; background: rgba(255,244,243,.96); }
+.operation-stops { display: grid; gap: 12px; }
+.operation-stops ol { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.operation-stops li { display: grid; grid-template-columns: 30px 1fr; align-items: center; gap: 11px; padding: 11px; border: 1px solid var(--border); border-radius: 11px; }
+.operation-stops li > span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #e7f1ff; color: var(--primary); font-weight: 850; }
+.operation-stops li div { display: grid; gap: 3px; }
+.operation-stops small { color: var(--muted); }
+.operation-actions { display: grid; gap: 8px; }
+.operation-actions .primary-button { width: 100%; }
+@media (max-width: 700px) {
+  .route-detail-backdrop, .route-operation-backdrop { padding: 0; }
+  .route-detail-modal, .route-operation-modal { width: 100%; min-height: 100dvh; margin: 0; padding: 22px 16px max(28px, env(safe-area-inset-bottom)); border-radius: 0; }
+  .operation-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .preview-card-button > footer { align-items: flex-start; flex-direction: column; }
+  .route-student-button { align-items: flex-start; }
+}

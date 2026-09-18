@@ -14,9 +14,15 @@ export type RecurringRoute = {
   schedules: Array<{ dayOfWeek: string; direction: RouteDirection; departureTime: string; responseDeadlineTime: string }>
   institutions: Array<{ institutionId: number; institutionName: string; stopOrder: number }>
 }
-export type RouteEnrollment = { id: number; routeId: number; routeName: string; studentId: number; studentName: string; outboundEnabled: boolean; returnEnabled: boolean; status: 'PENDING' | 'APPROVED' | 'REJECTED'; createdAt: string }
+export type RouteEnrollment = { id: number; routeId: number; routeName: string; driverName: string; studentId: number; studentName: string; institutionName: string | null; outboundEnabled: boolean; returnEnabled: boolean; status: 'APPROVED'; requestedAt: string; reviewedAt: string | null }
 export type RecurringRoutePayload = { name: string; vehicleId: number; schedules: Array<{ dayOfWeek: string; direction: RouteDirection; departureTime: string; responseDeadlineTime: string }>; institutions: Array<{ institutionId: number; stopOrder: number }> }
 export type RoutePreview = { routeId: number; routeName: string; serviceDate: string; direction: RouteDirection; departureTime: string; stops: Array<{ institutionName: string; order: number; expectedAt: string | null }>; passengers: Array<{ studentId: number; studentName: string; institutionName: string | null }> }
+export type OperationalRoutePreview = {
+  routeId: number; routeName: string; serviceDate: string; direction: RouteDirection
+  scheduledDepartureAt: string; departureAt: string; withinStartWindow: boolean; canStart: boolean
+  planningIssue: string | null; encodedPolyline: string | null; tripId: number | null; tripStatus: string | null
+  participants: Trip['participants']
+}
 
 export const driverConfirmations = () => apiFetch<DailyConfirmation[]>(`/api/drivers/me/daily-confirmations?date=${today()}`)
 export const driverTrips = (date = today()) => apiFetch<Trip[]>(`/api/drivers/me/trips?date=${date}`)
@@ -24,7 +30,9 @@ export const driverRoutes = () => apiFetch<RecurringRoute[]>('/api/drivers/me/ro
 export const driverRoutePreviews = (date = today()) => apiFetch<RoutePreview[]>(`/api/drivers/me/route-previews?date=${date}`)
 export const createDriverRoute = (body: RecurringRoutePayload) => apiFetch<RecurringRoute>('/api/drivers/me/routes', { method: 'POST', body: JSON.stringify(body) })
 export const driverRouteEnrollments = (routeId: number) => apiFetch<RouteEnrollment[]>(`/api/drivers/me/routes/${routeId}/enrollments`)
-export const reviewRouteEnrollment = (id: number, status: 'APPROVED' | 'REJECTED') => apiFetch<RouteEnrollment>(`/api/drivers/me/route-enrollments/${id}`, { method: 'PUT', body: JSON.stringify({ status }) })
+export const removeDriverRouteEnrollment = (id: number) => apiFetch<void>(`/api/drivers/me/route-enrollments/${id}`, { method: 'DELETE' })
+export const driverOperationalRoutePreview = (routeId: number, serviceDate: string, direction: RouteDirection) => apiFetch<OperationalRoutePreview>(`/api/drivers/me/routes/${routeId}/trip-preview?date=${serviceDate}&direction=${direction}`)
+export const startDriverRoute = (routeId: number, serviceDate: string, direction: RouteDirection, acknowledgeOutsideWindow: boolean) => apiFetch<Trip>(`/api/drivers/me/routes/${routeId}/start`, { method: 'POST', body: JSON.stringify({ serviceDate, direction, acknowledgeOutsideWindow }) })
 export const linkedStudents = () => apiFetch<LinkedStudent[]>('/api/drivers/me/students')
 export const invites = () => apiFetch<Invite[]>('/api/drivers/me/invites')
 export const createInvite = () => apiFetch<Invite>('/api/drivers/me/invites', { method: 'POST', body: JSON.stringify({ validityDays: 7, replaceCurrent: true }) })

@@ -9,7 +9,7 @@ vi.mock('./api', async importOriginal => ({ ...await importOriginal<typeof impor
 afterEach(() => { cleanup(); vi.resetAllMocks() })
 it('mostra e responde confirmação de amanhã liberada na noite anterior', async () => {
   vi.mocked(studentTrips).mockResolvedValue([])
-  vi.mocked(studentConfirmations).mockImplementation(async date => date === tomorrow() ? [{ id: 7, serviceDate: tomorrow(), direction: 'IDA', status: 'PENDING', scheduledTime: '07:00:00', preliminaryDepartureAt: `${tomorrow()}T06:00:00`, responseDeadline: `${tomorrow()}T05:00:00` }] : [])
+  vi.mocked(studentConfirmations).mockImplementation(async date => date === tomorrow() ? [{ id: 7, routeId: 3, serviceDate: tomorrow(), direction: 'IDA', status: 'PENDING', scheduledTime: '07:00:00', academicTime: '07:30:00', preliminaryDepartureAt: `${tomorrow()}T06:00:00`, responseDeadline: `${tomorrow()}T05:00:00` }] : [])
   vi.mocked(answerConfirmation).mockRejectedValue(new Error('O prazo terminou'))
   render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><StudentTodayPage /></QueryClientProvider>)
   await userEvent.click(await screen.findByRole('button', { name: 'Sim, eu vou' }))
@@ -19,7 +19,7 @@ it('mostra e responde confirmação de amanhã liberada na noite anterior', asyn
 
 it('mantém a ida confirmada visível antes de a rota ser calculada', async () => {
   vi.mocked(studentTrips).mockResolvedValue([])
-  vi.mocked(studentConfirmations).mockImplementation(async date => date === tomorrow() ? [] : [{ id: 8, serviceDate: date!, direction: 'IDA', status: 'YES', scheduledTime: '18:30:00', preliminaryDepartureAt: `${date}T17:30:00`, responseDeadline: `${date}T16:30:00`, institutionName: 'Universidade Federal' }])
+  vi.mocked(studentConfirmations).mockImplementation(async date => date === tomorrow() ? [] : [{ id: 8, routeId: 4, serviceDate: date!, direction: 'IDA', status: 'YES', scheduledTime: '18:30:00', academicTime: '19:00:00', preliminaryDepartureAt: `${date}T17:30:00`, responseDeadline: `${date}T16:30:00`, institutionName: 'Universidade Federal' }])
   render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><StudentTodayPage /></QueryClientProvider>)
   expect(await screen.findByText('Confirmado')).toBeInTheDocument()
   expect(screen.getByText('Universidade Federal')).toBeInTheDocument()

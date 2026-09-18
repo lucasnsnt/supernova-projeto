@@ -9,7 +9,7 @@ const days = [
 
 export function SchedulePage() {
   const schedules = useQuery({ queryKey: ['student-schedules'], queryFn: studentSchedules })
-  return <div className="page-stack"><header className="page-heading"><p className="eyebrow">Sua rotina</p><h1>Agenda semanal</h1><p className="muted">Escolha os dias de aula e informe o início e o fim. Usaremos esses horários para preparar ida e volta.</p></header><div className="schedule-legend"><span><b>Entrada</b> gera a ida</span><span><b>Saída</b> gera a volta</span></div>{schedules.isLoading && <div className="status-card">Carregando sua agenda…</div>}{schedules.isError && <div className="alert-card">Não foi possível carregar sua agenda.</div>}<div className="schedule-list">{days.map(([value, label]) => {
+  return <div className="page-stack"><header className="page-heading"><p className="eyebrow">Sua rotina acadêmica</p><h1>Horários de aula</h1><p className="muted">Informe quando sua aula começa e termina. Esses horários ajudam a ordenar embarques e desembarques nas rotas que você escolher.</p></header><div className="schedule-legend"><span><b>Início</b> define o limite de chegada</span><span><b>Fim</b> define quando você pode ser buscado</span></div>{schedules.isLoading && <div className="status-card">Carregando seus horários…</div>}{schedules.isError && <div className="alert-card">Não foi possível carregar seus horários.</div>}<div className="schedule-list">{days.map(([value, label]) => {
     const current = (schedules.data ?? []).filter((item) => item.dayOfWeek === value)
     const version = current.map((item) => `${item.direction}-${item.time}`).join('|')
     return <ScheduleRow key={`${value}-${version}`} day={value} label={label} schedules={current} />

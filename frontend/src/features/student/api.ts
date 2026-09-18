@@ -5,13 +5,13 @@ import type { RecurringRoute, RouteEnrollment, RoutePreview } from '../driver/ap
 export type Direction = 'IDA' | 'VOLTA'
 export type ConfirmationStatus = 'PENDING' | 'YES' | 'NO' | 'NO_RESPONSE'
 export type DailyConfirmation = {
-  id: number; studentName?: string; institutionName?: string | null; serviceDate: string; direction: Direction; scheduledTime: string
+  id: number; routeId: number; studentName?: string; institutionName?: string | null; serviceDate: string; direction: Direction; scheduledTime: string; academicTime: string
   preliminaryDepartureAt: string; responseDeadline: string; status: ConfirmationStatus
 }
 export type Schedule = { id: number; dayOfWeek: string; time: string; direction: Direction }
 export type Trip = {
-  id: number; serviceDate: string; direction: Direction; status: string
-  departureAt: string | null; planningIssue: string | null
+  id: number; routeId: number | null; serviceDate: string; direction: Direction; status: string
+  plannedDepartureAt: string | null; departureAt: string | null; planningIssue: string | null
   startedAt: string | null; completedAt: string | null; cancellationReason: string | null
   encodedPolyline: string | null; completedStopCount: number
   vehicle: { id: number; model: string; licensePlate: string } | null
@@ -34,13 +34,19 @@ export const availableRoutes = () => apiFetch<RecurringRoute[]>('/api/students/m
 export const studentRoutePreviews = (date = today()) => apiFetch<RoutePreview[]>(`/api/students/me/route-previews?date=${date}`)
 export const studentRouteEnrollments = () => apiFetch<RouteEnrollment[]>('/api/students/me/route-enrollments')
 export const requestRouteEnrollment = (routeId: number, outboundEnabled: boolean, returnEnabled: boolean) => apiFetch<RouteEnrollment>('/api/students/me/route-enrollments', { method: 'POST', body: JSON.stringify({ routeId, outboundEnabled, returnEnabled }) })
+export const leaveRouteEnrollment = (id: number) => apiFetch<void>(`/api/students/me/route-enrollments/${id}`, { method: 'DELETE' })
+export const studentRouteRoster = (routeId: number) => apiFetch<RouteEnrollment[]>(`/api/students/me/routes/${routeId}/enrollments`)
 export const studentSchedules = () => apiFetch<Schedule[]>('/api/students/me/schedules')
 export const saveSchedule = (day: string, outboundTime: string | null, returnTime: string | null) => apiFetch<Schedule[]>(`/api/students/me/schedules/${day}`, { method: 'PUT', body: JSON.stringify({ outboundTime, returnTime }) })
 export const removeSchedule = (day: string) => apiFetch<void>(`/api/students/me/schedules/${day}`, { method: 'DELETE' })
 
 export function time(value: string | null) {
   if (!value) return '—'
-  return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(new Date(value))
+  return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Bahia' }).format(parseBahiaDateTime(value))
+}
+
+export function parseBahiaDateTime(value: string) {
+  return new Date(/[zZ]|[+-]\d{2}:\d{2}$/.test(value) ? value : `${value}-03:00`)
 }
 
 export const directionLabel = (direction: Direction) => direction === 'IDA' ? 'Ida' : 'Volta'
