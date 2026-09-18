@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useId, useState, type FormEvent } from 'react'
 import { useAuth } from '../../auth/AuthContext'
+import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { institutions, type Institution } from '../admin/api'
-import { createDriverRoute, driverRouteEnrollments, driverRoutePreviews, driverRoutes, reviewRouteEnrollment, vehicles, type RecurringRoute, type RouteDirection, type RoutePreview } from '../driver/api'
-import { availableRoutes, requestRouteEnrollment, studentRouteEnrollments, studentRoutePreviews } from '../student/api'
+import { createDriverRoute, driverRouteEnrollments, driverRoutes, removeDriverRouteEnrollment, vehicles, type RecurringRoute, type RouteDirection, type RouteEnrollment } from '../driver/api'
+import { availableRoutes, leaveRouteEnrollment, requestRouteEnrollment, studentRouteEnrollments, studentRouteRoster } from '../student/api'
 
 const days = [
   ['MONDAY', 'Seg'], ['TUESDAY', 'Ter'], ['WEDNESDAY', 'Qua'], ['THURSDAY', 'Qui'], ['FRIDAY', 'Sex'], ['SATURDAY', 'Sáb'], ['SUNDAY', 'Dom'],
@@ -22,27 +23,65 @@ export function RoutesPage() {
 function DriverRoutes() {
   const client = useQueryClient()
   const routes = useQuery({ queryKey: ['driver-routes'], queryFn: driverRoutes })
-  const previews = useQuery({ queryKey: ['driver-route-previews'], queryFn: () => driverRoutePreviews() })
   const routeVehicles = useQuery({ queryKey: ['driver-vehicles'], queryFn: vehicles })
   const routeInstitutions = useQuery({ queryKey: ['institutions'], queryFn: institutions })
   const [showForm, setShowForm] = useState(false)
   const [selectedRoute, setSelectedRoute] = useState<RecurringRoute | null>(null)
-  const enrollments = useQuery({ queryKey: ['route-enrollments', selectedRoute?.id], queryFn: () => driverRouteEnrollments(selectedRoute!.id), enabled: Boolean(selectedRoute) })
-  const review = useMutation({ mutationFn: ({ id, status }: { id: number; status: 'APPROVED' | 'REJECTED' }) => reviewRouteEnrollment(id, status), onSuccess: () => void client.invalidateQueries({ queryKey: ['route-enrollments', selectedRoute?.id] }) })
   return <div className="page-stack">
-    <header className="page-heading"><p className="eyebrow">Sua operação</p><h1>Rotas e horários</h1><p className="muted">Defina sua saída fixa, as instituições por onde passa e aprove os alunos uma única vez.</p></header>
+    <header className="page-heading"><p className="eyebrow">Sua operação</p><h1>Rotas e horários</h1><p className="muted">Defina sua saída fixa e as instituições atendidas. Alunos vinculados entram imediatamente quando escolhem uma rota compatível.</p></header>
     {routes.error && <p role="alert" className="form-error">{routes.error.message}</p>}
-    <section className="route-intro"><span>1</span><div><strong>O horário é seu</strong><p>Os alunos entram na rota; a saída não é calculada a partir da aula deles.</p></div></section>
-    <PreviewSection previews={previews.data} loading={previews.isLoading} />
+    <section className="route-intro"><span>1</span><div><strong>O horário é seu</strong><p>Você pode iniciar pelo preview a qualquer momento. Fora da janela de 30 minutos antes ou depois, o sistema pede uma confirmação extra.</p></div></section>
     <section><div className="section-heading"><h2>Suas rotas</h2><button className="primary-button compact" onClick={() => setShowForm(true)}>Criar rota</button></div>
-      <div className="route-list">{routes.data?.map(route => <button key={route.id} className={`route-card ${selectedRoute?.id === route.id ? 'selected' : ''}`} onClick={() => setSelectedRoute(route)}><RouteSummary route={route} /><span aria-hidden="true">›</span></button>)}{!routes.isLoading && !routes.data?.length && <p className="empty-copy">Ainda não há rota. Crie a primeira com sua saída e as instituições atendidas.</p>}</div>
+      <div className="route-list">{routes.data?.map(route => <button key={route.id} className="route-card" onClick={() => setSelectedRoute(route)} aria-label={`Abrir detalhes da rota ${route.name}`}><RouteSummary route={route} /><span aria-hidden="true">›</span></button>)}{!routes.isLoading && !routes.data?.length && <p className="empty-copy">Ainda não há rota. Crie a primeira com sua saída e as instituições atendidas.</p>}</div>
     </section>
-    {selectedRoute && <section className="route-enrollment-panel"><div className="section-heading"><div><p className="section-kicker">{selectedRoute.name}</p><h2>Pedidos de vaga</h2></div><button className="text-button" onClick={() => setSelectedRoute(null)}>Fechar</button></div>
-      {enrollments.isLoading && <p className="muted">Carregando pedidos…</p>}{enrollments.error && <p className="form-error">{enrollments.error.message}</p>}
-      <div className="card-list">{enrollments.data?.map(item => <article className="trip-card" key={item.id}><div><strong>{item.studentName}</strong><p className="muted">{legLabel(item.outboundEnabled, item.returnEnabled)}</p></div>{item.status === 'PENDING' ? <div className="button-row"><button className="secondary-button" disabled={review.isPending} onClick={() => review.mutate({ id: item.id, status: 'REJECTED' })}>Recusar</button><button className="primary-button compact" disabled={review.isPending} onClick={() => review.mutate({ id: item.id, status: 'APPROVED' })}>Aprovar</button></div> : <span className={`tag ${item.status === 'APPROVED' ? 'neutral' : ''}`}>{item.status === 'APPROVED' ? 'Aprovado' : 'Recusado'}</span>}</article>)}{!enrollments.isLoading && !enrollments.data?.length && <p className="empty-copy">Nenhum pedido de vaga nesta rota.</p>}</div>
-    </section>}
+    {selectedRoute && <DriverRouteDetails route={selectedRoute} onClose={() => setSelectedRoute(null)} />}
     {showForm && <RouteForm routeVehicles={routeVehicles.data ?? []} routeInstitutions={routeInstitutions.data ?? []} institutionsLoading={routeInstitutions.isLoading} institutionsError={routeInstitutions.error?.message} onClose={() => setShowForm(false)} onCreated={() => { setShowForm(false); void client.invalidateQueries({ queryKey: ['driver-routes'] }) }} />}
   </div>
+}
+
+function DriverRouteDetails({ route, onClose }: { route: RecurringRoute; onClose: () => void }) {
+  const titleId = useId()
+  const client = useQueryClient()
+  const [studentToRemove, setStudentToRemove] = useState<RouteEnrollment | null>(null)
+  const roster = useQuery({ queryKey: ['route-enrollments', route.id], queryFn: () => driverRouteEnrollments(route.id) })
+  const remove = useMutation({
+    mutationFn: removeDriverRouteEnrollment,
+    onSuccess: async () => {
+      setStudentToRemove(null)
+      await client.invalidateQueries({ queryKey: ['route-enrollments', route.id] })
+      await client.invalidateQueries({ queryKey: ['driver-route-previews'] })
+    },
+  })
+  useModalEscape(onClose, remove.isPending)
+  return <div className="modal-backdrop route-detail-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget && !remove.isPending) onClose() }}>
+    <section className="route-detail-modal" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+      <header className="section-heading"><div><p className="section-kicker">Detalhes da rota</p><h2 id={titleId}>{route.name}</h2></div><button type="button" className="text-button" onClick={onClose}>Fechar</button></header>
+      <RouteInformation route={route} />
+      <section className="route-roster"><h3>Alunos na rota</h3><p className="muted">Selecione um aluno para removê-lo desta rota.</p>
+        {roster.isLoading && <p className="muted">Carregando alunos…</p>}
+        {roster.error && <p className="form-error" role="alert">{roster.error.message}</p>}
+        <div className="route-roster-list">{roster.data?.map(item => <button type="button" key={item.id} className="route-student-button" onClick={() => setStudentToRemove(item)}><span><strong>{item.studentName}</strong><small>{item.institutionName ?? 'Instituição não informada'} · {legLabel(item.outboundEnabled, item.returnEnabled)}</small></span><span className="remove-hint">Remover</span></button>)}{!roster.isLoading && !roster.data?.length && <p className="empty-copy compact-empty">Nenhum aluno entrou nesta rota.</p>}</div>
+      </section>
+      {remove.error && <p className="form-error" role="alert">{remove.error.message}</p>}
+    </section>
+    <ConfirmDialog open={Boolean(studentToRemove)} title="Remover aluno da rota?" message={`${studentToRemove?.studentName ?? 'Este aluno'} deixará de receber as confirmações diárias desta rota.`} confirmLabel="Remover aluno" busy={remove.isPending} onCancel={() => setStudentToRemove(null)} onConfirm={() => studentToRemove && remove.mutate(studentToRemove.id)} />
+  </div>
+}
+
+function RouteInformation({ route }: { route: RecurringRoute }) {
+  return <div className="route-information">
+    <div><span>Veículo</span><strong>{route.vehicleLabel}</strong></div>
+    <div><span>Instituições atendidas</span><strong>{route.institutions.map(item => item.institutionName).join(' · ')}</strong></div>
+    <div><span>Dias e saídas</span><div className="route-schedule-chips">{route.schedules.map((item, index) => <span key={`${item.dayOfWeek}-${item.direction}-${index}`}>{shortDay(item.dayOfWeek)} · {item.direction === 'IDA' ? 'Ida' : 'Volta'} {shortTime(item.departureTime)}</span>)}</div></div>
+  </div>
+}
+
+function useModalEscape(onClose: () => void, busy: boolean) {
+  useEffect(() => {
+    const close = (event: KeyboardEvent) => { if (event.key === 'Escape' && !busy) onClose() }
+    window.addEventListener('keydown', close)
+    return () => window.removeEventListener('keydown', close)
+  }, [busy, onClose])
 }
 
 export function RouteForm({ routeVehicles, routeInstitutions, institutionsLoading = false, institutionsError, onClose, onCreated }: { routeVehicles: Array<{ id: number; brand: string; model: string; licensePlate: string }>; routeInstitutions: Institution[]; institutionsLoading?: boolean; institutionsError?: string; onClose: () => void; onCreated: () => void }) {
@@ -102,23 +141,39 @@ function subtractHour(value: string) {
 }
 
 function StudentRoutes() {
-  const client = useQueryClient()
   const routes = useQuery({ queryKey: ['available-routes'], queryFn: availableRoutes })
-  const previews = useQuery({ queryKey: ['student-route-previews'], queryFn: () => studentRoutePreviews() })
   const enrollments = useQuery({ queryKey: ['student-route-enrollments'], queryFn: studentRouteEnrollments })
-  const [choice, setChoice] = useState<{ routeId: number; outbound: boolean; returning: boolean } | null>(null)
-  const request = useMutation({ mutationFn: () => requestRouteEnrollment(choice!.routeId, choice!.outbound, choice!.returning), onSuccess: () => { setChoice(null); void client.invalidateQueries({ queryKey: ['student-route-enrollments'] }) } })
-  return <div className="page-stack"><header className="page-heading"><p className="eyebrow">Seu transporte</p><h1>Escolha sua rota</h1><p className="muted">Veja as rotas do seu motorista que passam pela sua instituição e peça sua vaga.</p></header>
+  const [selectedRoute, setSelectedRoute] = useState<RecurringRoute | null>(null)
+  return <div className="page-stack"><header className="page-heading"><p className="eyebrow">Seu transporte</p><h1>Escolha sua rota</h1><p className="muted">Você verá apenas rotas do seu motorista que atendem à sua instituição. Ao escolher uma, sua entrada é imediata.</p></header>
     {routes.error && <p className="form-error">{routes.error.message}</p>}
-    <PreviewSection previews={previews.data} loading={previews.isLoading} student />
-    <section><div className="section-heading"><h2>Disponíveis para você</h2></div><div className="route-list">{routes.data?.map(route => { const enrollment = enrollments.data?.find(item => item.routeId === route.id); return <article className="student-route-card" key={route.id}><RouteSummary route={route} />{enrollment ? <span className={`tag ${enrollment.status === 'APPROVED' ? 'neutral' : ''}`}>{enrollment.status === 'PENDING' ? 'Pedido enviado' : enrollment.status === 'APPROVED' ? 'Na sua rota' : 'Recusado'}</span> : <button className="primary-button compact" onClick={() => setChoice({ routeId: route.id, outbound: true, returning: true })}>Pedir vaga</button>}</article> })}{!routes.isLoading && !routes.data?.length && <p className="empty-copy">Quando seu motorista criar uma rota que passe pela sua instituição, ela aparecerá aqui.</p>}</div></section>
-    <section><div className="section-heading"><h2>Seus pedidos</h2></div><div className="card-list">{enrollments.data?.map(item => <article className="trip-card" key={item.id}><div><strong>{item.routeName}</strong><p className="muted">{legLabel(item.outboundEnabled, item.returnEnabled)}</p></div><span className={`tag ${item.status === 'APPROVED' ? 'neutral' : ''}`}>{item.status === 'PENDING' ? 'Aguardando' : item.status === 'APPROVED' ? 'Aprovado' : 'Recusado'}</span></article>)}</div></section>
-    {choice && <div className="modal-backdrop"><section className="modal-card"><p className="section-kicker">Solicitar vaga</p><h2>Quais trechos você usa?</h2><p className="muted">Você poderá responder às confirmações do dia depois que o motorista aprovar.</p><label className="route-check"><input type="checkbox" checked={choice.outbound} onChange={e => setChoice({ ...choice, outbound: e.target.checked })} /> Ida</label><label className="route-check"><input type="checkbox" checked={choice.returning} onChange={e => setChoice({ ...choice, returning: e.target.checked })} /> Volta</label>{request.error && <p className="form-error">{request.error.message}</p>}<div className="modal-actions"><button className="secondary-button" onClick={() => setChoice(null)}>Cancelar</button><button className="primary-button compact" disabled={request.isPending || (!choice.outbound && !choice.returning)} onClick={() => request.mutate()}>{request.isPending ? 'Enviando…' : 'Enviar pedido'}</button></div></section></div>}
+    <section><div className="section-heading"><h2>Rotas compatíveis</h2></div><div className="route-list">{routes.data?.map(route => { const enrollment = enrollments.data?.find(item => item.routeId === route.id); return <button type="button" className="route-card" key={route.id} onClick={() => setSelectedRoute(route)} aria-label={`Abrir detalhes da rota ${route.name}`}><RouteSummary route={route} /><span className="route-card-side">{enrollment ? <small className="tag neutral">Na sua rota</small> : null}<b aria-hidden="true">›</b></span></button> })}{!routes.isLoading && !routes.data?.length && <p className="empty-copy">Aceite o convite do motorista e selecione sua instituição. Rotas compatíveis aparecerão aqui.</p>}</div></section>
+    {selectedRoute && <StudentRouteDetails route={selectedRoute} enrollment={enrollments.data?.find(item => item.routeId === selectedRoute.id) ?? null} onClose={() => setSelectedRoute(null)} />}
+  </div>
+}
+
+function StudentRouteDetails({ route, enrollment, onClose }: { route: RecurringRoute; enrollment: RouteEnrollment | null; onClose: () => void }) {
+  const titleId = useId()
+  const client = useQueryClient()
+  const [outbound, setOutbound] = useState(enrollment?.outboundEnabled ?? true)
+  const [returning, setReturning] = useState(enrollment?.returnEnabled ?? true)
+  const [confirmLeave, setConfirmLeave] = useState(false)
+  const roster = useQuery({ queryKey: ['student-route-roster', route.id], queryFn: () => studentRouteRoster(route.id) })
+  const join = useMutation({ mutationFn: () => requestRouteEnrollment(route.id, outbound, returning), onSuccess: async () => { await client.invalidateQueries({ queryKey: ['student-route-enrollments'] }); await client.invalidateQueries({ queryKey: ['student-route-roster', route.id] }) } })
+  const leave = useMutation({ mutationFn: () => leaveRouteEnrollment(enrollment!.id), onSuccess: async () => { setConfirmLeave(false); await client.invalidateQueries({ queryKey: ['student-route-enrollments'] }); await client.invalidateQueries({ queryKey: ['student-route-roster', route.id] }); onClose() } })
+  useModalEscape(onClose, join.isPending || leave.isPending)
+  return <div className="modal-backdrop route-detail-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget && !join.isPending && !leave.isPending) onClose() }}>
+    <section className="route-detail-modal" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+      <header className="section-heading"><div><p className="section-kicker">Detalhes da rota</p><h2 id={titleId}>{route.name}</h2></div><button type="button" className="text-button" onClick={onClose}>Fechar</button></header>
+      <RouteInformation route={route} />
+      <section className="route-roster"><h3>Alunos na rota</h3><div className="route-roster-list">{roster.data?.map(item => <div className="route-student-row" key={item.id}><span><strong>{item.studentName}</strong><small>{item.institutionName ?? 'Instituição'} · {legLabel(item.outboundEnabled, item.returnEnabled)}</small></span></div>)}{!roster.isLoading && !roster.data?.length && <p className="empty-copy compact-empty">Ainda não há alunos nesta rota.</p>}</div></section>
+      {enrollment ? <div className="route-membership"><p className="save-feedback">✓ Você está nesta rota · {legLabel(enrollment.outboundEnabled, enrollment.returnEnabled)}</p><button type="button" className="secondary-button" onClick={() => setConfirmLeave(true)}>Sair da rota</button></div> : <div className="route-membership"><h3>Entrar na rota</h3><p className="muted">Escolha os trechos usados. Não é necessário aguardar aprovação do motorista.</p><label className="route-check"><input type="checkbox" checked={outbound} onChange={event => setOutbound(event.target.checked)} /> Ida</label><label className="route-check"><input type="checkbox" checked={returning} onChange={event => setReturning(event.target.checked)} /> Volta</label><button type="button" className="primary-button" disabled={join.isPending || (!outbound && !returning)} onClick={() => join.mutate()}>{join.isPending ? 'Entrando…' : 'Entrar nesta rota'}</button></div>}
+      {(join.error || leave.error || roster.error) && <p className="form-error" role="alert">{(join.error ?? leave.error ?? roster.error)?.message}</p>}
+    </section>
+    <ConfirmDialog open={confirmLeave} title="Sair desta rota?" message="Você deixará de receber as confirmações diárias desta rota. Poderá entrar novamente enquanto ela continuar disponível." confirmLabel="Sair da rota" busy={leave.isPending} onCancel={() => setConfirmLeave(false)} onConfirm={() => leave.mutate()} />
   </div>
 }
 
 function RouteSummary({ route }: { route: RecurringRoute }) { return <div className="route-summary"><p className="section-kicker">{route.vehicleLabel}</p><h3>{route.name}</h3><p className="muted">{route.institutions.map(stop => stop.institutionName).join(' · ')}</p><div className="route-schedule-chips">{route.schedules.slice(0, 4).map((item, index) => <span key={`${item.dayOfWeek}-${item.direction}-${index}`}>{shortDay(item.dayOfWeek)} {item.direction === 'IDA' ? '↑' : '↓'} {shortTime(item.departureTime)}</span>)}{route.schedules.length > 4 && <span>+{route.schedules.length - 4}</span>}</div></div> }
-function PreviewSection({ previews, loading, student = false }: { previews: RoutePreview[] | undefined; loading: boolean; student?: boolean }) { return <section><div className="section-heading"><div><p className="section-kicker">Hoje</p><h2>Sua programação</h2></div></div>{loading ? <p className="muted">Montando prévia…</p> : <div className="preview-list">{previews?.map(item => <article className="preview-card" key={`${item.routeId}-${item.direction}-${item.departureTime}`}><header><div><p className="section-kicker">{item.routeName}</p><h3>{shortTime(item.departureTime)}</h3></div><span className="direction-pill">{item.direction === 'IDA' ? 'Ida' : 'Volta'}</span></header><p className="preview-destination">{item.stops.map(stop => stop.institutionName).join(' · ')}</p><div className="student-preview-list">{(student ? item.passengers.slice(0, 1) : item.passengers).map(person => <div className="student-preview" key={person.studentId}><span className="status-dot yes" /><div><strong>{student ? 'Sua vaga aprovada' : person.studentName}</strong><small>{person.institutionName ?? 'Instituição'}</small></div></div>)}</div><footer>Prévia sem rota calculada · {item.passengers.length} {item.passengers.length === 1 ? 'aluno' : 'alunos'}</footer></article>)}{!previews?.length && <p className="empty-copy">Nenhuma saída recorrente aprovada para hoje.</p>}</div>}</section> }
 function shortDay(day: string) { return days.find(([value]) => value === day)?.[1] ?? day }
 function shortTime(value: string) { return value.slice(0, 5) }
 function legLabel(outbound: boolean, returning: boolean) { return outbound && returning ? 'Ida e volta' : outbound ? 'Somente ida' : 'Somente volta' }
