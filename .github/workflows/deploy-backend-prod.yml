@@ -69,6 +69,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Configure SSH
+        id: configure_ssh
         env:
           SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           SSH_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
@@ -122,7 +123,7 @@ jobs:
           npx vercel@59.19.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
 
       - name: Remove temporary registry credentials from VPS
-        if: always()
+        if: ${{ always() && steps.configure_ssh.outcome == 'success' }}
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}

@@ -64,7 +64,7 @@ else
     run_step 'frontend build' run_in_dir "$ROOT_DIR/frontend" npm run build
   fi
   if [[ "$MODE" == full ]]; then
-    run_step 'backend full suite' bash -c "cd '$ROOT_DIR/backend' && ./mvnw test"
+    run_step 'backend full suite' run_in_dir "$ROOT_DIR/backend" ./mvnw test
   fi
 fi
 

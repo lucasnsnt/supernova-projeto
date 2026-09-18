@@ -20,9 +20,9 @@ ocorrência e pode sair.
   antecipado/tardio, freeze, capacidade e migração/histórico.
 - **Revisão:** executar `scripts/verify-transport-flow.sh quick` por padrão e os
   testes focados apenas nas áreas alteradas. Use `all` para o conjunto focado e
-  `full` separadamente para as suítes completas; `scripts/audit-transport-flow.sh`
-  revisa o escopo. Não fazer
-  deploy antes da revisão integrada e suítes finais.
+  `full` separadamente quando for necessário; `scripts/audit-transport-flow.sh`
+  revisa o escopo. O pipeline de produção executa a verificação final antes
+  de publicar o backend e o frontend.
 
 ## Checklist de aceite
 
