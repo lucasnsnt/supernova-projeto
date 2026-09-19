@@ -11,7 +11,6 @@ import ink.lucasnsnt.supernovaprojeto.dtos.vehicle.VehicleResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.route.RecurringRouteCreateRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.route.RecurringRouteResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.route.RouteEnrollmentResponse;
-import ink.lucasnsnt.supernovaprojeto.dtos.route.RouteEnrollmentReviewRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.common.AddressRequest;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.DailyConfirmationResponse;
 import ink.lucasnsnt.supernovaprojeto.dtos.trip.DepartureUpdateRequest;
@@ -170,13 +169,6 @@ public class DriverController {
     public List<RouteEnrollmentResponse> findRouteEnrollments(
             @AuthenticationPrincipal Jwt jwt, @PathVariable Long routeId) {
         return recurringRouteService.findEnrollmentsForDriver(userId(jwt), routeId);
-    }
-
-    @PutMapping("/route-enrollments/{enrollmentId}")
-    public RouteEnrollmentResponse reviewRouteEnrollment(
-            @AuthenticationPrincipal Jwt jwt, @PathVariable Long enrollmentId,
-            @Valid @RequestBody RouteEnrollmentReviewRequest request) {
-        return recurringRouteService.reviewEnrollment(userId(jwt), enrollmentId, request);
     }
 
     @GetMapping("/daily-confirmations")

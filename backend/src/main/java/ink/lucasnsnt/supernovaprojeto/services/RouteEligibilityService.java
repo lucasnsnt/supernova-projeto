@@ -24,7 +24,7 @@ public class RouteEligibilityService {
         var route = confirmation.getRecurringRoute();
         if (!eligible(confirmation.getStudent(), route)) return false;
         return enrollments.findByRouteIdAndStudentId(route.getId(), confirmation.getStudent().getId())
-                .filter(item -> item.getStatus() == RouteEnrollmentStatus.APPROVED)
+                .filter(RecurringRouteEnrollment::isActive)
                 .filter(item -> confirmation.getDirection() == Direction.IDA ? item.isOutboundEnabled() : item.isReturnEnabled())
                 .isPresent();
     }
