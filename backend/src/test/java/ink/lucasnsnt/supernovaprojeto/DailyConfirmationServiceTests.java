@@ -57,7 +57,7 @@ class DailyConfirmationServiceTests {
     }
 
     @Test
-    void shouldUseDriverRouteTimesForAnApprovedEnrollment() {
+    void shouldUseDriverRouteTimesForAnActiveMembership() {
         LocalDate serviceDate = LocalDate.of(2026, 9, 15);
         DriverStudentLink link = eligibleLink(serviceDate.getDayOfWeek(), LocalTime.of(18, 30));
         Vehicle vehicle = Vehicle.builder().model("Van").licensePlate("ABC1D23").passengerCapacity(15).driver(link.getDriver()).build();
@@ -65,8 +65,8 @@ class DailyConfirmationServiceTests {
         route.addSchedule(RecurringRouteSchedule.builder().dayOfWeek(serviceDate.getDayOfWeek()).direction(Direction.IDA)
                 .departureTime(LocalTime.of(17, 10)).responseDeadlineTime(LocalTime.of(16, 10)).build());
         RecurringRouteEnrollment enrollment = RecurringRouteEnrollment.builder().route(route).student(link.getStudent())
-                .outboundEnabled(true).returnEnabled(false).status(RouteEnrollmentStatus.APPROVED).requestedAt(LocalDateTime.now()).build();
-        when(routeEnrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED)).thenReturn(List.of(enrollment));
+                .outboundEnabled(true).returnEnabled(false).active(true).requestedAt(LocalDateTime.now()).build();
+        when(routeEnrollmentRepository.findAllByActiveTrue()).thenReturn(List.of(enrollment));
         when(linkRepository.findAllByStatus(DriverStudentLinkStatus.ACTIVE)).thenReturn(List.of(link));
         when(confirmationRepository.existsByStudentIdAndServiceDateAndDirectionAndScheduledTime(
                 20L, serviceDate, Direction.IDA, LocalTime.of(17, 10))).thenReturn(false);
@@ -98,8 +98,8 @@ class DailyConfirmationServiceTests {
         route.addSchedule(RecurringRouteSchedule.builder().dayOfWeek(serviceDate.getDayOfWeek()).direction(Direction.IDA)
                 .departureTime(LocalTime.of(19, 10)).responseDeadlineTime(LocalTime.of(18, 10)).build());
         RecurringRouteEnrollment enrollment = RecurringRouteEnrollment.builder().route(route).student(link.getStudent())
-                .outboundEnabled(true).returnEnabled(false).status(RouteEnrollmentStatus.APPROVED).requestedAt(LocalDateTime.now()).build();
-        when(routeEnrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED)).thenReturn(List.of(enrollment));
+                .outboundEnabled(true).returnEnabled(false).active(true).requestedAt(LocalDateTime.now()).build();
+        when(routeEnrollmentRepository.findAllByActiveTrue()).thenReturn(List.of(enrollment));
         when(confirmationRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         DailyConfirmationService routeService = new DailyConfirmationService(

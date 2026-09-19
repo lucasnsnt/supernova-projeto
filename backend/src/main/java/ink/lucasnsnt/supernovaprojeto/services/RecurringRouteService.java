@@ -2,11 +2,9 @@ package ink.lucasnsnt.supernovaprojeto.services;
 
 import ink.lucasnsnt.supernovaprojeto.dtos.route.*;
 import ink.lucasnsnt.supernovaprojeto.exceptions.BusinessRuleException;
-import ink.lucasnsnt.supernovaprojeto.exceptions.ResourceConflictException;
 import ink.lucasnsnt.supernovaprojeto.exceptions.ResourceNotFoundException;
 import ink.lucasnsnt.supernovaprojeto.models.*;
 import ink.lucasnsnt.supernovaprojeto.models.enums.DriverStudentLinkStatus;
-import ink.lucasnsnt.supernovaprojeto.models.enums.RouteEnrollmentStatus;
 import ink.lucasnsnt.supernovaprojeto.repositories.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -81,22 +79,9 @@ public class RecurringRouteService {
                 .orElseGet(() -> RecurringRouteEnrollment.builder().route(route).student(student).build());
         enrollment.setOutboundEnabled(request.outboundEnabled());
         enrollment.setReturnEnabled(request.returnEnabled());
-        enrollment.setStatus(RouteEnrollmentStatus.APPROVED);
+        enrollment.setActive(true);
         enrollment.setRequestedAt(LocalDateTime.now(clock));
-        enrollment.setReviewedAt(null);
         return RouteEnrollmentResponse.from(enrollmentRepository.save(enrollment));
-    }
-
-    @Transactional
-    public RouteEnrollmentResponse reviewEnrollment(@NotNull Long driverId, @NotNull Long enrollmentId, RouteEnrollmentReviewRequest request) {
-        driverService.requireApproved(driverId);
-        if (request.status() != RouteEnrollmentStatus.REJECTED) throw new BusinessRuleException("A entrada é feita pelo aluno e não requer aprovação do motorista");
-        RecurringRouteEnrollment enrollment = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException("Inscrição", enrollmentId));
-        if (!enrollment.getRoute().getDriver().getId().equals(driverId)) throw new ResourceNotFoundException("Inscrição", enrollmentId);
-        driverRepository.lockById(driverId);
-        enrollment.setStatus(request.status());
-        enrollment.setReviewedAt(LocalDateTime.now(clock));
-        return RouteEnrollmentResponse.from(enrollment);
     }
 
     @Transactional(readOnly = true)
@@ -115,8 +100,7 @@ public class RecurringRouteService {
     }
 
     private List<RouteEnrollmentResponse> activeRoster(Long routeId) {
-        return enrollmentRepository.findAllByRouteIdOrderByRequestedAtDesc(routeId).stream()
-                .filter(item -> item.getStatus() == RouteEnrollmentStatus.APPROVED)
+        return enrollmentRepository.findAllByRouteIdAndActiveTrueOrderByRequestedAtDesc(routeId).stream()
                 .filter(item -> eligibility.eligible(item.getStudent(), item.getRoute()))
                 .map(RouteEnrollmentResponse::from).toList();
     }
@@ -126,18 +110,21 @@ public class RecurringRouteService {
         var item = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException("Inscrição", enrollmentId));
         if (!item.getStudent().getId().equals(studentId)) throw new ResourceNotFoundException("Inscrição", enrollmentId);
         driverRepository.lockById(item.getRoute().getDriver().getId());
-        item.setStatus(RouteEnrollmentStatus.REJECTED);
-        item.setReviewedAt(LocalDateTime.now(clock));
+        item.setActive(false);
     }
 
     @Transactional
     public void remove(Long driverId, Long enrollmentId) {
-        reviewEnrollment(driverId, enrollmentId, new RouteEnrollmentReviewRequest(RouteEnrollmentStatus.REJECTED));
+        driverService.requireApproved(driverId);
+        var item = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException("Inscrição", enrollmentId));
+        if (!item.getRoute().getDriver().getId().equals(driverId)) throw new ResourceNotFoundException("Inscrição", enrollmentId);
+        driverRepository.lockById(driverId);
+        item.setActive(false);
     }
 
     @Transactional(readOnly = true)
     public List<RouteEnrollmentResponse> findEnrollmentsForStudent(@NotNull Long studentId) {
-        return enrollmentRepository.findAllByStudentIdOrderByRequestedAtDesc(studentId).stream().map(RouteEnrollmentResponse::from).toList();
+        return enrollmentRepository.findAllByStudentIdAndActiveTrueOrderByRequestedAtDesc(studentId).stream().map(RouteEnrollmentResponse::from).toList();
     }
 
     @Transactional(readOnly = true)
@@ -146,8 +133,7 @@ public class RecurringRouteService {
         return routeRepository.findAllByDriverIdOrderByName(driverId).stream().filter(RecurringRoute::isActive)
                 .flatMap(route -> route.getSchedules().stream().filter(schedule -> schedule.getDayOfWeek() == date.getDayOfWeek())
                         .map(schedule -> RecurringRoutePreviewResponse.from(route, date, schedule.getDirection(), schedule.getDepartureTime(),
-                                enrollmentRepository.findAllByRouteIdOrderByRequestedAtDesc(route.getId()).stream()
-                                        .filter(item -> item.getStatus() == RouteEnrollmentStatus.APPROVED)
+                                enrollmentRepository.findAllByRouteIdAndActiveTrueOrderByRequestedAtDesc(route.getId()).stream()
                                         .filter(item -> eligibility.eligible(item.getStudent(), route))
                                         .filter(item -> schedule.getDirection() == ink.lucasnsnt.supernovaprojeto.models.enums.Direction.IDA ? item.isOutboundEnabled() : item.isReturnEnabled()).toList())))
                 .toList();
@@ -155,7 +141,7 @@ public class RecurringRouteService {
 
     @Transactional(readOnly = true)
     public List<RecurringRoutePreviewResponse> findPreviewsForStudent(@NotNull Long studentId, LocalDate date) {
-        return previewsFor(date, enrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED).stream()
+        return previewsFor(date, enrollmentRepository.findAllByActiveTrue().stream()
                 .filter(item -> item.getStudent().getId().equals(studentId))
                 .filter(item -> eligibility.eligible(item.getStudent(), item.getRoute())).toList());
     }

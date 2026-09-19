@@ -14,7 +14,7 @@ export type RecurringRoute = {
   schedules: Array<{ dayOfWeek: string; direction: RouteDirection; departureTime: string; responseDeadlineTime: string }>
   institutions: Array<{ institutionId: number; institutionName: string; stopOrder: number }>
 }
-export type RouteEnrollment = { id: number; routeId: number; routeName: string; driverName: string; studentId: number; studentName: string; institutionName: string | null; outboundEnabled: boolean; returnEnabled: boolean; status: 'APPROVED'; requestedAt: string; reviewedAt: string | null }
+export type RouteEnrollment = { id: number; routeId: number; routeName: string; driverName: string; studentId: number; studentName: string; institutionName: string | null; outboundEnabled: boolean; returnEnabled: boolean; requestedAt: string }
 export type RecurringRoutePayload = { name: string; vehicleId: number; schedules: Array<{ dayOfWeek: string; direction: RouteDirection; departureTime: string; responseDeadlineTime: string }>; institutions: Array<{ institutionId: number; stopOrder: number }> }
 export type RoutePreview = { routeId: number; routeName: string; serviceDate: string; direction: RouteDirection; departureTime: string; stops: Array<{ institutionName: string; order: number; expectedAt: string | null }>; passengers: Array<{ studentId: number; studentName: string; institutionName: string | null }> }
 export type OperationalRoutePreview = {
