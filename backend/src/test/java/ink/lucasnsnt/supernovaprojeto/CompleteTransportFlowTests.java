@@ -122,9 +122,19 @@ class CompleteTransportFlowTests {
         Number routeId = JsonPath.read(route, "$.id");
         String enrollment = send(post("/api/students/me/route-enrollments"), student,
                 "{\"routeId\":%s,\"outboundEnabled\":false,\"returnEnabled\":true}".formatted(routeId));
-        assertThat(JsonPath.<String>read(enrollment, "$.status")).isEqualTo("APPROVED");
+        Number enrollmentId = JsonPath.read(enrollment, "$.id");
         assertThat((java.util.List<?>) read(get("/api/students/me/routes/{id}/enrollments", routeId),
                 student, "$" )).hasSize(1);
+
+        send(delete("/api/students/me/route-enrollments/{id}", enrollmentId), student, null);
+        assertThat((java.util.List<?>) read(get("/api/students/me/route-enrollments"), student, "$" )).isEmpty();
+        assertThat((java.util.List<?>) read(get("/api/students/me/routes/{id}/enrollments", routeId),
+                student, "$" )).isEmpty();
+
+        String reactivated = send(post("/api/students/me/route-enrollments"), student,
+                "{\"routeId\":%s,\"outboundEnabled\":false,\"returnEnabled\":true}".formatted(routeId));
+        assertThat(JsonPath.<Number>read(reactivated, "$.id").longValue()).isEqualTo(enrollmentId.longValue());
+        assertThat((java.util.List<?>) read(get("/api/students/me/route-enrollments"), student, "$" )).hasSize(1);
 
         // An old registration without coordinates must recover during planning.
         var oldAddress = addresses.findAll().getFirst();

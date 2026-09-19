@@ -1,6 +1,5 @@
 package ink.lucasnsnt.supernovaprojeto.models;
 
-import ink.lucasnsnt.supernovaprojeto.models.enums.RouteEnrollmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -14,7 +13,6 @@ public class RecurringRouteEnrollment {
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "student_id", nullable = false) private Student student;
     @Column(nullable = false) private boolean outboundEnabled;
     @Column(nullable = false) private boolean returnEnabled;
-    @Enumerated(EnumType.STRING) @Column(nullable = false) private RouteEnrollmentStatus status;
+    @Column(nullable = false) private boolean active;
     @Column(nullable = false) private LocalDateTime requestedAt;
-    private LocalDateTime reviewedAt;
 }

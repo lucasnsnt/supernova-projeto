@@ -7,7 +7,6 @@ import ink.lucasnsnt.supernovaprojeto.exceptions.ResourceNotFoundException;
 import ink.lucasnsnt.supernovaprojeto.models.DailyConfirmation;
 import ink.lucasnsnt.supernovaprojeto.models.RecurringRouteEnrollment;
 import ink.lucasnsnt.supernovaprojeto.models.RecurringRouteSchedule;
-import ink.lucasnsnt.supernovaprojeto.models.enums.RouteEnrollmentStatus;
 import ink.lucasnsnt.supernovaprojeto.models.enums.Direction;
 import ink.lucasnsnt.supernovaprojeto.repositories.RecurringRouteEnrollmentRepository;
 import ink.lucasnsnt.supernovaprojeto.models.enums.*;
@@ -43,7 +42,7 @@ public class DailyConfirmationService {
     public int releaseAvailableForDate(@NotNull LocalDate serviceDate) {
         LocalDateTime now = LocalDateTime.now(clock);
         int created = 0;
-        for (RecurringRouteEnrollment enrollment : routeEnrollmentRepository.findAllByStatus(RouteEnrollmentStatus.APPROVED).stream()
+        for (RecurringRouteEnrollment enrollment : routeEnrollmentRepository.findAllByActiveTrue().stream()
                 .sorted(java.util.Comparator.comparing(item -> item.getRoute().getDriver().getId())).toList()) {
             driverRepository.lockById(enrollment.getRoute().getDriver().getId());
             if (!eligibility.eligible(enrollment.getStudent(), enrollment.getRoute())
