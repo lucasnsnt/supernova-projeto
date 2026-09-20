@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1250" viewBox="0 0 2000 1250">
+<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity=".12"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#667085"/></marker></defs>
+<rect width="100%" height="100%" fill="#F6F8FC"/>
+<text x="60" y="58" font-family="DejaVu Sans,Arial" font-size="30" font-weight="700" fill="#172033" text-anchor="start">Transmoovi — geolocalização e rota</text>
+<text x="60" y="88" font-family="DejaVu Sans,Arial" font-size="15" font-weight="400" fill="#596579" text-anchor="start">Do endereço digitado ao rastreamento ao vivo, com validações e persistência</text>
+<rect x="35" y="115" width="360" height="990" rx="18" fill="#F2ECFF" fill-opacity=".48" stroke="#7C3AED" stroke-opacity=".35" stroke-width="2"/>
+<text x="55" y="145" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#7C3AED" text-anchor="start">CLIENTE</text>
+<rect x="425" y="115" width="850" height="990" rx="18" fill="#EAF1FF" fill-opacity=".48" stroke="#2563EB" stroke-opacity=".35" stroke-width="2"/>
+<text x="445" y="145" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#2563EB" text-anchor="start">BACKEND</text>
+<rect x="1305" y="115" width="650" height="990" rx="18" fill="#E6F8FC" fill-opacity=".48" stroke="#0891B2" stroke-opacity=".35" stroke-width="2"/>
+<text x="1325" y="145" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#0891B2" text-anchor="start">PROVEDORES E DADOS</text>
+<path d="M 215.0 315 L 215.0 380" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="155.0" y="332.5" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="215.0" y="349.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">preenche</text>
+<path d="M 350 447.5 L 470 252.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="350.0" y="335.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="410.0" y="352.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">POST preview</text>
+<path d="M 780 252.5 L 870 260.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="765.0" y="241.25" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="825.0" y="258.25" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">preview</text>
+<path d="M 1220 260.0 L 1370 257.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1235.0" y="243.75" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1295.0" y="260.75" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">busca</text>
+<path d="M 1370 257.5 L 1220 260.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1235.0" y="243.75" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1295.0" y="260.75" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">coordenadas</text>
+<path d="M 870 260.0 L 350 447.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="550.0" y="338.75" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="610.0" y="355.75" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">lat/lng</text>
+<path d="M 215.0 515 L 215.0 620" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="155.0" y="552.5" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="215.0" y="569.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">confirma</text>
+<path d="M 1220 260.0 L 1370 482.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1235.0" y="356.25" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1295.0" y="373.25" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">persistência pelo chamador</text>
+<path d="M 350 692.5 L 1370 482.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="800.0" y="572.5" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="860.0" y="589.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">salva dados</text>
+<path d="M 1370 482.5 L 830 605.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1040.0" y="528.75" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1100.0" y="545.75" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">pontos</text>
+<path d="M 830 605.0 L 875 615.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="792.5" y="595.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="852.5" y="612.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">request</text>
+<path d="M 1220 615.0 L 1370 742.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1235.0" y="663.75" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1295.0" y="680.75" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">optimizeTours</text>
+<path d="M 1620.0 830 L 1620.0 890" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1560.0" y="845.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1620.0" y="862.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">polyline + paradas</text>
+<path d="M 350 942.5 L 470 940.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="350.0" y="926.25" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="410.0" y="943.25" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">PUT localização</text>
+<path d="M 820 940.0 L 1370 967.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1035.0" y="938.75" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1095.0" y="955.75" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">upsert</text>
+<rect x="80" y="175" width="270" height="140" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="80" y="175" width="8" height="140" rx="4" fill="#7C3AED"/>
+<text x="102" y="203" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">1. Cadastro de endereço</text>
+<text x="102" y="227" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Rua, número, bairro</text>
+<text x="102" y="245" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">cidade, UF e CEP</text>
+<rect x="80" y="380" width="270" height="135" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="80" y="380" width="8" height="135" rx="4" fill="#7C3AED"/>
+<text x="102" y="408" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">2. Prévia no mapa</text>
+<text x="102" y="432" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">POST /api/geocoding/preview</text>
+<text x="102" y="450" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">AddressMap / Google Maps</text>
+<rect x="80" y="620" width="270" height="145" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="80" y="620" width="8" height="145" rx="4" fill="#7C3AED"/>
+<text x="102" y="648" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">3. Salvar perfil</text>
+<text x="102" y="672" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Alteração textual limpa</text>
+<text x="102" y="690" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">coordenadas antigas</text>
+<rect x="80" y="865" width="270" height="155" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="80" y="865" width="8" height="155" rx="4" fill="#7C3AED"/>
+<text x="102" y="893" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">8. GPS do motorista</text>
+<text x="102" y="917" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">watchPosition no navegador</text>
+<text x="102" y="935" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">lat/lng/accuracy/heading</text>
+<rect x="470" y="185" width="310" height="135" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="470" y="185" width="8" height="135" rx="4" fill="#2563EB"/>
+<text x="492" y="213" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">GeocodingController</text>
+<text x="492" y="237" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Valida AddressRequest</text>
+<text x="492" y="255" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">delega preview</text>
+<rect x="870" y="170" width="350" height="180" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="870" y="170" width="8" height="180" rx="4" fill="#2563EB"/>
+<text x="892" y="198" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">GeocodingService</text>
+<text x="892" y="222" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Só resolve coordenadas ausentes</text>
+<text x="892" y="240" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">confidence ≥ 0,6 • país BR</text>
+<text x="892" y="258" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">limites válidos de lat/lng</text>
+<rect x="470" y="500" width="360" height="210" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="470" y="500" width="8" height="210" rx="4" fill="#2563EB"/>
+<text x="492" y="528" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">4. TripPlanningService</text>
+<text x="492" y="552" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Base operacional do motorista</text>
+<text x="492" y="570" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">casas + instituições</text>
+<text x="492" y="588" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">capacidade e horário acadêmico</text>
+<text x="492" y="606" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">IDA: casa → instituição</text>
+<text x="492" y="624" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">VOLTA: instituição → casa</text>
+<rect x="875" y="520" width="345" height="190" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="875" y="520" width="8" height="190" rx="4" fill="#2563EB"/>
+<text x="897" y="548" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">5. RoutePlanningGateway</text>
+<text x="897" y="572" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">shipment por confirmação YES</text>
+<text x="897" y="590" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">janelas de tempo + capacidade</text>
+<text x="897" y="608" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">saída fixa</text>
+<rect x="470" y="855" width="350" height="170" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="470" y="855" width="8" height="170" rx="4" fill="#2563EB"/>
+<text x="492" y="883" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">9. TripTrackingService</text>
+<text x="492" y="907" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Aceita somente IN_PROGRESS</text>
+<text x="492" y="925" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">upsert por trip_id</text>
+<text x="492" y="943" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">aluno lê apenas se participa</text>
+<rect x="1370" y="180" width="500" height="155" rx="12" fill="#FFFFFF" stroke="#0891B2" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1370" y="180" width="8" height="155" rx="4" fill="#0891B2"/>
+<text x="1392" y="208" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">OpenRouteService / Pelias</text>
+<text x="1392" y="232" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">GET /pelias/v1/search • Brasil • pt</text>
+<text x="1392" y="250" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">retorna longitude, latitude e confiança</text>
+<rect x="1370" y="410" width="500" height="145" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1370" y="410" width="8" height="145" rx="4" fill="#15803D"/>
+<text x="1392" y="438" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">addresses</text>
+<text x="1392" y="462" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">latitude/longitude NUMERIC(38,8)</text>
+<text x="1392" y="480" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">usuário, instituição e base operacional</text>
+<rect x="1370" y="655" width="500" height="175" rx="12" fill="#FFFFFF" stroke="#0891B2" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1370" y="655" width="8" height="175" rx="4" fill="#0891B2"/>
+<text x="1392" y="683" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Google Route Optimization API</text>
+<text x="1392" y="707" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">optimizeTours • OAuth conta de serviço</text>
+<text x="1392" y="725" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">ordem de coleta/entrega, ETAs e polyline</text>
+<rect x="1370" y="890" width="500" height="155" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1370" y="890" width="8" height="155" rx="4" fill="#15803D"/>
+<text x="1392" y="918" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">trips + trip_locations</text>
+<text x="1392" y="942" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">rota congelada no início</text>
+<text x="1392" y="960" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">última posição sobrescrita (1:1)</text>
+<text x="1392" y="978" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">visível somente durante a viagem</text>
+<rect x="70" y="1060" width="870" height="115" rx="12" fill="#FDECEC" stroke="#C2413B" stroke-dasharray="6 4"/>
+<text x="88" y="1087" font-family="DejaVu Sans,Arial" font-size="14" font-weight="700" fill="#C2413B" text-anchor="start">Falhas previstas</text>
+<text x="88" y="1109" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Geocodificação desabilitada, baixa confiança ou indisponibilidade bloqueiam prévia/planejamento.</text>
+<text x="88" y="1126" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Sem coordenadas ou rota viável, a viagem fica NEEDS_ATTENTION; confirmados não são removidos.</text>
+<rect x="1010" y="1060" width="870" height="115" rx="12" fill="#EEF1F5" stroke="#475467" stroke-dasharray="6 4"/>
+<text x="1028" y="1087" font-family="DejaVu Sans,Arial" font-size="14" font-weight="700" fill="#475467" text-anchor="start">Legenda</text>
+<text x="1028" y="1109" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Roxo: navegador • Azul: serviços internos • Ciano: provedor externo • Verde: persistência</text>
+<text x="1028" y="1126" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Linha contínua: chamada/fluxo de dados. Numeração indica a sequência principal.</text>
+</svg>

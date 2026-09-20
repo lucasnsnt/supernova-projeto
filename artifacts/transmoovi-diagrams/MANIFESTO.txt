@@ -1,0 +1,15 @@
+PACOTE: Diagramas técnicos do Transmoovi
+DATA: 2026-09-18
+
+editaveis/  fontes diagrams.net/draw.io
+svg/        exportações vetoriais
+png/        exportações raster em alta resolução
+pdf/        revisão consolidada em quatro páginas
+tools/      gerador reprodutível dos artefatos
+LEIA-ME.md  guia de leitura e escopo
+
+Diagramas:
+01-arquitetura-geral
+02-modelo-de-dados
+03-fluxo-geolocalizacao
+04-operacao-da-viagem

@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-09-18T00:00:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="01-arquitetura-geral" name="Transmoovi — arquitetura geral">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1120" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="&lt;b&gt;Transmoovi — arquitetura geral&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Contexto lógico, integrações e implantação observados no repositório&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=24;fontColor=#172033;" parent="1" vertex="1">
+          <mxGeometry x="55" y="25" width="1690" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="&lt;b&gt;EXPERIÊNCIA&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=10;spacingLeft=14;fillColor=#F2ECFF;fillOpacity=45;strokeColor=#7C3AED;dashed=1;fontColor=#7C3AED;" parent="1" vertex="1">
+          <mxGeometry x="40" y="110" width="330" height="780" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="&lt;b&gt;APLICAÇÃO&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=10;spacingLeft=14;fillColor=#EAF1FF;fillOpacity=45;strokeColor=#2563EB;dashed=1;fontColor=#2563EB;" parent="1" vertex="1">
+          <mxGeometry x="400" y="110" width="850" height="780" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="&lt;b&gt;SERVIÇOS EXTERNOS&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=10;spacingLeft=14;fillColor=#E6F8FC;fillOpacity=45;strokeColor=#0891B2;dashed=1;fontColor=#0891B2;" parent="1" vertex="1">
+          <mxGeometry x="1280" y="110" width="480" height="780" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="&lt;b&gt;Usuários&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Aluno&lt;br&gt;Motorista&lt;br&gt;Administrador&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#7C3AED;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="85" y="175" width="240" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="&lt;b&gt;Web / PWA&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;React + TypeScript&lt;br&gt;Vite • Service Worker&lt;br&gt;Google Maps JS&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#7C3AED;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="85" y="380" width="240" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="&lt;b&gt;Entrada HTTPS&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Nginx / API pública&lt;br&gt;CORS + cookies seguros&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#475467;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="450" y="175" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="&lt;b&gt;API Spring Boot&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Controllers REST&lt;br&gt;JWT + CSRF&lt;br&gt;Serviços transacionais&lt;br&gt;Scheduler a cada minuto&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="450" y="365" width="300" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="&lt;b&gt;Domínio de transporte&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Cadastro e vínculos&lt;br&gt;Rotas recorrentes&lt;br&gt;Confirmações diárias&lt;br&gt;Planejamento e viagens&lt;br&gt;Tracking e notificações&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="850" y="345" width="330" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="&lt;b&gt;PostgreSQL / H2 local&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Flyway V1–V8&lt;br&gt;JPA repositories&lt;br&gt;Histórico preservado&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#15803D;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="620" y="680" width="300" height="145" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="&lt;b&gt;Notificações&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Persistência in-app&lt;br&gt;SSE em tempo real&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#B45309;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="980" y="680" width="220" height="145" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="&lt;b&gt;OpenRouteService&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Geocodificação Pelias&lt;br&gt;Backend • chave privada&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#0891B2;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1330" y="185" width="360" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="&lt;b&gt;Google Route Optimization&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;OAuth conta de serviço&lt;br&gt;Capacidade + janelas&lt;br&gt;Polyline + ordem de paradas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#0891B2;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1330" y="390" width="360" height="155" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="&lt;b&gt;Google Maps JavaScript&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Mapa de endereço&lt;br&gt;Mapa da viagem ativa&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#0891B2;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1330" y="650" width="360" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="&lt;b&gt;Implantação de produção&lt;/b&gt;&lt;br&gt;Frontend na Vercel; backend em container na VPS.&lt;br&gt;API em 127.0.0.1:8081 atrás do Nginx; banco não exposto à internet." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#EEF1F5;strokeColor=#475467;dashed=1;fontColor=#172033;" parent="1" vertex="1">
+          <mxGeometry x="70" y="930" width="800" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="&lt;b&gt;Legenda&lt;/b&gt;&lt;br&gt;Azul: aplicação/domínio • Roxo: cliente • Verde: dados&lt;br&gt;Ciano: integração externa • Tracejado: observação/contexto" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#EEF1F5;strokeColor=#475467;dashed=1;fontColor=#172033;" parent="1" vertex="1">
+          <mxGeometry x="930" y="930" width="800" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="interage" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="6" target="7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="HTTPS / JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="7" target="8" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="/api" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="8" target="9" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="orquestra" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="9" target="10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="JPA" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="10" target="11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="eventos" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="10" target="12" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="geocodifica" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="10" target="13" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="otimiza" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="10" target="14" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="renderiza" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="7" target="15" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

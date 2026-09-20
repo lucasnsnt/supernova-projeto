@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-09-18T00:00:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="04-operacao-da-viagem" name="Transmoovi — operação da viagem">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2100" pageHeight="1320" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="&lt;b&gt;Transmoovi — operação da viagem&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Rota fixa → confirmação → otimização → início → rastreamento → conclusão&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=24;fontColor=#172033;" parent="1" vertex="1">
+          <mxGeometry x="55" y="25" width="1990" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="&lt;b&gt;CONFIGURAÇÃO&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=10;spacingLeft=14;fillColor=#F2ECFF;fillOpacity=45;strokeColor=#7C3AED;dashed=1;fontColor=#7C3AED;" parent="1" vertex="1">
+          <mxGeometry x="35" y="115" width="2025" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="&lt;b&gt;OCORRÊNCIA DIÁRIA&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=10;spacingLeft=14;fillColor=#EAF1FF;fillOpacity=45;strokeColor=#2563EB;dashed=1;fontColor=#2563EB;" parent="1" vertex="1">
+          <mxGeometry x="35" y="370" width="2025" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="&lt;b&gt;PLANEJAMENTO&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=10;spacingLeft=14;fillColor=#FFF4E5;fillOpacity=45;strokeColor=#B45309;dashed=1;fontColor=#B45309;" parent="1" vertex="1">
+          <mxGeometry x="35" y="625" width="2025" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="&lt;b&gt;EXECUÇÃO&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=10;spacingLeft=14;fillColor=#EAF8EF;fillOpacity=45;strokeColor=#15803D;dashed=1;fontColor=#15803D;" parent="1" vertex="1">
+          <mxGeometry x="35" y="880" width="2025" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="&lt;b&gt;Motorista cria rota&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;dia/direção/saída&lt;br&gt;instituições + veículo&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#7C3AED;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="80" y="165" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="&lt;b&gt;Aluno entra na rota&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;convite ativo&lt;br&gt;instituição atendida&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#7C3AED;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="400" y="165" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="&lt;b&gt;Agenda acadêmica&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;valida chegada/coleta&lt;br&gt;não cria viagem sozinha&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#7C3AED;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="720" y="165" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="&lt;b&gt;Scheduler libera confirmação&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;hoje e amanhã&lt;br&gt;fuso America/Bahia&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="80" y="420" width="280" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="&lt;b&gt;Aluno responde&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;YES ou NO&lt;br&gt;até responseDeadline&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="420" y="420" width="250" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="&lt;b&gt;Prazo expira&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;P&lt;br&gt;E&lt;br&gt;N&lt;br&gt;D&lt;br&gt;I&lt;br&gt;N&lt;br&gt;G&lt;br&gt; &lt;br&gt;→&lt;br&gt; &lt;br&gt;N&lt;br&gt;O&lt;br&gt;_&lt;br&gt;R&lt;br&gt;E&lt;br&gt;S&lt;br&gt;P&lt;br&gt;O&lt;br&gt;N&lt;br&gt;S&lt;br&gt;E&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="730" y="420" width="250" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="&lt;b&gt;Conjunto elegível&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;somente YES vigente&lt;br&gt;matrícula/vínculo válidos&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1040" y="420" width="280" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="&lt;b&gt;Construir ocorrência&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;uma viagem por rota/data/direção&lt;br&gt;veículo da rota&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#B45309;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="80" y="675" width="280" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="&lt;b&gt;Validar&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;capacidade, endereços&lt;br&gt;horário acadêmico&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#B45309;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="430" y="675" width="250" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="&lt;b&gt;Otimizar Google&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;janelas + geografia&lt;br&gt;ordem, ETAs, polyline&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#B45309;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="750" y="675" width="300" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="&lt;b&gt;Rota viável?&lt;/b&gt;" style="rhombus;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#B45309;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1140" y="670" width="230" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="&lt;b&gt;PLANNED&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;manifesto e rota prontos&lt;br&gt;notifica participantes&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#15803D;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1450" y="675" width="250" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="&lt;b&gt;NEEDS_ATTENTION&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;preserva confirmados&lt;br&gt;permite recalcular&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#C2413B;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1450" y="835" width="250" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="&lt;b&gt;Motorista abre prévia&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;recalcula se não terminal&lt;br&gt;pode iniciar cedo&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#15803D;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="80" y="930" width="275" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="&lt;b&gt;Dentro de ±30 min?&lt;/b&gt;" style="rhombus;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#15803D;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="430" y="925" width="250" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="&lt;b&gt;Confirma exceção&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;“Iniciar antecipadamente”&lt;br&gt;ou “Iniciar agora”&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#B45309;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="760" y="930" width="280" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="&lt;b&gt;IN_PROGRESS&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;congela manifesto&lt;br&gt;PENDING → NO_RESPONSE&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#15803D;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1120" y="930" width="260" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="&lt;b&gt;Rastreamento&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;posição 1:1 da viagem&lt;br&gt;concluir paradas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#15803D;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1450" y="930" width="250" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="&lt;b&gt;COMPLETED&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;completed_at&lt;br&gt;posição deixa de aparecer&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#15803D;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1770" y="930" width="250" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="&lt;b&gt;Guardas de início&lt;/b&gt;&lt;br&gt;Motorista aprovado • nenhuma outra viagem IN_PROGRESS • ocorrência não vazia • rota viável&lt;br&gt;Fora da janela inclusiva de 30 min antes/depois, é obrigatório acknowledge explícito." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#FDECEC;strokeColor=#C2413B;dashed=1;fontColor=#172033;" parent="1" vertex="1">
+          <mxGeometry x="70" y="1145" width="930" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="27" value="&lt;b&gt;Legenda de estados&lt;/b&gt;&lt;br&gt;PENDING → YES | NO | NO_RESPONSE • PLANNED → IN_PROGRESS → COMPLETED&lt;br&gt;PLANNING/PLANNED podem resultar em NEEDS_ATTENTION; viagem também pode ser CANCELLED." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#EEF1F5;strokeColor=#475467;dashed=1;fontColor=#172033;" parent="1" vertex="1">
+          <mxGeometry x="1060" y="1145" width="930" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="28" value="publica" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="7" target="8" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="29" value="exige perfil" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="8" target="9" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="30" value="dia elegível" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="9" target="10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="31" value="PENDING" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="10" target="11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="32" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="11" target="13" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="33" value="exclui" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="12" target="13" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="34" value="após prazo / prévia" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="13" target="14" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="35" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="14" target="15" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="36" value="dados válidos" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="15" target="16" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37" value="resultado" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="16" target="17" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="38" value="sim" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="17" target="18" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="39" value="não" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="17" target="19" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="40" value="dia da saída" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="18" target="20" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="41" value="replanejar" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="19" target="16" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="42" value="iniciar" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="20" target="21" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="43" value="sim" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="21" target="23" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="44" value="não" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="21" target="22" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="45" value="confirmado" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="22" target="23" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="46" value="GPS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="23" target="24" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="47" value="concluir" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="24" target="25" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

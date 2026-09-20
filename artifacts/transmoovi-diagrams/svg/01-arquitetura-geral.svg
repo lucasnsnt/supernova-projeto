@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1120" viewBox="0 0 1800 1120">
+<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity=".12"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#667085"/></marker></defs>
+<rect width="100%" height="100%" fill="#F6F8FC"/>
+<text x="60" y="58" font-family="DejaVu Sans,Arial" font-size="30" font-weight="700" fill="#172033" text-anchor="start">Transmoovi — arquitetura geral</text>
+<text x="60" y="88" font-family="DejaVu Sans,Arial" font-size="15" font-weight="400" fill="#596579" text-anchor="start">Contexto lógico, integrações e implantação observados no repositório</text>
+<rect x="40" y="110" width="330" height="780" rx="18" fill="#F2ECFF" fill-opacity=".48" stroke="#7C3AED" stroke-opacity=".35" stroke-width="2"/>
+<text x="60" y="140" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#7C3AED" text-anchor="start">EXPERIÊNCIA</text>
+<rect x="400" y="110" width="850" height="780" rx="18" fill="#EAF1FF" fill-opacity=".48" stroke="#2563EB" stroke-opacity=".35" stroke-width="2"/>
+<text x="420" y="140" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#2563EB" text-anchor="start">APLICAÇÃO</text>
+<rect x="1280" y="110" width="480" height="780" rx="18" fill="#E6F8FC" fill-opacity=".48" stroke="#0891B2" stroke-opacity=".35" stroke-width="2"/>
+<text x="1300" y="140" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#0891B2" text-anchor="start">SERVIÇOS EXTERNOS</text>
+<path d="M 205.0 310 L 205.0 380" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="145.0" y="330.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="205.0" y="347.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">interage</text>
+<path d="M 325 455.0 L 450 235.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="327.5" y="330.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="387.5" y="347.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">HTTPS / JSON</text>
+<path d="M 580.0 295 L 600.0 365" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="530.0" y="315.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="590.0" y="332.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">/api</text>
+<path d="M 750 460.0 L 850 460.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="740.0" y="445.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="800.0" y="462.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">orquestra</text>
+<path d="M 1015.0 575 L 770.0 680" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="832.5" y="612.5" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="892.5" y="629.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">JPA</text>
+<path d="M 1015.0 575 L 1090.0 680" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="992.5" y="612.5" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1052.5" y="629.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">eventos</text>
+<path d="M 1180 460.0 L 1330 255.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1195.0" y="342.5" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1255.0" y="359.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">geocodifica</text>
+<path d="M 1180 460.0 L 1330 467.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1195.0" y="448.75" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1255.0" y="465.75" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">otimiza</text>
+<path d="M 325 455.0 L 1330 715.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="767.5" y="570.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="827.5" y="587.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">renderiza</text>
+<rect x="85" y="175" width="240" height="135" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="85" y="175" width="8" height="135" rx="4" fill="#7C3AED"/>
+<text x="107" y="203" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Usuários</text>
+<text x="107" y="227" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Aluno</text>
+<text x="107" y="245" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Motorista</text>
+<text x="107" y="263" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Administrador</text>
+<rect x="85" y="380" width="240" height="150" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="85" y="380" width="8" height="150" rx="4" fill="#7C3AED"/>
+<text x="107" y="408" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Web / PWA</text>
+<text x="107" y="432" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">React + TypeScript</text>
+<text x="107" y="450" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Vite • Service Worker</text>
+<text x="107" y="468" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Google Maps JS</text>
+<rect x="450" y="175" width="260" height="120" rx="12" fill="#FFFFFF" stroke="#475467" stroke-width="2" filter="url(#shadow)"/>
+<rect x="450" y="175" width="8" height="120" rx="4" fill="#475467"/>
+<text x="472" y="203" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Entrada HTTPS</text>
+<text x="472" y="227" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Nginx / API pública</text>
+<text x="472" y="245" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">CORS + cookies seguros</text>
+<rect x="450" y="365" width="300" height="190" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="450" y="365" width="8" height="190" rx="4" fill="#2563EB"/>
+<text x="472" y="393" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">API Spring Boot</text>
+<text x="472" y="417" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Controllers REST</text>
+<text x="472" y="435" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">JWT + CSRF</text>
+<text x="472" y="453" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Serviços transacionais</text>
+<text x="472" y="471" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Scheduler a cada minuto</text>
+<rect x="850" y="345" width="330" height="230" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="850" y="345" width="8" height="230" rx="4" fill="#2563EB"/>
+<text x="872" y="373" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Domínio de transporte</text>
+<text x="872" y="397" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Cadastro e vínculos</text>
+<text x="872" y="415" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Rotas recorrentes</text>
+<text x="872" y="433" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Confirmações diárias</text>
+<text x="872" y="451" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Planejamento e viagens</text>
+<text x="872" y="469" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Tracking e notificações</text>
+<rect x="620" y="680" width="300" height="145" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="620" y="680" width="8" height="145" rx="4" fill="#15803D"/>
+<text x="642" y="708" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">PostgreSQL / H2 local</text>
+<text x="642" y="732" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Flyway V1–V8</text>
+<text x="642" y="750" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">JPA repositories</text>
+<text x="642" y="768" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Histórico preservado</text>
+<rect x="980" y="680" width="220" height="145" rx="12" fill="#FFFFFF" stroke="#B45309" stroke-width="2" filter="url(#shadow)"/>
+<rect x="980" y="680" width="8" height="145" rx="4" fill="#B45309"/>
+<text x="1002" y="708" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Notificações</text>
+<text x="1002" y="732" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Persistência in-app</text>
+<text x="1002" y="750" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">SSE em tempo real</text>
+<rect x="1330" y="185" width="360" height="140" rx="12" fill="#FFFFFF" stroke="#0891B2" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1330" y="185" width="8" height="140" rx="4" fill="#0891B2"/>
+<text x="1352" y="213" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">OpenRouteService</text>
+<text x="1352" y="237" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Geocodificação Pelias</text>
+<text x="1352" y="255" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Backend • chave privada</text>
+<rect x="1330" y="390" width="360" height="155" rx="12" fill="#FFFFFF" stroke="#0891B2" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1330" y="390" width="8" height="155" rx="4" fill="#0891B2"/>
+<text x="1352" y="418" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Google Route Optimization</text>
+<text x="1352" y="442" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">OAuth conta de serviço</text>
+<text x="1352" y="460" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Capacidade + janelas</text>
+<text x="1352" y="478" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Polyline + ordem de paradas</text>
+<rect x="1330" y="650" width="360" height="130" rx="12" fill="#FFFFFF" stroke="#0891B2" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1330" y="650" width="8" height="130" rx="4" fill="#0891B2"/>
+<text x="1352" y="678" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Google Maps JavaScript</text>
+<text x="1352" y="702" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Mapa de endereço</text>
+<text x="1352" y="720" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">Mapa da viagem ativa</text>
+<rect x="70" y="930" width="800" height="120" rx="12" fill="#EEF1F5" stroke="#475467" stroke-dasharray="6 4"/>
+<text x="88" y="957" font-family="DejaVu Sans,Arial" font-size="14" font-weight="700" fill="#475467" text-anchor="start">Implantação de produção</text>
+<text x="88" y="979" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Frontend na Vercel; backend em container na VPS.</text>
+<text x="88" y="996" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">API em 127.0.0.1:8081 atrás do Nginx; banco não exposto à internet.</text>
+<rect x="930" y="930" width="800" height="120" rx="12" fill="#EEF1F5" stroke="#475467" stroke-dasharray="6 4"/>
+<text x="948" y="957" font-family="DejaVu Sans,Arial" font-size="14" font-weight="700" fill="#475467" text-anchor="start">Legenda</text>
+<text x="948" y="979" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Azul: aplicação/domínio • Roxo: cliente • Verde: dados</text>
+<text x="948" y="996" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Ciano: integração externa • Tracejado: observação/contexto</text>
+</svg>

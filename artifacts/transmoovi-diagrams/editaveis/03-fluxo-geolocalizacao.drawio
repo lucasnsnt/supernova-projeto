@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-09-18T00:00:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="03-fluxo-geolocalizacao" name="Transmoovi — geolocalização e rota">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="1250" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="&lt;b&gt;Transmoovi — geolocalização e rota&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Do endereço digitado ao rastreamento ao vivo, com validações e persistência&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=24;fontColor=#172033;" parent="1" vertex="1">
+          <mxGeometry x="55" y="25" width="1890" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="&lt;b&gt;CLIENTE&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=10;spacingLeft=14;fillColor=#F2ECFF;fillOpacity=45;strokeColor=#7C3AED;dashed=1;fontColor=#7C3AED;" parent="1" vertex="1">
+          <mxGeometry x="35" y="115" width="360" height="990" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="&lt;b&gt;BACKEND&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=10;spacingLeft=14;fillColor=#EAF1FF;fillOpacity=45;strokeColor=#2563EB;dashed=1;fontColor=#2563EB;" parent="1" vertex="1">
+          <mxGeometry x="425" y="115" width="850" height="990" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="&lt;b&gt;PROVEDORES E DADOS&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=10;spacingLeft=14;fillColor=#E6F8FC;fillOpacity=45;strokeColor=#0891B2;dashed=1;fontColor=#0891B2;" parent="1" vertex="1">
+          <mxGeometry x="1305" y="115" width="650" height="990" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="&lt;b&gt;1. Cadastro de endereço&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Rua, número, bairro&lt;br&gt;cidade, UF e CEP&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#7C3AED;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="80" y="175" width="270" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="&lt;b&gt;2. Prévia no mapa&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;POST /api/geocoding/preview&lt;br&gt;AddressMap / Google Maps&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#7C3AED;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="80" y="380" width="270" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="&lt;b&gt;3. Salvar perfil&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Alteração textual limpa&lt;br&gt;coordenadas antigas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#7C3AED;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="80" y="620" width="270" height="145" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="&lt;b&gt;8. GPS do motorista&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;watchPosition no navegador&lt;br&gt;lat/lng/accuracy/heading&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#7C3AED;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="80" y="865" width="270" height="155" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="&lt;b&gt;GeocodingController&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Valida AddressRequest&lt;br&gt;delega preview&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="470" y="185" width="310" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="&lt;b&gt;GeocodingService&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Só resolve coordenadas ausentes&lt;br&gt;confidence ≥ 0,6 • país BR&lt;br&gt;limites válidos de lat/lng&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="870" y="170" width="350" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="&lt;b&gt;4. TripPlanningService&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Base operacional do motorista&lt;br&gt;casas + instituições&lt;br&gt;capacidade e horário acadêmico&lt;br&gt;IDA: casa → instituição&lt;br&gt;VOLTA: instituição → casa&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="470" y="500" width="360" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="&lt;b&gt;5. RoutePlanningGateway&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;shipment por confirmação YES&lt;br&gt;janelas de tempo + capacidade&lt;br&gt;saída fixa&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="875" y="520" width="345" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="&lt;b&gt;9. TripTrackingService&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;Aceita somente IN_PROGRESS&lt;br&gt;upsert por trip_id&lt;br&gt;aluno lê apenas se participa&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="470" y="855" width="350" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="&lt;b&gt;OpenRouteService / Pelias&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;GET /pelias/v1/search • Brasil • pt&lt;br&gt;retorna longitude, latitude e confiança&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#0891B2;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1370" y="180" width="500" height="155" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="&lt;b&gt;addresses&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;latitude/longitude NUMERIC(38,8)&lt;br&gt;usuário, instituição e base operacional&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#15803D;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1370" y="410" width="500" height="145" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="&lt;b&gt;Google Route Optimization API&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;optimizeTours • OAuth conta de serviço&lt;br&gt;ordem de coleta/entrega, ETAs e polyline&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#0891B2;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1370" y="655" width="500" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="&lt;b&gt;trips + trip_locations&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#596579&quot;&gt;rota congelada no início&lt;br&gt;última posição sobrescrita (1:1)&lt;br&gt;visível somente durante a viagem&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#FFFFFF;strokeColor=#15803D;strokeWidth=2;fontColor=#172033;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="1370" y="890" width="500" height="155" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="&lt;b&gt;Falhas previstas&lt;/b&gt;&lt;br&gt;Geocodificação desabilitada, baixa confiança ou indisponibilidade bloqueiam prévia/planejamento.&lt;br&gt;Sem coordenadas ou rota viável, a viagem fica NEEDS_ATTENTION; confirmados não são removidos." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#FDECEC;strokeColor=#C2413B;dashed=1;fontColor=#172033;" parent="1" vertex="1">
+          <mxGeometry x="70" y="1060" width="870" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="&lt;b&gt;Legenda&lt;/b&gt;&lt;br&gt;Roxo: navegador • Azul: serviços internos • Ciano: provedor externo • Verde: persistência&lt;br&gt;Linha contínua: chamada/fluxo de dados. Numeração indica a sequência principal." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#EEF1F5;strokeColor=#475467;dashed=1;fontColor=#172033;" parent="1" vertex="1">
+          <mxGeometry x="1010" y="1060" width="870" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="preenche" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="6" target="7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="POST preview" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="7" target="10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="preview" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="10" target="11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="busca" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="11" target="15" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="coordenadas" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="15" target="11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="lat/lng" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="11" target="7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="27" value="confirma" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="7" target="8" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="28" value="persistência pelo chamador" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="11" target="16" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="29" value="salva dados" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="8" target="16" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="30" value="pontos" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="16" target="12" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="31" value="request" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="12" target="13" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="32" value="optimizeTours" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="13" target="17" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="33" value="polyline + paradas" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="17" target="18" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="34" value="PUT localização" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="9" target="14" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="35" value="upsert" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#98A2B3;dashed=0;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" source="14" target="18" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

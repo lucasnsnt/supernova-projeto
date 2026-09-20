@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2100" height="1320" viewBox="0 0 2100 1320">
+<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity=".12"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#667085"/></marker></defs>
+<rect width="100%" height="100%" fill="#F6F8FC"/>
+<text x="60" y="58" font-family="DejaVu Sans,Arial" font-size="30" font-weight="700" fill="#172033" text-anchor="start">Transmoovi — operação da viagem</text>
+<text x="60" y="88" font-family="DejaVu Sans,Arial" font-size="15" font-weight="400" fill="#596579" text-anchor="start">Rota fixa → confirmação → otimização → início → rastreamento → conclusão</text>
+<rect x="35" y="115" width="2025" height="210" rx="18" fill="#F2ECFF" fill-opacity=".48" stroke="#7C3AED" stroke-opacity=".35" stroke-width="2"/>
+<text x="55" y="145" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#7C3AED" text-anchor="start">CONFIGURAÇÃO</text>
+<rect x="35" y="370" width="2025" height="210" rx="18" fill="#EAF1FF" fill-opacity=".48" stroke="#2563EB" stroke-opacity=".35" stroke-width="2"/>
+<text x="55" y="400" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#2563EB" text-anchor="start">OCORRÊNCIA DIÁRIA</text>
+<rect x="35" y="625" width="2025" height="210" rx="18" fill="#FFF4E5" fill-opacity=".48" stroke="#B45309" stroke-opacity=".35" stroke-width="2"/>
+<text x="55" y="655" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#B45309" text-anchor="start">PLANEJAMENTO</text>
+<rect x="35" y="880" width="2025" height="210" rx="18" fill="#EAF8EF" fill-opacity=".48" stroke="#15803D" stroke-opacity=".35" stroke-width="2"/>
+<text x="55" y="910" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#15803D" text-anchor="start">EXECUÇÃO</text>
+<path d="M 340 225.0 L 400 225.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="310.0" y="210.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="370.0" y="227.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">publica</text>
+<path d="M 660 225.0 L 720 225.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="630.0" y="210.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="690.0" y="227.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">exige perfil</text>
+<path d="M 720 225.0 L 360 482.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="480.0" y="338.75" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="540.0" y="355.75" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">dia elegível</text>
+<path d="M 360 482.5 L 420 482.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="330.0" y="467.5" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="390.0" y="484.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">PENDING</text>
+<path d="M 670 482.5 L 1040 482.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="795.0" y="467.5" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="855.0" y="484.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">YES</text>
+<path d="M 980 482.5 L 1040 482.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="950.0" y="467.5" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1010.0" y="484.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">exclui</text>
+<path d="M 1040 482.5 L 360 740.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="640.0" y="596.25" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="700.0" y="613.25" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">após prazo / prévia</text>
+<path d="M 360 740.0 L 430 740.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 680 740.0 L 750 740.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="655.0" y="725.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="715.0" y="742.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">dados válidos</text>
+<path d="M 1050 740.0 L 1140 740.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1035.0" y="725.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1095.0" y="742.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">resultado</text>
+<path d="M 1370 740.0 L 1450 740.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1350.0" y="725.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1410.0" y="742.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">sim</text>
+<path d="M 1370 740.0 L 1450 900.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1350.0" y="805.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1410.0" y="822.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">não</text>
+<path d="M 1450 740.0 L 355 992.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="842.5" y="851.25" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="902.5" y="868.25" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">dia da saída</text>
+<path d="M 1450 900.0 L 1050 740.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1190.0" y="805.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1250.0" y="822.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">replanejar</text>
+<path d="M 355 992.5 L 430 995.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="332.5" y="978.75" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="392.5" y="995.75" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">iniciar</text>
+<path d="M 680 995.0 L 1120 995.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="840.0" y="980.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="900.0" y="997.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">sim</text>
+<path d="M 680 995.0 L 760 992.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="660.0" y="978.75" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="720.0" y="995.75" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">não</text>
+<path d="M 1040 992.5 L 1120 995.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1020.0" y="978.75" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1080.0" y="995.75" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">confirmado</text>
+<path d="M 1380 995.0 L 1450 995.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1355.0" y="980.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1415.0" y="997.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">GPS</text>
+<path d="M 1700 995.0 L 1770 995.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1675.0" y="980.0" width="120" height="22" rx="7" fill="#FFFFFF"/>
+<text x="1735.0" y="997.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="middle">concluir</text>
+<rect x="80" y="165" width="260" height="120" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="80" y="165" width="8" height="120" rx="4" fill="#7C3AED"/>
+<text x="102" y="193" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Motorista cria rota</text>
+<text x="102" y="217" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">dia/direção/saída</text>
+<text x="102" y="235" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">instituições + veículo</text>
+<rect x="400" y="165" width="260" height="120" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="400" y="165" width="8" height="120" rx="4" fill="#7C3AED"/>
+<text x="422" y="193" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Aluno entra na rota</text>
+<text x="422" y="217" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">convite ativo</text>
+<text x="422" y="235" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">instituição atendida</text>
+<rect x="720" y="165" width="260" height="120" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="720" y="165" width="8" height="120" rx="4" fill="#7C3AED"/>
+<text x="742" y="193" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Agenda acadêmica</text>
+<text x="742" y="217" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">valida chegada/coleta</text>
+<text x="742" y="235" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">não cria viagem sozinha</text>
+<rect x="80" y="420" width="280" height="125" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="80" y="420" width="8" height="125" rx="4" fill="#2563EB"/>
+<text x="102" y="448" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Scheduler libera confirmação</text>
+<text x="102" y="472" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">hoje e amanhã</text>
+<text x="102" y="490" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">fuso America/Bahia</text>
+<rect x="420" y="420" width="250" height="125" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="420" y="420" width="8" height="125" rx="4" fill="#2563EB"/>
+<text x="442" y="448" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Aluno responde</text>
+<text x="442" y="472" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">YES ou NO</text>
+<text x="442" y="490" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">até responseDeadline</text>
+<rect x="730" y="420" width="250" height="125" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="730" y="420" width="8" height="125" rx="4" fill="#2563EB"/>
+<text x="752" y="448" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Prazo expira</text>
+<text x="752" y="472" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">P</text>
+<text x="752" y="490" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">E</text>
+<text x="752" y="508" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">N</text>
+<text x="752" y="526" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">D</text>
+<text x="752" y="544" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">I</text>
+<text x="752" y="562" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">N</text>
+<text x="752" y="580" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">G</text>
+<text x="752" y="598" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start"> </text>
+<text x="752" y="616" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">→</text>
+<text x="752" y="634" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start"> </text>
+<text x="752" y="652" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">N</text>
+<text x="752" y="670" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">O</text>
+<text x="752" y="688" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">_</text>
+<text x="752" y="706" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">R</text>
+<text x="752" y="724" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">E</text>
+<text x="752" y="742" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">S</text>
+<text x="752" y="760" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">P</text>
+<text x="752" y="778" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">O</text>
+<text x="752" y="796" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">N</text>
+<text x="752" y="814" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">S</text>
+<text x="752" y="832" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">E</text>
+<rect x="1040" y="420" width="280" height="125" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1040" y="420" width="8" height="125" rx="4" fill="#2563EB"/>
+<text x="1062" y="448" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Conjunto elegível</text>
+<text x="1062" y="472" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">somente YES vigente</text>
+<text x="1062" y="490" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">matrícula/vínculo válidos</text>
+<rect x="80" y="675" width="280" height="130" rx="12" fill="#FFFFFF" stroke="#B45309" stroke-width="2" filter="url(#shadow)"/>
+<rect x="80" y="675" width="8" height="130" rx="4" fill="#B45309"/>
+<text x="102" y="703" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Construir ocorrência</text>
+<text x="102" y="727" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">uma viagem por rota/data/direção</text>
+<text x="102" y="745" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">veículo da rota</text>
+<rect x="430" y="675" width="250" height="130" rx="12" fill="#FFFFFF" stroke="#B45309" stroke-width="2" filter="url(#shadow)"/>
+<rect x="430" y="675" width="8" height="130" rx="4" fill="#B45309"/>
+<text x="452" y="703" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Validar</text>
+<text x="452" y="727" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">capacidade, endereços</text>
+<text x="452" y="745" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">horário acadêmico</text>
+<rect x="750" y="675" width="300" height="130" rx="12" fill="#FFFFFF" stroke="#B45309" stroke-width="2" filter="url(#shadow)"/>
+<rect x="750" y="675" width="8" height="130" rx="4" fill="#B45309"/>
+<text x="772" y="703" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Otimizar Google</text>
+<text x="772" y="727" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">janelas + geografia</text>
+<text x="772" y="745" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">ordem, ETAs, polyline</text>
+<polygon points="1255.0,670 1370,740.0 1255.0,810 1140,740.0" fill="#FFF4E5" stroke="#B45309" stroke-width="2" filter="url(#shadow)"/>
+<text x="1255.0" y="745.0" font-family="DejaVu Sans,Arial" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">Rota viável?</text>
+<rect x="1450" y="675" width="250" height="130" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1450" y="675" width="8" height="130" rx="4" fill="#15803D"/>
+<text x="1472" y="703" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">PLANNED</text>
+<text x="1472" y="727" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">manifesto e rota prontos</text>
+<text x="1472" y="745" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">notifica participantes</text>
+<rect x="1450" y="835" width="250" height="130" rx="12" fill="#FFFFFF" stroke="#C2413B" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1450" y="835" width="8" height="130" rx="4" fill="#C2413B"/>
+<text x="1472" y="863" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">NEEDS_ATTENTION</text>
+<text x="1472" y="887" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">preserva confirmados</text>
+<text x="1472" y="905" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">permite recalcular</text>
+<rect x="80" y="930" width="275" height="125" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="80" y="930" width="8" height="125" rx="4" fill="#15803D"/>
+<text x="102" y="958" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Motorista abre prévia</text>
+<text x="102" y="982" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">recalcula se não terminal</text>
+<text x="102" y="1000" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">pode iniciar cedo</text>
+<polygon points="555.0,925 680,995.0 555.0,1065 430,995.0" fill="#EAF8EF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<text x="555.0" y="1000.0" font-family="DejaVu Sans,Arial" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">Dentro de ±30 min?</text>
+<rect x="760" y="930" width="280" height="125" rx="12" fill="#FFFFFF" stroke="#B45309" stroke-width="2" filter="url(#shadow)"/>
+<rect x="760" y="930" width="8" height="125" rx="4" fill="#B45309"/>
+<text x="782" y="958" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Confirma exceção</text>
+<text x="782" y="982" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">“Iniciar antecipadamente”</text>
+<text x="782" y="1000" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">ou “Iniciar agora”</text>
+<rect x="1120" y="930" width="260" height="130" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1120" y="930" width="8" height="130" rx="4" fill="#15803D"/>
+<text x="1142" y="958" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">IN_PROGRESS</text>
+<text x="1142" y="982" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">congela manifesto</text>
+<text x="1142" y="1000" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PENDING → NO_RESPONSE</text>
+<rect x="1450" y="930" width="250" height="130" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1450" y="930" width="8" height="130" rx="4" fill="#15803D"/>
+<text x="1472" y="958" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">Rastreamento</text>
+<text x="1472" y="982" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">posição 1:1 da viagem</text>
+<text x="1472" y="1000" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">concluir paradas</text>
+<rect x="1770" y="930" width="250" height="130" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1770" y="930" width="8" height="130" rx="4" fill="#15803D"/>
+<text x="1792" y="958" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">COMPLETED</text>
+<text x="1792" y="982" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">completed_at</text>
+<text x="1792" y="1000" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">posição deixa de aparecer</text>
+<rect x="70" y="1145" width="930" height="110" rx="12" fill="#FDECEC" stroke="#C2413B" stroke-dasharray="6 4"/>
+<text x="88" y="1172" font-family="DejaVu Sans,Arial" font-size="14" font-weight="700" fill="#C2413B" text-anchor="start">Guardas de início</text>
+<text x="88" y="1194" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Motorista aprovado • nenhuma outra viagem IN_PROGRESS • ocorrência não vazia • rota viável</text>
+<text x="88" y="1211" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Fora da janela inclusiva de 30 min antes/depois, é obrigatório acknowledge explícito.</text>
+<rect x="1060" y="1145" width="930" height="110" rx="12" fill="#EEF1F5" stroke="#475467" stroke-dasharray="6 4"/>
+<text x="1078" y="1172" font-family="DejaVu Sans,Arial" font-size="14" font-weight="700" fill="#475467" text-anchor="start">Legenda de estados</text>
+<text x="1078" y="1194" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">PENDING → YES | NO | NO_RESPONSE • PLANNED → IN_PROGRESS → COMPLETED</text>
+<text x="1078" y="1211" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">PLANNING/PLANNED podem resultar em NEEDS_ATTENTION; viagem também pode ser CANCELLED.</text>
+</svg>

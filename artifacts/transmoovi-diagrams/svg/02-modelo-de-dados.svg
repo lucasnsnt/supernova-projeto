@@ -1,0 +1,273 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1650" viewBox="0 0 2200 1650">
+<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity=".12"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#667085"/></marker></defs>
+<rect width="100%" height="100%" fill="#F6F8FC"/>
+<text x="60" y="58" font-family="DejaVu Sans,Arial" font-size="30" font-weight="700" fill="#172033" text-anchor="start">Transmoovi — modelo de dados</text>
+<text x="60" y="88" font-family="DejaVu Sans,Arial" font-size="15" font-weight="400" fill="#596579" text-anchor="start">Esquema efetivo após Flyway V1–V8 • PK/FK/UQ e cardinalidades principais</text>
+<rect x="35" y="105" width="680" height="460" rx="18" fill="#F2ECFF" fill-opacity=".48" stroke="#7C3AED" stroke-opacity=".35" stroke-width="2"/>
+<text x="55" y="135" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#7C3AED" text-anchor="start">IDENTIDADE E CADASTRO</text>
+<rect x="745" y="105" width="680" height="460" rx="18" fill="#EAF1FF" fill-opacity=".48" stroke="#2563EB" stroke-opacity=".35" stroke-width="2"/>
+<text x="765" y="135" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#2563EB" text-anchor="start">OFERTA E MATRÍCULA</text>
+<rect x="1455" y="105" width="710" height="460" rx="18" fill="#EEF1F5" fill-opacity=".48" stroke="#475467" stroke-opacity=".35" stroke-width="2"/>
+<text x="1475" y="135" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#475467" text-anchor="start">SEGURANÇA E COMUNICAÇÃO</text>
+<rect x="35" y="600" width="1320" height="995" rx="18" fill="#EAF8EF" fill-opacity=".48" stroke="#15803D" stroke-opacity=".35" stroke-width="2"/>
+<text x="55" y="630" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#15803D" text-anchor="start">OPERAÇÃO DIÁRIA E VIAGEM</text>
+<rect x="1390" y="600" width="775" height="995" rx="18" fill="#E6F8FC" fill-opacity=".48" stroke="#0891B2" stroke-opacity=".35" stroke-width="2"/>
+<text x="1410" y="630" font-family="DejaVu Sans,Arial" font-size="13" font-weight="700" fill="#0891B2" text-anchor="start">REFERÊNCIAS GEOGRÁFICAS</text>
+<path d="M 395 290.0 L 360 292.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="402" y="283.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..1</text>
+<text x="353" y="285.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">0..1</text>
+<path d="M 537.5 455 L 537.5 425" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="544.5" y="448" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">1</text>
+<text x="530.5" y="418" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 217.5 455 L 537.5 425" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="224.5" y="448" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">1</text>
+<text x="530.5" y="418" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 537.5 455 L 217.5 410" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="544.5" y="448" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..1</text>
+<text x="210.5" y="403" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">0..*</text>
+<path d="M 920.0 345 L 537.5 455" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="927.0" y="338" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="530.5" y="448" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 1090 247.5 L 680 542.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1097" y="240.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="673" y="535.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 1090 247.5 L 1055 250.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1097" y="240.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="1048" y="243.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 920.0 385 L 1235.0 340" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="927.0" y="378" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="1228.0" y="333" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 1235.0 385 L 1235.0 340" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1242.0" y="378" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="1228.0" y="333" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 1380 490.0 L 1485 735.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1387" y="483.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="1478" y="728.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 1235.0 635 L 1235.0 340" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1242.0" y="628" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="1228.0" y="333" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 1090 742.5 L 360 532.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1097" y="735.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="353" y="525.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 785 730.0 L 360 532.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="792" y="723.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="353" y="525.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 360 532.5 L 1485 735.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="367" y="525.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="1478" y="728.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">0..1</text>
+<path d="M 1485 735.0 L 360 292.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1492" y="728.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">1</text>
+<text x="353" y="285.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 920.0 865 L 537.5 630" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="927.0" y="858" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="530.5" y="623" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 785 960.0 L 360 532.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="792" y="953.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="353" y="525.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 1485 952.5 L 680 542.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1492" y="945.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="673" y="535.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 1490 255.0 L 680 290.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1497" y="248.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="673" y="283.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 1830 522.5 L 680 290.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1837" y="515.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="673" y="283.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 1830 522.5 L 780 1200.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1837" y="515.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="773" y="1193.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">0..1</text>
+<path d="M 1830 522.5 L 395 832.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1837" y="515.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="388" y="825.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">0..1</text>
+<path d="M 235.0 690 L 537.5 630" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="242.0" y="683" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="530.5" y="623" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 235.0 690 L 217.5 610" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="242.0" y="683" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="210.5" y="603" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 395 832.5 L 1090 247.5" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="402" y="825.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="1083" y="240.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">0..1</text>
+<path d="M 605.0 1040 L 537.5 630" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="612.0" y="1033" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="530.5" y="623" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 605.0 1040 L 920.0 345" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="612.0" y="1033" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="913.0" y="338" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">0..1</text>
+<path d="M 605.0 1040 L 1235.0 340" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="612.0" y="1033" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="1228.0" y="333" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">0..1</text>
+<path d="M 395 1230.0 L 430 1200.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="402" y="1223.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">1..*</text>
+<text x="423" y="1193.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 235.0 1110 L 217.5 610" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="242.0" y="1103" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..*</text>
+<text x="210.5" y="603" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 235.0 1110 L 235.0 975" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="242.0" y="1103" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..1</text>
+<text x="228.0" y="968" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<path d="M 835 1212.5 L 780 1200.0" fill="none" stroke="#98A2B3" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="842" y="1205.5" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="start">0..1</text>
+<text x="773" y="1193.0" font-family="DejaVu Sans,Arial" font-size="12" font-weight="700" fill="#172033" text-anchor="end">1</text>
+<rect x="75" y="175" width="285" height="235" rx="12" fill="#FFFFFF" stroke="#0891B2" stroke-width="2" filter="url(#shadow)"/>
+<rect x="75" y="175" width="8" height="235" rx="4" fill="#0891B2"/>
+<text x="97" y="203" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">addresses</text>
+<text x="97" y="227" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="97" y="245" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">street, number, neighborhood</text>
+<text x="97" y="263" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">city, state, zip_code</text>
+<text x="97" y="281" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">latitude, longitude</text>
+<rect x="395" y="155" width="285" height="270" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="395" y="155" width="8" height="270" rx="4" fill="#7C3AED"/>
+<text x="417" y="183" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">users</text>
+<text x="417" y="207" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK user_id</text>
+<text x="417" y="225" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ email</text>
+<text x="417" y="243" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK/UQ address_id → addresses</text>
+<text x="417" y="261" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">name, password, phone</text>
+<text x="417" y="279" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">date_of_birth, role</text>
+<rect x="395" y="455" width="285" height="175" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="395" y="455" width="8" height="175" rx="4" fill="#7C3AED"/>
+<text x="417" y="483" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">drivers</text>
+<text x="417" y="507" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK/FK user_id → users</text>
+<text x="417" y="525" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ cnh</text>
+<text x="417" y="543" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK operational_address_id</text>
+<text x="417" y="561" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">status, status_reason</text>
+<rect x="75" y="455" width="285" height="155" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+<rect x="75" y="455" width="8" height="155" rx="4" fill="#7C3AED"/>
+<text x="97" y="483" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">students</text>
+<text x="97" y="507" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK/FK user_id → users</text>
+<text x="97" y="525" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK institution_id → institutions</text>
+<rect x="785" y="155" width="270" height="190" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="785" y="155" width="8" height="190" rx="4" fill="#2563EB"/>
+<text x="807" y="183" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">vehicles</text>
+<text x="807" y="207" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="807" y="225" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK driver_id → drivers</text>
+<text x="807" y="243" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ license_plate</text>
+<text x="807" y="261" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">passenger_capacity</text>
+<text x="807" y="279" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">default_vehicle</text>
+<rect x="1090" y="155" width="290" height="185" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1090" y="155" width="8" height="185" rx="4" fill="#2563EB"/>
+<text x="1112" y="183" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">recurring_routes</text>
+<text x="1112" y="207" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="1112" y="225" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK driver_id → drivers</text>
+<text x="1112" y="243" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK vehicle_id → vehicles</text>
+<text x="1112" y="261" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">name, active, created_at</text>
+<rect x="785" y="385" width="270" height="205" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="785" y="385" width="8" height="205" rx="4" fill="#2563EB"/>
+<text x="807" y="413" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">recurring_route_schedules</text>
+<text x="807" y="437" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="807" y="455" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK route_id → recurring_routes</text>
+<text x="807" y="473" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">day_of_week, direction</text>
+<text x="807" y="491" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">departure_time</text>
+<text x="807" y="509" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">response_deadline_time</text>
+<rect x="1090" y="385" width="290" height="210" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1090" y="385" width="8" height="210" rx="4" fill="#2563EB"/>
+<text x="1112" y="413" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">recurring_route_institutions</text>
+<text x="1112" y="437" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="1112" y="455" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK route_id → recurring_routes</text>
+<text x="1112" y="473" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK institution_id → institutions</text>
+<text x="1112" y="491" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ route + institution</text>
+<text x="1112" y="509" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">stop_order, times</text>
+<rect x="1090" y="635" width="290" height="215" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1090" y="635" width="8" height="215" rx="4" fill="#2563EB"/>
+<text x="1112" y="663" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">recurring_route_enrollments</text>
+<text x="1112" y="687" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="1112" y="705" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK route_id → recurring_routes</text>
+<text x="1112" y="723" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK student_id → students</text>
+<text x="1112" y="741" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ route + student</text>
+<text x="1112" y="759" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">directions, status</text>
+<rect x="785" y="635" width="270" height="190" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="785" y="635" width="8" height="190" rx="4" fill="#2563EB"/>
+<text x="807" y="663" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">student_schedules</text>
+<text x="807" y="687" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="807" y="705" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK student_id → students</text>
+<text x="807" y="723" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ student/day/time/direction</text>
+<text x="807" y="741" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">academic time</text>
+<rect x="1485" y="645" width="300" height="180" rx="12" fill="#FFFFFF" stroke="#0891B2" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1485" y="645" width="8" height="180" rx="4" fill="#0891B2"/>
+<text x="1507" y="673" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">institutions</text>
+<text x="1507" y="697" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="1507" y="715" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK/UQ address_id → addresses</text>
+<text x="1507" y="733" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">name, institution_type</text>
+<rect x="785" y="865" width="270" height="190" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+<rect x="785" y="865" width="8" height="190" rx="4" fill="#2563EB"/>
+<text x="807" y="893" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">driver_student_links</text>
+<text x="807" y="917" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="807" y="935" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK driver_id → drivers</text>
+<text x="807" y="953" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK student_id → students</text>
+<text x="807" y="971" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">start/end, status</text>
+<rect x="1485" y="855" width="300" height="195" rx="12" fill="#FFFFFF" stroke="#475467" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1485" y="855" width="8" height="195" rx="4" fill="#475467"/>
+<text x="1507" y="883" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">driver_invite</text>
+<text x="1507" y="907" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="1507" y="925" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK driver_id → drivers</text>
+<text x="1507" y="943" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ token</text>
+<text x="1507" y="961" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">expires_at, status</text>
+<rect x="1490" y="160" width="300" height="190" rx="12" fill="#FFFFFF" stroke="#475467" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1490" y="160" width="8" height="190" rx="4" fill="#475467"/>
+<text x="1512" y="188" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">refresh_tokens</text>
+<text x="1512" y="212" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="1512" y="230" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK user_id → users</text>
+<text x="1512" y="248" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ token_hash</text>
+<text x="1512" y="266" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">expires_at, status</text>
+<rect x="1830" y="160" width="300" height="210" rx="12" fill="#FFFFFF" stroke="#475467" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1830" y="160" width="8" height="210" rx="4" fill="#475467"/>
+<text x="1852" y="188" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">email_verifications</text>
+<text x="1852" y="212" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="1852" y="230" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ email</text>
+<text x="1852" y="248" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ registration_token_hash</text>
+<text x="1852" y="266" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">code_hash, expiry, attempts</text>
+<rect x="1830" y="410" width="300" height="225" rx="12" fill="#FFFFFF" stroke="#475467" stroke-width="2" filter="url(#shadow)"/>
+<rect x="1830" y="410" width="8" height="225" rx="4" fill="#475467"/>
+<text x="1852" y="438" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">in_app_notifications</text>
+<text x="1852" y="462" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="1852" y="480" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK recipient_id → users</text>
+<text x="1852" y="498" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK trip_id → trips</text>
+<text x="1852" y="516" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK confirmation_id → confirmations</text>
+<text x="1852" y="534" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">type, message, read_at</text>
+<rect x="75" y="690" width="320" height="285" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="75" y="690" width="8" height="285" rx="4" fill="#15803D"/>
+<text x="97" y="718" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">daily_confirmations</text>
+<text x="97" y="742" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id • version</text>
+<text x="97" y="760" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK driver_id → drivers</text>
+<text x="97" y="778" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK student_id → students</text>
+<text x="97" y="796" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK recurring_route_id → routes</text>
+<text x="97" y="814" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ student/date/direction/route/time</text>
+<text x="97" y="832" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">status, deadlines, academic_time</text>
+<rect x="430" y="1040" width="350" height="320" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="430" y="1040" width="8" height="320" rx="4" fill="#15803D"/>
+<text x="452" y="1068" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">trips</text>
+<text x="452" y="1092" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id • version</text>
+<text x="452" y="1110" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK driver_id → drivers</text>
+<text x="452" y="1128" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK vehicle_id → vehicles</text>
+<text x="452" y="1146" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK recurring_route_id → routes</text>
+<text x="452" y="1164" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ route/date/direction</text>
+<text x="452" y="1182" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">status + lifecycle timestamps</text>
+<text x="452" y="1200" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">provider, reference, polyline</text>
+<text x="452" y="1218" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">completed_stop_count</text>
+<rect x="75" y="1110" width="320" height="240" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="75" y="1110" width="8" height="240" rx="4" fill="#15803D"/>
+<text x="97" y="1138" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">trip_participants</text>
+<text x="97" y="1162" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK id</text>
+<text x="97" y="1180" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK trip_id → trips</text>
+<text x="97" y="1198" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK student_id → students</text>
+<text x="97" y="1216" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">FK/UQ confirmation_id → confirmations</text>
+<text x="97" y="1234" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">UQ trip + student</text>
+<text x="97" y="1252" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">orders + ETAs</text>
+<rect x="835" y="1110" width="300" height="205" rx="12" fill="#FFFFFF" stroke="#15803D" stroke-width="2" filter="url(#shadow)"/>
+<rect x="835" y="1110" width="8" height="205" rx="4" fill="#15803D"/>
+<text x="857" y="1138" font-family="DejaVu Sans,Arial" font-size="16" font-weight="700" fill="#172033" text-anchor="start">trip_locations</text>
+<text x="857" y="1162" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">PK/FK trip_id → trips</text>
+<text x="857" y="1180" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">latitude, longitude</text>
+<text x="857" y="1198" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">accuracy, heading</text>
+<text x="857" y="1216" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#596579" text-anchor="start">recorded_at, updated_at</text>
+<rect x="1420" y="1110" width="685" height="250" rx="12" fill="#EEF1F5" stroke="#475467" stroke-dasharray="6 4"/>
+<text x="1438" y="1137" font-family="DejaVu Sans,Arial" font-size="14" font-weight="700" fill="#475467" text-anchor="start">Legenda relacional</text>
+<text x="1438" y="1159" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">PK = chave primária • FK = chave estrangeira • UQ = unicidade</text>
+<text x="1438" y="1176" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">1 = obrigatório e único • 0..1 = opcional • 0..* = muitos</text>
+<text x="1438" y="1193" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Setas apontam para a entidade referenciada.</text>
+<text x="1438" y="1210" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Domínios são agrupamentos de leitura; não são schemas PostgreSQL.</text>
+<rect x="1420" y="1400" width="685" height="135" rx="12" fill="#FFF4E5" stroke="#B45309" stroke-dasharray="6 4"/>
+<text x="1438" y="1427" font-family="DejaVu Sans,Arial" font-size="14" font-weight="700" fill="#B45309" text-anchor="start">Nota de histórico</text>
+<text x="1438" y="1449" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">V8 preserva confirmações/viagens históricas, liga ocorrências inequívocas</text>
+<text x="1438" y="1466" font-family="DejaVu Sans,Arial" font-size="12" font-weight="400" fill="#172033" text-anchor="start">a rotas recorrentes e mantém casos ambíguos em NEEDS_ATTENTION.</text>
+</svg>
