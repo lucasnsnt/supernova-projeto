@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Slf4j
@@ -70,9 +71,9 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
         Map<String, Object> shipment = new LinkedHashMap<>();
         shipment.put("label", passenger.confirmationId().toString());
         shipment.put("pickups", List.of(visit(
-                passenger.pickup(), passenger.earliestPickupAt(), passenger.latestPickupAt())));
+                passenger.pickup(), passenger.earliestPickupAt(), passenger.latestPickupAt(), null)));
         shipment.put("deliveries", List.of(visit(
-                passenger.dropoff(), null, passenger.latestDropoffAt())));
+                passenger.dropoff(), null, passenger.latestDropoffAt(), passenger.preferredDropoffAt())));
         shipment.put("loadDemands", Map.of("passengers", Map.of("amount", "1")));
         return shipment;
     }
@@ -99,7 +100,7 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
     }
 
     private Map<String, Object> visit(
-            RoutePoint point, LocalDateTime earliest, LocalDateTime latest) {
+            RoutePoint point, LocalDateTime earliest, LocalDateTime latest, LocalDateTime preferredLatest) {
         Map<String, Object> visit = new LinkedHashMap<>();
         visit.put("arrivalLocation", location(point));
         if (earliest != null || latest != null) {
@@ -109,6 +110,11 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
             }
             if (latest != null) {
                 window.put("endTime", instant(latest));
+            }
+            if (preferredLatest != null) {
+                window.put("softEndTime", instant(preferredLatest));
+                window.put("costPerHourAfterSoftEndTime",
+                        properties.getGoogle().getLateArrivalCostPerHour());
             }
             visit.put("timeWindows", List.of(window));
         }
@@ -121,16 +127,16 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
 
     private RoutePlanningResult result(
             RoutePlanningRequest request, GoogleOptimizeResponse response) {
-        if (response == null || response.routes() == null || response.routes().isEmpty()) {
-            return RoutePlanningResult.unavailable("O Google não retornou uma rota viável");
-        }
-        if (response.skippedShipments() != null && !response.skippedShipments().isEmpty()) {
+        if (response != null && response.skippedShipments() != null && !response.skippedShipments().isEmpty()) {
             String skipped = response.skippedShipments().stream()
-                    .map(GoogleSkippedShipment::label)
+                    .map(item -> skippedStudentName(request, item))
                     .filter(Objects::nonNull)
                     .collect(java.util.stream.Collectors.joining(", "));
             return RoutePlanningResult.unavailable(
                     "A rota não conseguiu atender as confirmações: " + skipped);
+        }
+        if (response == null || response.routes() == null || response.routes().isEmpty()) {
+            return RoutePlanningResult.unavailable("O Google não retornou uma rota viável");
         }
 
         GoogleRoute route = response.routes().getFirst();
@@ -181,7 +187,19 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
     }
 
     private String instant(LocalDateTime value) {
-        return value.atZone(properties.getZoneId()).toInstant().toString();
+        // Route Optimization rejects protobuf timestamps when the nanos field is present.
+        return value.atZone(properties.getZoneId()).toInstant()
+                .truncatedTo(ChronoUnit.SECONDS)
+                .toString();
+    }
+
+    private String skippedStudentName(RoutePlanningRequest request, GoogleSkippedShipment skipped) {
+        if (skipped.label() == null) return null;
+        return request.passengers().stream()
+                .filter(passenger -> passenger.confirmationId().toString().equals(skipped.label()))
+                .map(RoutePassenger::studentName)
+                .findFirst()
+                .orElse(skipped.label());
     }
 
     private LocalDateTime localDateTime(String value) {

@@ -2,6 +2,7 @@ package ink.lucasnsnt.supernovaprojeto.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TripLocation {
+public class TripLocation implements Persistable<Long> {
     @Id
     @Column(name = "trip_id")
     private Long tripId;
@@ -36,4 +37,24 @@ public class TripLocation {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @Transient
+    @Builder.Default
+    private boolean newLocation = true;
+
+    @Override
+    public Long getId() {
+        return tripId;
+    }
+
+    @Override
+    public boolean isNew() {
+        return newLocation;
+    }
+
+    @PostLoad
+    @PostPersist
+    void markPersisted() {
+        newLocation = false;
+    }
 }

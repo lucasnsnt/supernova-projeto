@@ -22,6 +22,7 @@ public class DailyTransportProperties {
     private Duration departureChangeLock = Duration.ofMinutes(30);
     private Duration maximumDepartureAdjustment = Duration.ofMinutes(30);
     private Duration maximumReturnWait = Duration.ofMinutes(30);
+    private Duration maximumAcademicDelay = Duration.ofMinutes(45);
     private Google google = new Google();
     private Geocoding geocoding = new Geocoding();
 
@@ -39,5 +40,6 @@ public class DailyTransportProperties {
         private boolean enabled;
         private String projectId;
         private String endpoint = "https://routeoptimization.googleapis.com";
+        private double lateArrivalCostPerHour = 100.0;
     }
 }

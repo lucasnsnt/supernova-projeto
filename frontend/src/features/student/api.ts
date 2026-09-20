@@ -15,7 +15,7 @@ export type Trip = {
   startedAt: string | null; completedAt: string | null; cancellationReason: string | null
   encodedPolyline: string | null; completedStopCount: number
   vehicle: { id: number; model: string; licensePlate: string } | null
-  participants: Array<{ studentId: number; studentName: string; institutionName: string | null; pickupOrder: number; dropoffOrder: number; estimatedPickupAt: string | null; estimatedDropoffAt: string | null; pickupAddress: Address | null; dropoffAddress: Address | null }>
+  participants: Array<{ studentId: number; studentName: string; institutionName: string | null; pickupOrder: number; dropoffOrder: number; estimatedPickupAt: string | null; estimatedDropoffAt: string | null; academicTime: string | null; pickupAddress: Address | null; dropoffAddress: Address | null }>
 }
 export type TripLocation = { latitude: number; longitude: number; accuracy: number | null; heading: number | null; recordedAt: string; updatedAt: string }
 export type TripTracking = { trip: Trip; location: TripLocation | null }

@@ -5,6 +5,7 @@ import { removeSchedule, saveSchedule, studentSchedules, type Schedule } from '.
 const days = [
   ['MONDAY', 'Segunda'], ['TUESDAY', 'Terça'], ['WEDNESDAY', 'Quarta'],
   ['THURSDAY', 'Quinta'], ['FRIDAY', 'Sexta'], ['SATURDAY', 'Sábado'],
+  ['SUNDAY', 'Domingo'],
 ] as const
 
 export function SchedulePage() {

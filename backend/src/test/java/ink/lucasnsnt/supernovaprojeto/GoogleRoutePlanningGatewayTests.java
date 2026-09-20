@@ -43,6 +43,12 @@ class GoogleRoutePlanningGatewayTests {
                 .andExpect(jsonPath("$.model.shipments[0].label").value("101"))
                 .andExpect(jsonPath("$.model.shipments[0].pickups[0].arrivalLocation.latitude").value(-12.98))
                 .andExpect(jsonPath("$.model.shipments[0].pickups[0].arrivalLocation.latitudeLongitude").doesNotExist())
+                .andExpect(jsonPath("$.model.shipments[0].deliveries[0].timeWindows[0].softEndTime")
+                        .value("2026-09-15T10:00:00Z"))
+                .andExpect(jsonPath("$.model.shipments[0].deliveries[0].timeWindows[0].endTime")
+                        .value("2026-09-15T10:45:00Z"))
+                .andExpect(jsonPath("$.model.shipments[0].deliveries[0].timeWindows[0].costPerHourAfterSoftEndTime")
+                        .value(100.0))
                 .andExpect(jsonPath("$.model.vehicles[0].startLocation.longitude").value(-38.5014))
                 .andExpect(jsonPath("$.model.vehicles[0].costPerHour").value(1.0))
                 .andExpect(jsonPath("$.model.vehicles[0].loadLimits.passengers.maxLoad").value("4"))
@@ -118,15 +124,59 @@ class GoogleRoutePlanningGatewayTests {
         server.verify();
     }
 
+    @Test
+    void shouldOmitNanosFromGoogleTimestamps() {
+        server.expect(requestTo(
+                        "https://routeoptimization.googleapis.com/v1/projects/test-project:optimizeTours"))
+                .andExpect(jsonPath("$.model.vehicles[0].startTimeWindows[0].startTime")
+                        .value("2026-09-15T08:45:12Z"))
+                .andExpect(jsonPath("$.model.vehicles[0].startTimeWindows[0].endTime")
+                        .value("2026-09-15T08:45:12Z"))
+                .andRespond(withSuccess("""
+                        {"routes": [{
+                          "vehicleStartTime": "2026-09-15T08:45:12Z",
+                          "visits": [
+                            {"shipmentIndex": 0, "isPickup": true,
+                             "startTime": "2026-09-15T09:00:00Z"},
+                            {"shipmentIndex": 0, "isPickup": false,
+                             "startTime": "2026-09-15T09:30:00Z"}
+                          ]
+                        }]}
+                        """, MediaType.APPLICATION_JSON));
+
+        RoutePlanningRequest request = request();
+        request = new RoutePlanningRequest(request.driverId(), request.serviceDate(), request.direction(),
+                request.vehicleCapacity(), request.start(), request.end(), request.passengers(),
+                LocalDateTime.of(2026, 9, 15, 5, 45, 12, 987_654_321));
+
+        assertThat(gateway.optimize(request).feasible()).isTrue();
+        server.verify();
+    }
+
+    @Test
+    void shouldIdentifySkippedConfirmationByStudentName() {
+        server.expect(requestTo(
+                        "https://routeoptimization.googleapis.com/v1/projects/test-project:optimizeTours"))
+                .andRespond(withSuccess("""
+                        {"routes": [], "skippedShipments": [{"index": 0, "label": "101"}]}
+                        """, MediaType.APPLICATION_JSON));
+
+        assertThat(gateway.optimize(request()).issue())
+                .isEqualTo("A rota não conseguiu atender as confirmações: Aluno Teste");
+        server.verify();
+    }
+
     private RoutePlanningRequest request() {
         RoutePoint driver = point(-12.9714, -38.5014);
         RoutePassenger passenger = new RoutePassenger(
                 101L,
                 20L,
+                "Aluno Teste",
                 point(-12.9800, -38.5100),
                 point(-12.9900, -38.5200),
                 LocalDateTime.of(2026, 9, 15, 5, 30),
                 LocalDateTime.of(2026, 9, 15, 6, 30),
+                LocalDateTime.of(2026, 9, 15, 7, 45),
                 LocalDateTime.of(2026, 9, 15, 7, 0));
         return new RoutePlanningRequest(10L, LocalDate.of(2026, 9, 15),
                 Direction.IDA, 4, driver, driver, List.of(passenger));
