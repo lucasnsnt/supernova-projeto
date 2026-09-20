@@ -43,6 +43,7 @@ function DriverActiveTrip({ initial }: { initial: Trip }) {
   const trip = tracking.data.trip
   const stops = useMemo(() => tripStops(trip), [trip])
   const next = stops[trip.completedStopCount]
+  const mapsUrl = googleMapsRouteUrl(stops.slice(trip.completedStopCount), localLocation ?? tracking.data.location)
 
   function leave() { void client.invalidateQueries({ queryKey: ['trips'] }); navigate('/viagens') }
 
@@ -68,6 +69,7 @@ function DriverActiveTrip({ initial }: { initial: Trip }) {
     <section className="trip-control-sheet">
       <div className="trip-progress-heading"><div><p className="section-kicker">Viagem em andamento</p><h1>{next ? `Próxima: ${next.title}` : 'Todas as paradas concluídas'}</h1><p className="muted">{next?.address ?? 'Você já pode encerrar a viagem.'}</p></div><strong>{trip.completedStopCount}/{stops.length}</strong></div>
       <div className="progress-track"><span style={{ width: `${stops.length ? trip.completedStopCount / stops.length * 100 : 100}%` }} /></div>
+      {mapsUrl && <><a className="primary-button maps-navigation" href={mapsUrl} target="_blank" rel="noreferrer">Abrir rota no Google Maps</a><p className="maps-tracking-warning">O celular pode pausar o rastreamento enquanto o Maps estiver em primeiro plano.</p></>}
       <div className="active-actions">{next && <button className="primary-button" disabled={stop.isPending} onClick={() => stop.mutate()}>{stop.isPending ? 'Salvando…' : 'Concluir parada'}</button>}<button className="secondary-button" onClick={() => setConfirming('finish')}>Encerrar viagem</button><button className="text-button danger-text" onClick={() => setConfirming('cancel')}>Cancelar viagem</button></div>
       {(stop.error || finish.error || cancel.error) && <p role="alert" className="form-error">{(stop.error ?? finish.error ?? cancel.error)?.message}</p>}
     </section>
@@ -89,9 +91,20 @@ function GpsBadge({ state }: { state: GpsState }) {
 }
 
 function tripStops(trip: Trip) {
-  const pickups = [...trip.participants].sort((a, b) => a.pickupOrder - b.pickupOrder).map(item => ({ title: item.studentName, address: formatAddress(item.pickupAddress) }))
-  const dropoffs = [...trip.participants].sort((a, b) => a.dropoffOrder - b.dropoffOrder).map(item => ({ title: item.institutionName ?? item.studentName, address: formatAddress(item.dropoffAddress) }))
-  return [...pickups, ...dropoffs]
+  return trip.participants.flatMap(item => [
+    stop(item.pickupOrder, item.studentName, item.pickupAddress),
+    stop(item.dropoffOrder, item.institutionName ?? item.studentName, item.dropoffAddress),
+  ]).sort((a, b) => a.order - b.order)
+}
+function stop(order: number, title: string, address: Trip['participants'][number]['pickupAddress']) { return { order, title, address: formatAddress(address), latitude: address?.latitude ?? null, longitude: address?.longitude ?? null } }
+export function googleMapsRouteUrl(stops: ReturnType<typeof tripStops>, location: Awaited<ReturnType<typeof driverTripTracking>>['location']) {
+  const segment = stops.filter(item => item.latitude != null && item.longitude != null).slice(0, 10)
+  if (!segment.length) return null
+  const destination = segment.at(-1)!
+  const params = new URLSearchParams({ api: '1', destination: `${destination.latitude},${destination.longitude}`, travelmode: 'driving', dir_action: 'navigate' })
+  if (location) params.set('origin', `${location.latitude},${location.longitude}`)
+  if (segment.length > 1) params.set('waypoints', segment.slice(0, -1).map(item => `${item.latitude},${item.longitude}`).join('|'))
+  return `https://www.google.com/maps/dir/?${params.toString()}`
 }
 function formatAddress(address: Trip['participants'][number]['pickupAddress']) { return address ? `${address.street}, ${address.number} · ${address.neighborhood}` : 'Endereço não informado' }
 function secondsAgo(value: string) { return Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 1_000)) }
