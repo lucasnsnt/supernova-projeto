@@ -71,9 +71,9 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
         Map<String, Object> shipment = new LinkedHashMap<>();
         shipment.put("label", passenger.confirmationId().toString());
         shipment.put("pickups", List.of(visit(
-                passenger.pickup(), passenger.earliestPickupAt(), passenger.latestPickupAt())));
+                passenger.pickup(), passenger.earliestPickupAt(), passenger.latestPickupAt(), null)));
         shipment.put("deliveries", List.of(visit(
-                passenger.dropoff(), null, passenger.latestDropoffAt())));
+                passenger.dropoff(), null, passenger.latestDropoffAt(), passenger.preferredDropoffAt())));
         shipment.put("loadDemands", Map.of("passengers", Map.of("amount", "1")));
         return shipment;
     }
@@ -100,7 +100,7 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
     }
 
     private Map<String, Object> visit(
-            RoutePoint point, LocalDateTime earliest, LocalDateTime latest) {
+            RoutePoint point, LocalDateTime earliest, LocalDateTime latest, LocalDateTime preferredLatest) {
         Map<String, Object> visit = new LinkedHashMap<>();
         visit.put("arrivalLocation", location(point));
         if (earliest != null || latest != null) {
@@ -110,6 +110,11 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
             }
             if (latest != null) {
                 window.put("endTime", instant(latest));
+            }
+            if (preferredLatest != null) {
+                window.put("softEndTime", instant(preferredLatest));
+                window.put("costPerHourAfterSoftEndTime",
+                        properties.getGoogle().getLateArrivalCostPerHour());
             }
             visit.put("timeWindows", List.of(window));
         }

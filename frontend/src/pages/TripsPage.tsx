@@ -84,6 +84,7 @@ function TripCard({ trip, driver, onChanged }: { trip: Trip; driver: boolean; on
       <ol>{[...trip.participants].sort((a, b) => a.pickupOrder - b.pickupOrder).map((participant, index) => <li key={participant.studentId ?? index}>
         <strong>{participant.studentName}</strong> · {participant.institutionName}
         <p className="muted">Embarque {time(participant.estimatedPickupAt)} · Desembarque {time(participant.estimatedDropoffAt)}</p>
+        {trip.direction === 'IDA' && <DelayNotice participant={participant} serviceDate={trip.serviceDate} />}
         <p>Parada {participant.pickupOrder} — Embarque: {formatAddress(participant.pickupAddress)}</p>
         <p>Parada {participant.dropoffOrder} — Desembarque: {formatAddress(participant.dropoffAddress)}</p>
       </li>)}</ol>
@@ -98,6 +99,14 @@ function TripCard({ trip, driver, onChanged }: { trip: Trip; driver: boolean; on
     </div>
     <ConfirmDialog open={confirmOutsideWindow} title={outsideLabel === 'Iniciar antecipadamente' ? 'Fora do horário previsto' : 'Horário previsto já passou'} message={outsideLabel === 'Iniciar antecipadamente' ? `A saída está prevista para ${time(trip.plannedDepartureAt ?? trip.departureAt)}. A viagem começará agora.` : `A saída estava prevista para ${time(trip.plannedDepartureAt ?? trip.departureAt)}. Confirme para iniciar agora.`} confirmLabel={outsideLabel} busy={action.isPending} onCancel={() => setConfirmOutsideWindow(false)} onConfirm={() => action.mutate({ value: 'start', acknowledgeOutsideWindow: true })} />
   </article>
+}
+
+function DelayNotice({ participant, serviceDate }: { participant: Trip['participants'][number]; serviceDate: string }) {
+  if (!participant.estimatedDropoffAt || !participant.academicTime) return null
+  const arrival = parseBahiaDateTime(participant.estimatedDropoffAt)
+  const target = parseBahiaDateTime(`${serviceDate}T${participant.academicTime}`)
+  const minutes = Math.max(0, Math.ceil((arrival.getTime() - target.getTime()) / 60_000))
+  return minutes > 0 ? <p className="delay-warning">Chegada estimada com {minutes} min de atraso.</p> : null
 }
 
 function TripConfiguration({ trip, onChanged }: { trip: Trip; onChanged: () => void }) {

@@ -5,6 +5,7 @@ import ink.lucasnsnt.supernovaprojeto.dtos.common.AddressResponse;
 import ink.lucasnsnt.supernovaprojeto.models.enums.Direction;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public record TripParticipantResponse(
         Long studentId,
@@ -15,6 +16,7 @@ public record TripParticipantResponse(
         int dropoffOrder,
         LocalDateTime estimatedPickupAt,
         LocalDateTime estimatedDropoffAt,
+        LocalTime academicTime,
         AddressResponse pickupAddress,
         AddressResponse dropoffAddress) {
 
@@ -31,6 +33,7 @@ public record TripParticipantResponse(
                 participant.getDropoffOrder(),
                 participant.getEstimatedPickupAt(),
                 participant.getEstimatedDropoffAt(),
+                participant.getConfirmation().getAcademicTime(),
                 AddressResponse.from(direction == Direction.IDA ? home : destination),
                 AddressResponse.from(direction == Direction.IDA ? destination : home));
     }

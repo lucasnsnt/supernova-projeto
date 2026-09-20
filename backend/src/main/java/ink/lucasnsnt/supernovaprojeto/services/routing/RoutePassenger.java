@@ -10,5 +10,6 @@ public record RoutePassenger(
         RoutePoint dropoff,
         LocalDateTime earliestPickupAt,
         LocalDateTime latestPickupAt,
-        LocalDateTime latestDropoffAt) {
+        LocalDateTime latestDropoffAt,
+        LocalDateTime preferredDropoffAt) {
 }

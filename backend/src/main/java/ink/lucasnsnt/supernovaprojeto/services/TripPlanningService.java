@@ -198,12 +198,13 @@ public class TripPlanningService {
         if (confirmation.getDirection() == Direction.IDA) {
             return new RoutePassenger(confirmation.getId(), confirmation.getStudent().getId(),
                     confirmation.getStudent().getUser().getName(),
-                    point(home), point(institution), null, null, scheduled);
+                    point(home), point(institution), null, null,
+                    scheduled.plus(properties.getMaximumAcademicDelay()), scheduled);
         }
         return new RoutePassenger(confirmation.getId(), confirmation.getStudent().getId(),
                 confirmation.getStudent().getUser().getName(),
                 point(institution), point(home), scheduled,
-                scheduled.plus(properties.getMaximumReturnWait()), null);
+                scheduled.plus(properties.getMaximumReturnWait()), null, null);
     }
 
     private RoutePoint point(Address address) {

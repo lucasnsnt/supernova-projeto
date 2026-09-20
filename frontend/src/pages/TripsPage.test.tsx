@@ -8,11 +8,11 @@ import { studentTrips, today, type Trip } from '../features/student/api'
 import { MemoryRouter } from 'react-router-dom'
 let role = 'DRIVER'
 vi.mock('../auth/AuthContext', () => ({ useAuth: () => ({ session: { role, driverStatus: 'APPROVED' } }) }))
-vi.mock('../features/driver/api', () => ({ driverTrips: vi.fn(), tripAction: vi.fn(), cancelTrip: vi.fn(), vehicles: vi.fn(), changeTripVehicle: vi.fn(), updateDeparture: vi.fn() }))
+vi.mock('../features/driver/api', () => ({ driverTrips: vi.fn(), driverOperationalRoutePreview: vi.fn(), tripAction: vi.fn(), cancelTrip: vi.fn(), vehicles: vi.fn(), changeTripVehicle: vi.fn(), updateDeparture: vi.fn() }))
 vi.mock('../features/student/api', async importOriginal => ({ ...await importOriginal<typeof import('../features/student/api')>(), studentTrips: vi.fn() }))
-const trip: Trip = { id: 4, routeId: 9, serviceDate: '2026-09-15', direction: 'VOLTA', status: 'PLANNED', plannedDepartureAt: '2026-09-15T12:00:00', departureAt: '2026-09-15T12:00:00', planningIssue: null, startedAt: null, completedAt: null, cancellationReason: null, encodedPolyline: null, completedStopCount: 0, vehicle: { id: 1, model: 'Ducato', licensePlate: 'ABC1234' }, participants: [{ studentId: 2, studentName: 'Ana', institutionName: 'Faculdade', pickupOrder: 1, dropoffOrder: 2, estimatedPickupAt: '2026-09-15T12:10:00', estimatedDropoffAt: '2026-09-15T12:30:00', pickupAddress: null, dropoffAddress: null }] }
+const trip: Trip = { id: 4, routeId: 9, serviceDate: '2026-09-15', direction: 'VOLTA', status: 'PLANNED', plannedDepartureAt: '2026-09-15T12:00:00', departureAt: '2026-09-15T12:00:00', planningIssue: null, startedAt: null, completedAt: null, cancellationReason: null, encodedPolyline: null, completedStopCount: 0, vehicle: { id: 1, model: 'Ducato', licensePlate: 'ABC1234' }, participants: [{ studentId: 2, studentName: 'Ana', institutionName: 'Faculdade', pickupOrder: 1, dropoffOrder: 2, estimatedPickupAt: '2026-09-15T12:10:00', estimatedDropoffAt: '2026-09-15T12:30:00', academicTime: '12:00:00', pickupAddress: null, dropoffAddress: null }] }
 function mount() { render(<MemoryRouter><QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><TripsPage /></QueryClientProvider></MemoryRouter>) }
-beforeEach(() => { vi.resetAllMocks(); role = 'DRIVER'; vi.mocked(api.driverTrips).mockResolvedValue([trip]); vi.mocked(api.vehicles).mockResolvedValue([]) })
+beforeEach(() => { vi.resetAllMocks(); role = 'DRIVER'; vi.mocked(api.driverTrips).mockResolvedValue([trip]); vi.mocked(api.vehicles).mockResolvedValue([]); vi.mocked(api.driverOperationalRoutePreview).mockResolvedValue({ routeId: 9, routeName: 'Rota', serviceDate: trip.serviceDate, direction: trip.direction, scheduledDepartureAt: trip.plannedDepartureAt!, departureAt: trip.departureAt!, withinStartWindow: true, canStart: true, planningIssue: null, encodedPolyline: null, tripId: trip.id, tripStatus: trip.status, participants: trip.participants }) })
 afterEach(cleanup)
 it('inicia a viagem e abre o acompanhamento', async () => {
   vi.mocked(api.tripAction).mockImplementation(async (_id, action) => {
@@ -22,7 +22,7 @@ it('inicia a viagem e abre o acompanhamento', async () => {
   mount()
   expect(await screen.findByText('Ana')).toBeInTheDocument()
   await userEvent.click(await screen.findByRole('button', { name: 'Iniciar viagem' }))
-  expect(api.tripAction).toHaveBeenCalledWith(4, 'start')
+  expect(api.tripAction).toHaveBeenCalledWith(4, 'start', { acknowledgeOutsideWindow: false })
 })
 it('mostra erro ao iniciar e mantém a viagem planejada', async () => {
   vi.mocked(api.tripAction).mockRejectedValue(new Error('Motorista suspenso'))
