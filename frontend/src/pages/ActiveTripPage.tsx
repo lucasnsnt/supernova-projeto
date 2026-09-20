@@ -69,7 +69,7 @@ function DriverActiveTrip({ initial }: { initial: Trip }) {
     <section className="trip-control-sheet">
       <div className="trip-progress-heading"><div><p className="section-kicker">Viagem em andamento</p><h1>{next ? `Próxima: ${next.title}` : 'Todas as paradas concluídas'}</h1><p className="muted">{next?.address ?? 'Você já pode encerrar a viagem.'}</p></div><strong>{trip.completedStopCount}/{stops.length}</strong></div>
       <div className="progress-track"><span style={{ width: `${stops.length ? trip.completedStopCount / stops.length * 100 : 100}%` }} /></div>
-      {mapsUrl && <><a className="primary-button maps-navigation" href={mapsUrl} target="_blank" rel="noreferrer">Abrir rota no Google Maps</a><p className="maps-tracking-warning">O celular pode pausar o rastreamento enquanto o Maps estiver em primeiro plano.</p></>}
+      {mapsUrl && <><a className="primary-button maps-navigation" href={mapsUrl} target="_blank" rel="noreferrer">Abrir rota no Google Maps</a><p className="maps-tracking-warning">Ao abrir o Maps, o navegador pode pausar o rastreamento. Nesse caso, os alunos não verão sua localização em tempo real com precisão.</p></>}
       <div className="active-actions">{next && <button className="primary-button" disabled={stop.isPending} onClick={() => stop.mutate()}>{stop.isPending ? 'Salvando…' : 'Concluir parada'}</button>}<button className="secondary-button" onClick={() => setConfirming('finish')}>Encerrar viagem</button><button className="text-button danger-text" onClick={() => setConfirming('cancel')}>Cancelar viagem</button></div>
       {(stop.error || finish.error || cancel.error) && <p role="alert" className="form-error">{(stop.error ?? finish.error ?? cancel.error)?.message}</p>}
     </section>
