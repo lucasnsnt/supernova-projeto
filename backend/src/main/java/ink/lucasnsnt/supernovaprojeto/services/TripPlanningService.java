@@ -197,9 +197,11 @@ public class TripPlanningService {
         LocalDateTime scheduled = confirmation.getServiceDate().atTime(confirmation.getAcademicTime());
         if (confirmation.getDirection() == Direction.IDA) {
             return new RoutePassenger(confirmation.getId(), confirmation.getStudent().getId(),
+                    confirmation.getStudent().getUser().getName(),
                     point(home), point(institution), null, null, scheduled);
         }
         return new RoutePassenger(confirmation.getId(), confirmation.getStudent().getId(),
+                confirmation.getStudent().getUser().getName(),
                 point(institution), point(home), scheduled,
                 scheduled.plus(properties.getMaximumReturnWait()), null);
     }

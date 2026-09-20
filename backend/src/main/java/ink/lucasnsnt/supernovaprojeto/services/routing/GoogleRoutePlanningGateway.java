@@ -122,16 +122,16 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
 
     private RoutePlanningResult result(
             RoutePlanningRequest request, GoogleOptimizeResponse response) {
-        if (response == null || response.routes() == null || response.routes().isEmpty()) {
-            return RoutePlanningResult.unavailable("O Google não retornou uma rota viável");
-        }
-        if (response.skippedShipments() != null && !response.skippedShipments().isEmpty()) {
+        if (response != null && response.skippedShipments() != null && !response.skippedShipments().isEmpty()) {
             String skipped = response.skippedShipments().stream()
-                    .map(GoogleSkippedShipment::label)
+                    .map(item -> skippedStudentName(request, item))
                     .filter(Objects::nonNull)
                     .collect(java.util.stream.Collectors.joining(", "));
             return RoutePlanningResult.unavailable(
                     "A rota não conseguiu atender as confirmações: " + skipped);
+        }
+        if (response == null || response.routes() == null || response.routes().isEmpty()) {
+            return RoutePlanningResult.unavailable("O Google não retornou uma rota viável");
         }
 
         GoogleRoute route = response.routes().getFirst();
@@ -186,6 +186,15 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
         return value.atZone(properties.getZoneId()).toInstant()
                 .truncatedTo(ChronoUnit.SECONDS)
                 .toString();
+    }
+
+    private String skippedStudentName(RoutePlanningRequest request, GoogleSkippedShipment skipped) {
+        if (skipped.label() == null) return null;
+        return request.passengers().stream()
+                .filter(passenger -> passenger.confirmationId().toString().equals(skipped.label()))
+                .map(RoutePassenger::studentName)
+                .findFirst()
+                .orElse(skipped.label());
     }
 
     private LocalDateTime localDateTime(String value) {

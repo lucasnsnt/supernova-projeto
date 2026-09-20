@@ -147,11 +147,25 @@ class GoogleRoutePlanningGatewayTests {
         server.verify();
     }
 
+    @Test
+    void shouldIdentifySkippedConfirmationByStudentName() {
+        server.expect(requestTo(
+                        "https://routeoptimization.googleapis.com/v1/projects/test-project:optimizeTours"))
+                .andRespond(withSuccess("""
+                        {"routes": [], "skippedShipments": [{"index": 0, "label": "101"}]}
+                        """, MediaType.APPLICATION_JSON));
+
+        assertThat(gateway.optimize(request()).issue())
+                .isEqualTo("A rota não conseguiu atender as confirmações: Aluno Teste");
+        server.verify();
+    }
+
     private RoutePlanningRequest request() {
         RoutePoint driver = point(-12.9714, -38.5014);
         RoutePassenger passenger = new RoutePassenger(
                 101L,
                 20L,
+                "Aluno Teste",
                 point(-12.9800, -38.5100),
                 point(-12.9900, -38.5200),
                 LocalDateTime.of(2026, 9, 15, 5, 30),

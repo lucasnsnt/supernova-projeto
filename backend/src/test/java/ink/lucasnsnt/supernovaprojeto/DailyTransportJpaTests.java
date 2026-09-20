@@ -5,6 +5,7 @@ import ink.lucasnsnt.supernovaprojeto.models.enums.*;
 import ink.lucasnsnt.supernovaprojeto.repositories.DailyConfirmationRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.InAppNotificationRepository;
 import ink.lucasnsnt.supernovaprojeto.repositories.TripRepository;
+import ink.lucasnsnt.supernovaprojeto.repositories.TripLocationRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ class DailyTransportJpaTests {
     @Autowired private EntityManager entityManager;
     @Autowired private DailyConfirmationRepository confirmationRepository;
     @Autowired private TripRepository tripRepository;
+    @Autowired private TripLocationRepository locationRepository;
     @Autowired private InAppNotificationRepository notificationRepository;
 
     @Test
@@ -114,6 +116,30 @@ class DailyTransportJpaTests {
         assertThat(persisted.getParticipants().getFirst().getConfirmation().getStatus())
                 .isEqualTo(DailyConfirmationStatus.YES);
         assertThat(notificationRepository.countByRecipientIdAndReadAtIsNull(student.getId())).isOne();
+    }
+
+    @Test
+    void shouldPersistFirstLiveLocationWithSharedTripId() {
+        User driverUser = user("Motorista GPS", "driver-gps@test.local", Role.DRIVER);
+        entityManager.persist(driverUser);
+        Driver driver = Driver.builder().user(driverUser).cnh("CNH-GPS")
+                .status(DriverStatus.APPROVED).build();
+        driverUser.setDriver(driver);
+        entityManager.persist(driver);
+        Trip trip = Trip.builder().driver(driver).serviceDate(LocalDate.of(2026, 9, 20))
+                .direction(Direction.IDA).status(TripStatus.IN_PROGRESS)
+                .createdAt(LocalDateTime.of(2026, 9, 20, 16, 0)).build();
+        tripRepository.saveAndFlush(trip);
+
+        locationRepository.saveAndFlush(TripLocation.builder().trip(trip).tripId(trip.getId())
+                .latitude(-10.91).longitude(-37.07).accuracy(8.0)
+                .recordedAt(LocalDateTime.of(2026, 9, 20, 16, 1))
+                .updatedAt(LocalDateTime.of(2026, 9, 20, 16, 1)).build());
+        entityManager.clear();
+
+        assertThat(locationRepository.findById(trip.getId()))
+                .get().extracting(TripLocation::getLatitude, TripLocation::getLongitude)
+                .containsExactly(-10.91, -37.07);
     }
 
     private User user(String name, String email, Role role) {
