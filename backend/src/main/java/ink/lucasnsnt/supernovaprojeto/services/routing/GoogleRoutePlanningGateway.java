@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Slf4j
@@ -181,7 +182,10 @@ public class GoogleRoutePlanningGateway implements RoutePlanningGateway {
     }
 
     private String instant(LocalDateTime value) {
-        return value.atZone(properties.getZoneId()).toInstant().toString();
+        // Route Optimization rejects protobuf timestamps when the nanos field is present.
+        return value.atZone(properties.getZoneId()).toInstant()
+                .truncatedTo(ChronoUnit.SECONDS)
+                .toString();
     }
 
     private LocalDateTime localDateTime(String value) {

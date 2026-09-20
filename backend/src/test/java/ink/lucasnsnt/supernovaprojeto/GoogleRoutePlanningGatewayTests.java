@@ -118,6 +118,35 @@ class GoogleRoutePlanningGatewayTests {
         server.verify();
     }
 
+    @Test
+    void shouldOmitNanosFromGoogleTimestamps() {
+        server.expect(requestTo(
+                        "https://routeoptimization.googleapis.com/v1/projects/test-project:optimizeTours"))
+                .andExpect(jsonPath("$.model.vehicles[0].startTimeWindows[0].startTime")
+                        .value("2026-09-15T08:45:12Z"))
+                .andExpect(jsonPath("$.model.vehicles[0].startTimeWindows[0].endTime")
+                        .value("2026-09-15T08:45:12Z"))
+                .andRespond(withSuccess("""
+                        {"routes": [{
+                          "vehicleStartTime": "2026-09-15T08:45:12Z",
+                          "visits": [
+                            {"shipmentIndex": 0, "isPickup": true,
+                             "startTime": "2026-09-15T09:00:00Z"},
+                            {"shipmentIndex": 0, "isPickup": false,
+                             "startTime": "2026-09-15T09:30:00Z"}
+                          ]
+                        }]}
+                        """, MediaType.APPLICATION_JSON));
+
+        RoutePlanningRequest request = request();
+        request = new RoutePlanningRequest(request.driverId(), request.serviceDate(), request.direction(),
+                request.vehicleCapacity(), request.start(), request.end(), request.passengers(),
+                LocalDateTime.of(2026, 9, 15, 5, 45, 12, 987_654_321));
+
+        assertThat(gateway.optimize(request).feasible()).isTrue();
+        server.verify();
+    }
+
     private RoutePlanningRequest request() {
         RoutePoint driver = point(-12.9714, -38.5014);
         RoutePassenger passenger = new RoutePassenger(
